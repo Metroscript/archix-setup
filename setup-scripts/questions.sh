@@ -55,7 +55,7 @@ if grep -E opendoas <<< $(pacman -Q opendoas);then
     echo "----------------------------------------------------------------"
     printf "Use a custom (More secure) doas.conf? This is what it'll look like ^^^^^^^ [y/n]: "
     read doch
-    until [ $doch ==y ] || [ $doch == n ];do
+    until [ $doch == y ] || [ $doch == n ];do
     echo "Sorry, please try again."
     doasconf
     printf "Use a custom (More secure) doas.conf? This is what it'll look like ^^^^^^^ [y/n]: "
