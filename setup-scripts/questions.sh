@@ -50,7 +50,9 @@ if grep -E opendoas <<< $(pacman -Q opendoas);then
     ###################################################
     ############### END OF PROBLEM AREA ###############
     ###################################################
+    echo "----------------------------------------------------------------"
     doasconf
+    echo "----------------------------------------------------------------"
     printf "Use a custom (More secure) doas.conf? This is what it'll look like ^^^^^^^ [y/n]: "
     read doch
     until [ $doch ==y ] || [ $doch == n ];do
