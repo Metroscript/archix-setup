@@ -1,0 +1,3 @@
+[Thumbnailer Entry]
+Exec=/usr/bin/convert %i[0] -thumbnail %sx%s png:%o
+MimeType=image/webp;

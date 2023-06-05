@@ -1,0 +1,24 @@
+#!/bin/bash
+w=wpctl
+a=@DEFAULT_AUDIO_
+o=${a}SINK@
+i=${a}SOURCE@
+v=set-volume
+u=set-mute
+ic=$($w get-volume $i)
+oc=$($w get-volume $o)
+if [ $m == y ];then
+    if grep -E [MUTED] <<< $ic;then
+        $w $u $i 0
+    elif [ $d == y ];then
+        $w $v $i 5%-;else
+        $w $v -l 1.0 $i 5%+
+    fi
+else
+    if grep -E [MUTED] <<< $oc;then
+        $w $u $o 0
+    elif [ $d == y ];then
+        $w $v $o 5%-;else
+        $w $v -l 1.0 $o 5%+
+    fi
+fi
