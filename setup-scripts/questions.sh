@@ -15,7 +15,7 @@ if grep -E "Artix Linux" <<< $(cat /etc/issue);then
         init=runit
     elif grep -E s6-base <<< $(pacman -Q s6-base);then
         init=s6
-    elif grpe -E dinit <<< $(pacman -Q dinit);then
+    elif grep -E dinit <<< $(pacman -Q dinit);then
         init=dinit
     fi;else
     artix=n
