@@ -1,0 +1,9 @@
+#!/bin/bash
+w=$(which doas)
+u=" pacman -Syu"
+if grep -E /usr/bin/doas <<< $w;then
+    clear
+    doas$u;else
+    clear
+    sudo$u
+fi
