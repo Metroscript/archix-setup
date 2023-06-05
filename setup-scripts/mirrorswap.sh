@@ -18,10 +18,8 @@ if [ $suas == y ];then
 fi
 sudo pacman -S --needed --noconfirm reflector rsync
 if [ $artix == y ];then
-    sudo reflector --save /etc/pacman.d/mirrorlist-arch --sort rate -c Australia -p https,rsync
-    sudo nvim /etc/pacman.d/mirrorlist-arch;else
+    sudo reflector --save /etc/pacman.d/mirrorlist-arch --sort rate -c Australia -p https,rsync;else
     sudo reflector --save /etc/pacman.d/mirrorlist --sort rate -c Australia -p https,rsync
-    sudo nvim /etc/pacman.d/mirrorlist
 fi
 
 sudo pacman -Sy
