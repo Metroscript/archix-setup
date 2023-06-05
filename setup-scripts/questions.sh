@@ -33,19 +33,18 @@ if grep -E opendoas <<< $(pacman -Q opendoas);then
     ######### MORE PERMS FOR INIT COMMANDS? ###########
     ###################################################
     doasconf() {
-        docfg='echo -e permit persist :wheel as root cmd pacman\npermit nopass :wheel as root cmd pacman args -Syu\npermit nopass :wheel as root cmd pacman args -Sc\npermit persist :wheel as root cmd downgrade\npermit persist :wheel as root cmd sensors-detect\npermit nopass :wheel as root cmd smartctl\npermit persist :wheel as root cmd reflector'
         if [ $artix == y ];then
             if [ $init == dinit ];then
-                ${docfg}\npermit persist :wheel as root cmd dinit\npermit persist :wheel as root cmd dinitcheck\npermit persist :wheel as root cmd dinitctl
+                $echo -e "permit persist :wheel as root cmd pacman\npermit nopass :wheel as root cmd pacman args -Syu\npermit nopass :wheel as root cmd pacman args -Sc\npermit persist :wheel as root cmd downgrade\npermit persist :wheel as root cmd sensors-detect\npermit nopass :wheel as root cmd smartctl\npermit persist :wheel as root cmd reflector\npermit persist :wheel as root cmd dinit\npermit persist :wheel as root cmd dinitcheck\npermit persist :wheel as root cmd dinitctl"
             elif [ $init == runit ];then
-                ${docfg}\npermit persist :wheel as root cmd sv
+                echo -e "permit persist :wheel as root cmd pacman\npermit nopass :wheel as root cmd pacman args -Syu\npermit nopass :wheel as root cmd pacman args -Sc\npermit persist :wheel as root cmd downgrade\npermit persist :wheel as root cmd sensors-detect\npermit nopass :wheel as root cmd smartctl\npermit persist :wheel as root cmd reflector\npermit persist :wheel as root cmd sv"
             elif [ $init == openrc ];then
-                ${docfg}\npermit persist :wheel as root cmd openrc\npermit persist :wheel as root cmd rc-update\npermit persist :wheel as root cmd rc-update\npermit persist :wheel as root cmd rc-status
+                echo -e "permit persist :wheel as root cmd pacman\npermit nopass :wheel as root cmd pacman args -Syu\npermit nopass :wheel as root cmd pacman args -Sc\npermit persist :wheel as root cmd downgrade\npermit persist :wheel as root cmd sensors-detect\npermit nopass :wheel as root cmd smartctl\npermit persist :wheel as root cmd reflector\npermit persist :wheel as root cmd openrc\npermit persist :wheel as root cmd rc-update\npermit persist :wheel as root cmd rc-update\npermit persist :wheel as root cmd rc-status"
             elif [ $init == s6 ];then
-                ${docfg}\npermit persist :wheel as root cmd s6-db-reload\n permit persist :wheel as root cmd s6-rc
+                echo -e "permit persist :wheel as root cmd pacman\npermit nopass :wheel as root cmd pacman args -Syu\npermit nopass :wheel as root cmd pacman args -Sc\npermit persist :wheel as root cmd downgrade\npermit persist :wheel as root cmd sensors-detect\npermit nopass :wheel as root cmd smartctl\npermit persist :wheel as root cmd reflector\npermit persist :wheel as root cmd s6-db-reload\n permit persist :wheel as root cmd s6-rc"
             fi
         else
-            ${docfg}\npermit persist :wheel as root cmd systemctl
+            echo -e "permit persist :wheel as root cmd pacman\npermit nopass :wheel as root cmd pacman args -Syu\npermit nopass :wheel as root cmd pacman args -Sc\npermit persist :wheel as root cmd downgrade\npermit persist :wheel as root cmd sensors-detect\npermit nopass :wheel as root cmd smartctl\npermit persist :wheel as root cmd reflector\npermit persist :wheel as root cmd systemctl"
         fi
     }
     ###################################################
