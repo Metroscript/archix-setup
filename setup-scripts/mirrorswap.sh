@@ -8,8 +8,7 @@ if [ $artix == y ];then
     sudo mv ${repo}/dotfiles/root/artixpacman.conf /etc/pacman.conf
     sudo pacman -Sy --needed --noconfirm artix-archlinux-support
     sudo sed -i -e "/\[extra\]/,/Include/"'s/^#//' -i -e "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
-    sudo pacman-key --populate
-else
+    sudo pacman-key --populate;else
     sudo sed -i -e 's/#Color/Color/' -i -e '/Color/a ILoveCandy' -i -e 's/#Verbose/Verbose/' -i -e 's/#Parallel/Parallel/' -i -e "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
 fi
 sudo pacman -Sy
