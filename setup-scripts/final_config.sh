@@ -59,6 +59,7 @@ fi
 ######################################## END OF PROBLEM AREA #########################################
 ######################################################################################################
 mv ${repo}/dotfiles/config/* .config/
+mkdir .config/retroarch
 mv ${repo}/dotfiles/retroarch.cfg .config/retroarch
 mv ${repo}/dotfiles/bashrc .bashrc
 mv ${repo}/dotfiles/inputrc .inputrc
@@ -91,7 +92,7 @@ fi
 sudo pkgfile --update
 if [ $doch == y ];then
     doasconf > doas.conf
-    sudo chown -c root:root $doas.conf
+    sudo chown -c root:root doas.conf
     sudo chmod -c 0400 doas.conf
     sudo mv doas.conf /etc/
 fi
