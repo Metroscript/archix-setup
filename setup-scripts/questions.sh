@@ -35,7 +35,7 @@ if grep -E opendoas <<< $(pacman -Q opendoas);then
     doasconf() {
         if [ $artix == y ];then
             if [ $init == dinit ];then
-                $echo -e "permit persist :wheel as root cmd pacman\npermit nopass :wheel as root cmd pacman args -Syu\npermit nopass :wheel as root cmd pacman args -Sc\npermit persist :wheel as root cmd downgrade\npermit persist :wheel as root cmd sensors-detect\npermit nopass :wheel as root cmd smartctl\npermit persist :wheel as root cmd reflector\npermit persist :wheel as root cmd dinit\npermit persist :wheel as root cmd dinitcheck\npermit persist :wheel as root cmd dinitctl"
+                echo -e "permit persist :wheel as root cmd pacman\npermit nopass :wheel as root cmd pacman args -Syu\npermit nopass :wheel as root cmd pacman args -Sc\npermit persist :wheel as root cmd downgrade\npermit persist :wheel as root cmd sensors-detect\npermit nopass :wheel as root cmd smartctl\npermit persist :wheel as root cmd reflector\npermit persist :wheel as root cmd dinit\npermit persist :wheel as root cmd dinitcheck\npermit persist :wheel as root cmd dinitctl"
             elif [ $init == runit ];then
                 echo -e "permit persist :wheel as root cmd pacman\npermit nopass :wheel as root cmd pacman args -Syu\npermit nopass :wheel as root cmd pacman args -Sc\npermit persist :wheel as root cmd downgrade\npermit persist :wheel as root cmd sensors-detect\npermit nopass :wheel as root cmd smartctl\npermit persist :wheel as root cmd reflector\npermit persist :wheel as root cmd sv"
             elif [ $init == openrc ];then
