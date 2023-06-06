@@ -9,7 +9,7 @@ if [ $artix == y ];then
     #sudo pacman -Sy --needed --noconfirm artix-archlinux-support
     #sudo sed -i -e "/\[extra\]/,/Include/"'s/^#//' -i -e "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
     #sudo pacman-key --populate;else
-    sh ${repo}/setup-scripts/install-archlinux-support.sh
+    sudo sh ${repo}/setup-scripts/install-archlinux-support.sh
     sudo sed -i -e 's/#Color/Color/' -i -e '/Color/a ILoveCandy' -i -e 's/#Verbose/Verbose/' -i -e 's/#Parallel/Parallel/' -i -e "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
 fi
 sudo pacman -Sy
