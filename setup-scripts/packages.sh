@@ -73,15 +73,10 @@ if [ $artix == y ]; then
     sudo pacman -S sddm-$init cups-$init openntpd-$init firewalld-$init power-profiles-daemon-$init avahi-$init
 fi
 
-if [ $de == 1 ]; then
-    #Hyprland 
-    sudo pacman -Syu --needed --noconfirm wl-clipboard cliphist qt{5{ct,-wayland},6{ct,-wayland}} pavucontrol nemo{,-{fileroller,share}} catdoc odt2txt poppler libgsf gvfs-{mtp,afc,nfs,smb} ffmpegthumbnailer polkit-gnome imv calcurse gamescope brightnessctl udiskie gammastep swayidle hyprland xdg-desktop-portal-hyprland breeze-{icons,gtk}
-    paru -S --needed rofi-lbonn-wayland-git waybar-hyprland-git hyprpicker-git swww nwg-look swaync wlr-randr grimblast swaylock-effects-git psuinfo
-    sudo pacman -S --needed --noconfirm rofi-calc
-elif [ $de == 2 ]; then
-    #KDE Plasma
-    sudo pacman -Syu --needed --noconfirm packagekit-qt5 plasma-{wayland-session,nm,desktop,pa,firewall,disks,thunderbolt,vault,systemmonitor} k{gamma5,infocenter,screen{,locker},menuedit,wayland-integration,pipewire,de{graphics-thumbnailers,plasma-addons,-gtk-config}} powerdevil discover sddm-kcm dolphin ark spectacle xdg-desktop-portal-kde flatpak-kcm plymouth-kcm ffmpegthumbs gwenview qt5-imageformats
-fi
+#Hyprland 
+sudo pacman -Syu --needed --noconfirm wl-clipboard cliphist qt{5{ct,-wayland},6{ct,-wayland}} pavucontrol nemo{,-{fileroller,share}} catdoc odt2txt poppler libgsf gvfs-{mtp,afc,nfs,smb} ffmpegthumbnailer polkit-gnome imv calcurse gamescope brightnessctl udiskie gammastep swayidle hyprland xdg-desktop-portal-hyprland breeze-{icons,gtk}
+paru -S --needed rofi-lbonn-wayland-git waybar-hyprland-git hyprpicker-git swww nwg-look swaync wlr-randr grimblast swaylock-effects-git psuinfo
+sudo pacman -S --needed --noconfirm rofi-calc
 
 #Flatpak
 sudo pacman -Syu --needed --noconfirm flatpak

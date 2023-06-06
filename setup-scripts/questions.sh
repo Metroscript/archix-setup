@@ -71,52 +71,53 @@ until [ $bin == y ] || [ $bin == n ];do
   printf "Use precompiled binaries where availiable? [y/n]: "
   read bin
 done
+
 #############################################################################
 ################## HAVE SOMETHING OTHER THAN KDE OR HYPRLAND WORK ###########
 #############################################################################
-echo "Which DE would you like to install? 1.Hyprland, 2.KDE Plasma, 3.Cinnamon, 4.Gnome, 5.MATE, 6.Budgie, 6.LXQT, or 7.A WM?"
-printf "[1/2/3/4/5/6/7]: "
-read de
-until [ $de == 1 ] || [ $de == 2 ] || [ $de == 3 ] || [ $de == 4 ] || [ $de == 5 ] || [ $de == 6 ] || [ $de == 7 ] || [ $de == 8 ]; do
-    echo "Please try again. Which DE would you like to install? 1.Hyprland, 2.KDE Plasma, 3.Cinnamon, 4.Gnome, 5.MATE, 6.Budgie, 6.LXQT, or 7.A WM?"
-    printf "[1/2/3/4/5/6/7]: "
-    read de
-done
+#echo "Which DE would you like to install? 1.Hyprland, 2.KDE Plasma, 3.Cinnamon, 4.Gnome, 5.MATE, 6.Budgie, 6.LXQT, or 7.A WM?"
+#printf "[1/2/3/4/5/6/7]: "
+#read de
+#until [ $de == 1 ] || [ $de == 2 ] || [ $de == 3 ] || [ $de == 4 ] || [ $de == 5 ] || [ $de == 6 ] || [ $de == 7 ] || [ $de == 8 ]; do
+#    echo "Please try again. Which DE would you like to install? 1.Hyprland, 2.KDE Plasma, 3.Cinnamon, 4.Gnome, 5.MATE, 6.Budgie, 6.LXQT, or 7.A WM?"
+#    printf "[1/2/3/4/5/6/7]: "
+#    read de
+#done
 ############################################################################
 ####################### END OF PROBLEM AREA ################################
 ############################################################################
 ############################################################################
 ######################## ADD WM SUPPORT ####################################
 ############################################################################
-if [ $de == 7 ];then
-    echo "Would you like a 1.Wayland or 2.X11 based WM?"
-    printf "[1/2]: "
-    read wmtype
-    until [ $wmtype == 1 ] || [ $wmtype == 2 ];do
-        echo "Sorry, please try again. Would you like a 1.Wayland or 2.X11 based WM?"
-        printf "[1/2]: "
-        read wmtype
-    done
-    if [ $wmtype == 1 ];then
-        echo "Would you like 1.Hyprland, 2.Sway, 3.River, 4.Wayfire, 5.DWL?"
-        printf "[1/2/3/4/5]: "
-        read wm
-        until [ $wm == 1 ] || [ $wm == 2 ] || [ $wm == 3 ] || [ $wm == 4 ] || [ $wm == 5 ];do
-            echo "Sorry, please try again. Would you like 1.Hyprland, 2.Sway, 3.River, 4.Wayfire, 5.DWL?"
-            printf "[1/2/3/4/5]: "
-            read wm
-        done
-    elif [ $wmtype == 2 ];then
-        echo "Would you like 1.AwesomeWM, 2.DWM, 3.i3, or 4.BSPWM?"
-        printf "[1/2/3/4]: "
-        read xwm
-        until [ $xwm == 1 ] || [ $xwm == 2 ] || [ $xwm == 3 ] || [ $xwm == 4 ];do
-            echo "Sorry, please try again. Would you like 1.AwesomeWM, 2.DWM, 3.i3, or 4.BSPWM?"
-            printf "[1/2/3/4]: "
-            read xwm
-        done
-    fi
-fi
+#if [ $de == 7 ];then
+#    echo "Would you like a 1.Wayland or 2.X11 based WM?"
+#    printf "[1/2]: "
+#    read wmtype
+#    until [ $wmtype == 1 ] || [ $wmtype == 2 ];do
+#        echo "Sorry, please try again. Would you like a 1.Wayland or 2.X11 based WM?"
+#        printf "[1/2]: "
+#        read wmtype
+#    done
+#    if [ $wmtype == 1 ];then
+#        echo "Would you like 1.Hyprland, 2.Sway, 3.River, 4.Wayfire, 5.DWL?"
+#        printf "[1/2/3/4/5]: "
+#        read wm
+#        until [ $wm == 1 ] || [ $wm == 2 ] || [ $wm == 3 ] || [ $wm == 4 ] || [ $wm == 5 ];do
+#            echo "Sorry, please try again. Would you like 1.Hyprland, 2.Sway, 3.River, 4.Wayfire, 5.DWL?"
+#            printf "[1/2/3/4/5]: "
+#            read wm
+#        done
+#    elif [ $wmtype == 2 ];then
+#        echo "Would you like 1.AwesomeWM, 2.DWM, 3.i3, or 4.BSPWM?"
+#        printf "[1/2/3/4]: "
+#        read xwm
+#        until [ $xwm == 1 ] || [ $xwm == 2 ] || [ $xwm == 3 ] || [ $xwm == 4 ];do
+#            echo "Sorry, please try again. Would you like 1.AwesomeWM, 2.DWM, 3.i3, or 4.BSPWM?"
+#           printf "[1/2/3/4]: "
+#           read xwm
+#        done
+#    fi
+#fi
     ############################################################################
     ###################### END OF PROBLEM AREA ##################################
     #############################################################################
