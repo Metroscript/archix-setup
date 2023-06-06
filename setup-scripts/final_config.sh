@@ -98,7 +98,6 @@ if [ $doch == y ];then
 fi
 rm -rf grapejuice-git/ ${repo}/ paru/
 if [ $artix == y ]; then
-    sed -i 's/#exec-once/exec-once/' ~/.config/hypr/hyprland.conf
     loginctl reboot
 else
     reboot

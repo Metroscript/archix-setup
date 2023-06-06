@@ -8,6 +8,7 @@ fi
 
 if grep -E "Artix Linux" <<< $(cat /etc/issue);then
     artix=y
+    sed -i -e 's/#exec-once/exec-once/' -i -e '/--systemd/d' -i -e '/systemctl/d' ${repo}/dotfiles/config/hypr/hyprland.conf
     sed -i -e 's/action" : "reboot/action" : "loginctl reboot/' -i -e 's/poweroff/loginctl poweroff/' -i -e 's/action" : "suspend/action" : "loginctl suspend/' ${repo}/dotfiles/config/wlogout/layout
     if grep -E openrc <<< $(pacman -Q openrc);then
         init=openrc
