@@ -3,9 +3,9 @@
 # version: 1.1.6
 # shellcheck disable=SC2064
 
-# Original script by https://github.com/Lancia-Greggori
+# Original script: https://github.com/Lancia-Greggori/install-archlinux-support
 
-# Modified by https://github.com/Metroscript to remove support for the now defunct [community] repo
+# Modified to remove support for the now defunct [community] repo
 
 PROGRAM_NAME="$(basename "$0")"
 NO_MULTILIB='false'
