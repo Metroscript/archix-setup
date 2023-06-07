@@ -1,12 +1,12 @@
 #CPU Ucode
-if grep -E "AuthenticAMD" <<< $(lscpu) && ! grep -E amd-ucode <<< $(pacman -Q amd-ucode);then
+if grep -E "AuthenticAMD" <<< $(lscpu) && grep -E error <<< $(pacman -Q amd-ucode);then
    sudo pacman -S --needed --noconfirm amd-ucode
    if [ $artix == y ] || [ $grub == y ];then
    	sudo grub-mkconfig -o /boot/grub/grub.cfg
    else
    	sudo sed -i '/vmlinuz/a initrd /amd-ucode.img' /boot/loader/entries/arch.conf
    fi
-elif ! grep -E intel-ucode <<< $(pacman -Q intel-ucode);then
+elif ! grep -E error <<< $(pacman -Q intel-ucode);then
         sudo pacman -S --needed --noconfirm intel-ucode
         if [ $artix == y ] || [ $grub == y ];then
             sudo grub-mkconfig -o /boot/grub/grub.cfg
@@ -16,11 +16,11 @@ elif ! grep -E intel-ucode <<< $(pacman -Q intel-ucode);then
 fi
 	#Graphics drivers
 gpu=$(lspci)
-if grep -E "NVIDIA|GeForce" <<< $gpu;then
+if lspci | grep 'VGA' | grep -E "Radeon|AMD";then
+   sudo pacman -S --noconfirm --needed xf86-video-amdgpu vulkan-{radeon,icd-loader} lib{va-mesa-driver,32-{libva-mesa-driver,mesa,vulkan-{radeon,icd-loader}}}
+elif grep -E "NVIDIA|GeForce" <<< $gpu;then
    sudo pacman -S --noconfirm --needed nvidia{,-utils} lib32-{nvidia-utils,vulkan-icd-loader} vulkan-icd-loader
    nvidia-xconfig
-elif lspci | grep 'VGA' | grep -E "Radeon|AMD";then
-   sudo pacman -S --noconfirm --needed xf86-video-amdgpu vulkan-{radeon,icd-loader} lib{va-mesa-driver,32-{libva-mesa-driver,mesa,vulkan-{radeon,icd-loader}}}
 elif grep -E "Integrated Graphics Controller" <<< $gpu || grep -E "Intel Corporation UHD" <<< $gpu;then
      sudo pacman -S --noconfirm --needed xf86-video-intel vulkan-{intel,icd-loader} lib{va-{intel-driver,utils},vdpau-va-gl,32-{vulkan-{intel,icd-loader},mesa,libva-intel-driver}}
 fi
@@ -75,9 +75,14 @@ if [ $artix == y ]; then
 fi
 
 #Hyprland 
+#if [ $de == 1 ];then
 sudo pacman -Syu --needed --noconfirm wl-clipboard cliphist qt{5{ct,-wayland},6{ct,-wayland}} pavucontrol nemo{,-{fileroller,share}} catdoc odt2txt poppler libgsf gvfs-{mtp,afc,nfs,smb} ffmpegthumbnailer polkit-gnome imv calcurse gamescope brightnessctl udiskie gammastep swayidle hyprland xdg-desktop-portal-hyprland breeze-{icons,gtk}
 paru -S --needed rofi-lbonn-wayland-git waybar-hyprland-git hyprpicker-git swww nwg-look swaync wlr-randr grimblast swaylock-effects-git psuinfo
 sudo pacman -S --needed --noconfirm rofi-calc
+#elif [ $de == 2 ];then
+#    sudo pacman -Syu --needed plasma{,-wayland-session} kde-applications
+#elif [ $de == 3 ];then
+#    sudo pacman -Syu --needed 
 
 #Flatpak
 sudo pacman -Syu --needed --noconfirm flatpak
