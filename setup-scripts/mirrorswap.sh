@@ -47,8 +47,8 @@ if [ $artix == y ];then
     ###################################
     ######## END OF PROBLEM AREA ######
     ###################################
-    sudo reflector --save /etc/pacman.d/mirrorlist-arch --sort rate -c $country -p https,rsync;else
-    sudo reflector --save /etc/pacman.d/mirrorlist --sort rate -c $country -p https,rsync
+    sudo reflector --save /etc/pacman.d/mirrorlist-arch --sort rate -c ${country} -p https,rsync;else
+    sudo reflector --save /etc/pacman.d/mirrorlist --sort rate -c ${country} -p https,rsync
 fi
 
 sudo pacman -Sy
