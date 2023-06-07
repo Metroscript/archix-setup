@@ -1,18 +1,18 @@
 #CPU Ucode
-if grep -E "AuthenticAMD" <<< $(lscpu);then
+if grep -E "AuthenticAMD" <<< $(lscpu) && ! grep -E amd-ucode <<< $(pacman -Q amd-ucode);then
    sudo pacman -S --needed --noconfirm amd-ucode
    if [ $artix == y ] || [ $grub == y ];then
    	sudo grub-mkconfig -o /boot/grub/grub.cfg
    else
    	sudo sed -i '/vmlinuz/a initrd /amd-ucode.img' /boot/loader/entries/arch.conf
    fi
-else
-    sudo pacman -S --needed --noconfirm intel-ucode
-    if [ $artix == y ] || [ $grub == y ];then
-        sudo grub-mkconfig -o /boot/grub/grub.cfg
-    else
-    	sudo sed -i '/vmlinuz/a initrd /intel-ucode.img' /boot/loader/entries/arch.conf
-    fi
+elif ! grep -E intel-ucode <<< $(pacman -Q intel-ucode);then
+        sudo pacman -S --needed --noconfirm intel-ucode
+        if [ $artix == y ] || [ $grub == y ];then
+            sudo grub-mkconfig -o /boot/grub/grub.cfg
+        else
+    	    sudo sed -i '/vmlinuz/a initrd /intel-ucode.img' /boot/loader/entries/arch.conf
+        fi
 fi
 	#Graphics drivers
 gpu=$(lspci)
