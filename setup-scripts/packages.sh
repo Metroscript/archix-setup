@@ -49,10 +49,11 @@ bat PKGBUILD
 makepkg -si --noconfirm
 cd
 mkdir .config/paru
-cp /etc/paru.conf .config/paru
+cp /etc/paru.conf .config/paru/
 sed -i -e 's/#Clean/Clean/' -i -e 's/#News/News/' .config/paru/paru.conf
 if [ $suas == y ];then
-    sed -i -e 's/#[bin]/[bin]/' -i -e 's\#Sudo = doas\Sudo = /bin/doas\' .config/paru/paru.conf
+    #alias paru='paru --sudo /bin/doas'
+    sed -i -e 's/#[bin]/[bin]/' -i -e 's\Sudo = doas\Sudo = /bin/doas\' .config/paru/paru.conf
 fi
 if [ $bin == y ]; then
     if [ $artix == y ]; then
