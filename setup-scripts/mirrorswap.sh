@@ -5,13 +5,12 @@ fi
 
 #Repo config + doas base-devel packages
 if [ $artix == y ];then
-    #sudo mv ${repo}/dotfiles/root/artixpacman.conf /etc/pacman.conf
-    #sudo pacman -Sy --needed --noconfirm artix-archlinux-support
-    #sudo sed -i -e "/\[extra\]/,/Include/"'s/^#//' -i -e "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
-    #sudo pacman-key --populate;else
-    sudo sh ${repo}/setup-scripts/install-archlinux-support.sh;else
-    sudo sed -i -e 's/#Color/Color/' -i -e '/Color/a ILoveCandy' -i -e 's/#Verbose/Verbose/' -i -e 's/#Parallel/Parallel/' -i -e "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
+    sudo sed -i -z -e 's;\[galaxy\]\nInclude;\[galaxy\]\nInclude\n\n\[universe\]\nServer = https://universe.artixlinux.org/$arch\nServer = https://mirror1.artixlinux.org/universe/$arch\nServer = https://mirror.pascalpuffke.de/artix-universe/$arch\nServer = https://artixlinux.qontinuum.space/artixlinux/universe/os/$arch\nServer = https://mirror1.cl.netactuate.com/artix/universe/$arch\nServer = https://ftp.crifo.org/artix-universe/$arch\nServer = https://artix.sakamoto.pl/universe/$arch;' -i -z -e 's;\[lib32\]\n#Include;\[lib32\]\n#Include\n\n#Arch Repos\n\n#\[extra\]\n#Include = /etc/pacman.d/mirrorlist-arch\n\n#\[multilib-testing\]\n#Include = /etc/pacman.d/mirrorlist-arch\n\n#\[multilib\]\n#Include = /etc/pacman.d/mirrorlist-arch;' /etc/pacman.conf
+    sudo pacman -Sy --needed --noconfirm artix-archlinux-support
+    sudo sed -i -e "/\[lib32\]/,/Include/"'s/^#//' -i -e "/\[extra\]/,/Include/"'s/^#//' /etc/pacman.conf
+    sudo pacman-key --populate;else
 fi
+    sudo sed -i -e 's/#Color/Color/' -i -e '/Color/a ILoveCandy' -i -e 's/#Verbose/Verbose/' -i -e 's/#Parallel/Parallel/' -i -e "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
 sudo pacman -Sy
 if [ $suas == y ];then
     sudo pacman -S --needed --noconfirm autoconf automake binutils bison debugedit fakeroot flex gcc groff libtool m4 make patch pkgconf texinfo which
