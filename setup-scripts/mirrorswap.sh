@@ -18,8 +18,9 @@ fi
 sudo pacman -S --needed --noconfirm reflector rsync pacman-contrib
 if [ $artix == y ];then
     sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.pacnew
+    sudo rm /etc/pacman.d/mirrorlist
     sudo rankmirrors /etc/pacman.d/mirrorlist.pacnew > /etc/pacman.d/mirrorlist
-    countr=$(cat /etc/timezone)
+    countr=$(curl https://ipapi.co/timezone)
     #####################################
     ### ADD SUPPORT FOR MORE COUNTRIES ##
     #####################################
