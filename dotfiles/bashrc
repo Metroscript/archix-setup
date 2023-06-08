@@ -38,6 +38,7 @@ shopt -s lithist
 shopt -sq autocd
 shopt -sq checkwinsize
 complete -cf sudo
+clear
 
 #Pacman
 alias p='sudo pacman -S'
