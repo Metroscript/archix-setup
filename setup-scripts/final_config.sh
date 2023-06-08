@@ -1,7 +1,6 @@
 #Plymouth check & conf
 if grep -E plymouth <<< $(pacman -Q plymouth);then
     sudo sed -i 's/udev/udev plymouth/g' /etc/mkinitcpio.conf
-    sudo mkinitcpio -P
     sudo sed -i 's/splash/splash plymouth.nolog/' $bootdir
     if [ $artix == y ] || [ $grub == y ];then
         sudo grub-mkconfig -o /boot/grub/grub.cfg
@@ -40,9 +39,13 @@ fi
 #Final Configuration
 gsettings set org.cinnamon.desktop.privacy remember-recent-files false
 gsettings set org.cinnamon.desktop.default-applications.terminal exec alacritty
-sudo echo -e "[Theme]\nCurrent=archlinux-simplyblack" > /etc/sddm.conf
+echo -e "[Theme]\nCurrent=archlinux-simplyblack" > sddm.conf
+sudo chown root:root sddm.conf
+sudo mv sddm.conf /etc/
 sudo mkdir /etc/sysctl.d/
-sudo echo "vm.max_map_count=2147483642" > /etc/sysctl.d/90-override.conf
+echo "vm.max_map_count=2147483642" > 90-override.conf
+sudo chown root:root 90-override.conf
+sudo mv 90-override.conf /etc/sysctl.d/
 sudo sed -i 's/#IgnorePkg   =/IgnorePkg   =linux-lts linux-lts-headers linux linux-headers linux-firmware/' /etc/pacman.conf
 ######################################################################################################
 ############################### NEEDS WORKING ON!!! (bashrc editing) #################################
@@ -93,9 +96,9 @@ fi
 sudo pkgfile --update
 if [ $doch == y ];then
     doasconf > doas.conf
+    sudo chown root:root doas.conf
+    sudo chmod 0400 doas.conf
     sudo mv doas.conf /etc/
-    sudo chown root:root /etc/doas.conf
-    sudo chmod 0400 /etc/doas.conf
 fi
 rm -rf grapejuice-git/ ${repo}/ paru/
 if [ $artix == y ]; then
