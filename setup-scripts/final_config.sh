@@ -89,6 +89,7 @@ elif [ $init == dinit ]; then
     sudo dinitctl enable ntpd
     sudo dinitctl enable cupsd
     sudo dinitctl enable $dm
+    sudo dinitctl enable libvirtd
 elif [ $init == runit ]; then
     sudo ln -s /etc/runit/sv/ntpd /run/runit/service
     sudo ln -s /etc/runit/sv/cupsd /run/runit/service
@@ -97,6 +98,7 @@ elif [ $init == openrc ]; then
     sudo rc-update add ntpd boot
     sudo rc-update add cupsd boot
     sudo rc-update add $dm boot
+    sudo rc-update add libvirtd default
 elif [ $init == s6 ];then
     sudo touch /etc/s6/adminsv/default/contents.d/ntpd
     sudo touch /etc/s6/adminsv/default/contents.d/$dm

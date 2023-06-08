@@ -92,6 +92,13 @@ if [ $gayms == y ];then
         printf "Install Grapejuice? (A WINE wrapper for Roblox) [y/n]: "
         read rlx
     done
+    printf "Install Prismlauncher? (A custom Minecraft launcher with mod support) [y/n]: "
+    read min
+    until [ $min == y ] || [ $min == n ];do
+        echo "Sorry, please try again."
+        printf "Install Prismlauncher? (A custom Minecraft launcher with mod support) [y/n]: "
+        read min
+    done
 fi
 
 #############################################################################

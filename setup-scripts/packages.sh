@@ -64,28 +64,28 @@ if [ $suas == y ];then
     sed -i -e 's/#\[bin\]/\[bin\]/' -i -e 's\#Sudo = doas\Sudo = /bin/doas\' .config/paru/paru.conf
 fi
 if [ $bin == y ]; then
-    if [ $artix == y ]; then
-        if [ $de == 1 ];then
-            paru -S sddm-git archlinux-themes-sddm;else
-            paru -S downgrade prismlauncher-bin
-        fi
-        sudo pacman -S --needed --noconfirm librewolf timeshift
-    else
-        if [ $de == 1 ];then
-            paru -S sddm-git archlinux-themes-sddm;else
-            paru -S librewolf-bin timeshift-bin downgrade prismlauncher-bin
-        fi
-    fi
-elif [ $artix == y ];then
     if [ $de == 1 ];then
-        paru -S sddm-git archlinux-themes-sddm;else
-        paru -S downgrade prismlauncher
+        paru -S sddm-git archlinux-themes-sddm
     fi
-    sudo pacman -S --needed --noconfirm librewolf timeshift
+    if [ $min == y ];then
+        paru -S prismlauncher-bin
+    fi
+    if [ $artix == y ];then
+        paru -S downgrade
+        sudo pacman -S --needed --noconfirm librewolf timeshift;else
+        paru -S downgrade librewolf-bin timeshift-bin
+    fi
 else
     if [ $de == 1 ];then
-        paru -S sddm-git archlinux-themes-sddm;else
-        paru -S librewolf timeshift downgrade prismlauncher
+        paru -S sddm-git archlinux-themes-sddm
+    fi
+    if [ $min == y ];then
+        paru -S prismlauncher
+    fi
+    if [ $artix == y ];then
+        paru -S downgrade
+        sudo pacman -S --needed --noconfirm librewolf timeshift;else
+        paru -S librewolf timeshift downgrade
     fi
 fi
 
