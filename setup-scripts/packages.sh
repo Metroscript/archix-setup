@@ -47,7 +47,7 @@ cd paru
 bat PKGBUILD
 makepkg -si --noconfirm
 cd
-mkdir .config/paru
+mkdir -p .config/paru/
 cp /etc/paru.conf .config/paru/
 sed -i -e 's/#Clean/Clean/' -i -e 's/#News/News/' .config/paru/paru.conf
 if [ $suas == y ];then
