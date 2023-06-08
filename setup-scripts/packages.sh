@@ -30,24 +30,28 @@ sudo pacman -Syu --needed --noconfirm vkd3d lib32-vkd3d
 sudo pacman -Syu --needed --noconfirm linux-{headers,lts{,-headers}} pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber man-db wayland xorg-xwayland smartmontools v4l2loopback-dkms pkgfile gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{jetbrains-mono-nerd,hack-nerd,ubuntu-nerd,noto-nerd} cups{,-pk-helper,-pdf} gutenprint foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley firewalld fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{rar,zip,arj,ace} xz zip zstd squashfs-tools fd bat lsd fortune-mod ponysay mesa jre{-openjdk,11-openjdk,8-openjdk} rust libreoffice-fresh{,-en-gb} hunspell{,-en_au} coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp mythes-en lib{paper,wpg,pulse,mythes,32-{gnutls,libpulse,alsa-{lib,plugins},pipewire{,-jack,-v4l2},mesa}} keepassxc gst-{libav,plugins-{base,good}} phonon-qt5-gstreamer imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq qemu virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat
 
     #Games, etc
-sudo pacman -Syu --needed --noconfirm wine{,-gecko,-mono} lutris steam plymouth breeze-plymouth retroarch{,-assets-{glui,ozone,xmb}} gamemode lib{32-gamemode,retro-{dolphin,pcsx2,citra,melonds,duckstation}}
+if [ $gayms == y ];then
+    sudo pacman -Syu --needed --noconfirm wine{,-gecko,-mono} lutris steam plymouth breeze-plymouth retroarch{,-assets-{glui,ozone,xmb}} gamemode lib{32-gamemode,retro-{dolphin,pcsx2,citra,melonds,duckstation}}
+fi
 
 	#AUR
 if [ $suas == y ];then
     sudo sed -i 's\#PACMAN_AUTH=()\PACMAN_AUTH=(/bin/doas)\' /etc/makepkg.conf
 fi
-git clone --depth=1 https://aur.archlinux.org/grapejuice-git.git
-cd grapejuice-git
-bat PKGBUILD
-makepkg -si --noconfirm
-cd
+if [ $gayms == y ] && [ $rlx == y ];then
+    git clone --depth=1 https://aur.archlinux.org/grapejuice-git.git
+    cd grapejuice-git
+#    bat PKGBUILD
+    makepkg -si --noconfirm
+    cd
+fi
 if [ $bin == y ];then
     git clone https://aur.archlinux.org/paru-bin.git
     cd paru-bin;else
     git clone https://aur.archlinux.org/paru.git
     cd paru
 fi
-bat PKGBUILD
+#bat PKGBUILD
 makepkg -si --noconfirm
 cd
 if ! grep -E ".config" <<< $(ls -a);then

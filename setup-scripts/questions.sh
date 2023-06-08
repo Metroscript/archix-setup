@@ -77,16 +77,33 @@ until [ $bin == y ] || [ $bin == n ];do
   read bin
 done
 
+printf "Install Emulation & Steam/WINE support? [y/n]: "
+read gayms
+until [ $gayms == y ] || [ $gayms == n];do
+    echo "Sorry, please try again"
+    printf "Install Emulation & Steam/WINE support? [y/n]: "
+    read gayms
+done
+if [ $gayms == y ];then
+    printf "Install Grapejuice? (A WINE wrapper for Roblox) [y/n]: "
+    read rlx
+    until [ $rlx == y ] || [ $rlx == n ];do
+        echo "Sorry, please try again"
+        printf "Install Grapejuice? (A WINE wrapper for Roblox) [y/n]: "
+        read rlx
+    done
+fi
+
 #############################################################################
 ################## HAVE SOMETHING OTHER THAN KDE OR HYPRLAND WORK ###########
 #############################################################################
-echo "Which DE/WM would you like to install? 1.Hyprland, 2.KDE Plasma, 3.Gnome"
+echo "Which DE/WM would you like to install? 1.Hyprland, 2.KDE Plasma or 3.Gnome (doesn't install properly)"
 # 4.Cinnamon 5.MATE" #or 6.A WM?"
 printf "[1/2/3]: "
 read de
 until [ $de == 1 ] || [ $de == 2 ] || [ $de == 3 ];do
     # [ $de == 4 ] || [ $de == 5 ];do #|| [ $de == 6 ];do
-    echo "Please try again. Which DE/WM would you like to install? 1.Hyprland, 2.KDE Plasma, 3.Gnome"
+    echo "Please try again. Which DE/WM would you like to install? 1.Hyprland, 2.KDE Plasma, 3.Gnome (doesn't install properly)"
     #4.Cinnamon, 5.MATE"#or 6.A WM?"
     printf "[1/2/3]: "
     read de
