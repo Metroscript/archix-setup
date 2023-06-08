@@ -107,7 +107,6 @@ sudo pkgfile --update
 if [ $doch == y ];then
     doasconf > doas.conf
     sudo chown root:root doas.conf
-    sudo chmod 0600 doas.conf
     sudo mv doas.conf /etc/
 fi
 rm -rf grapejuice-git/ ${repo}/ 

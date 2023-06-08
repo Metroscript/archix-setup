@@ -66,7 +66,7 @@ if grep -E opendoas <<< $(pacman -Q opendoas);then
 fi
 
 if [ $doch == y ];then
-    echo "You should run 'chmod 0400 /etc/doas.conf' as root after install is finished"
+    echo "You should make any changes & run 'chmod 0400 /etc/doas.conf' as root after install"
     sleep 5
 fi
 printf "Use precompiled AUR binaries where availiable? [y/n]: "
