@@ -79,7 +79,7 @@ done
 
 printf "Install Emulation & Steam/WINE support? [y/n]: "
 read gayms
-until [ $gayms == y ] || [ $gayms == n];do
+until [ $gayms == y ] || [ $gayms == n ];do
     echo "Sorry, please try again"
     printf "Install Emulation & Steam/WINE support? [y/n]: "
     read gayms
