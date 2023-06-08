@@ -87,12 +87,7 @@ fi
 
 #Artix Exclusive packages
 if [ $artix == y ]; then
-    sudo pacman -S --needed --noconfirm cups-$init openntpd-$init firewalld-$init power-profiles-daemon-$init avahi-$init
-    if [ $de == 1 ] || [ $de == 2 ];then
-        sudo pacman -S --needed --noconfirm sddm-$init
-    elif [ $de == 3 ];then
-        sudo pacman -S --needed --noconfirm gdm-$init
-    fi
+    sudo pacman -S --needed --noconfirm ${dm}-$init cups-$init openntpd-$init firewalld-$init power-profiles-daemon-$init avahi-$init
 fi
 
 #Hyprland 

@@ -39,14 +39,14 @@ fi
 #Final Configuration
 gsettings set org.cinnamon.desktop.privacy remember-recent-files false
 gsettings set org.cinnamon.desktop.default-applications.terminal exec alacritty
-if [ $de == 1 ] || [ $de == 2 ];then
+if [ $dm == sddm ];then
     if [ $de == 2 ];then
     echo -e "[Theme]\nCurrent=breeze" > sddm.conf;else
     echo -e "[Theme]\nCurrent=archlinux-simplyblack" > sddm.conf
     fi
+    sudo chown root:root sddm.conf
+    sudo mv sddm.conf /etc/
 fi
-sudo chown root:root sddm.conf
-sudo mv sddm.conf /etc/
 if ! grep -E "sysctl.d" <<< $(ls /etc/);then
     sudo mkdir /etc/sysctl.d/
 fi
@@ -80,23 +80,23 @@ if [ $artix == n ]; then
     #############################################
     ###### ADD FEATURE FOR TIMEZONE SELECT ######
     #############################################
-    sudo systemctl enable systemd-timesyncd cups sddm pkgfile-update.timer
+    sudo systemctl enable systemd-timesyncd cups $dm pkgfile-update.timer
     systemctl --user --now enable wireplumber.service pipewire.service pipewire-pulse.service
 elif [ $init == dinit ]; then
     sudo dinitctl enable ntpd
     sudo dinitctl enable cupsd
-    sudo dinitctl enable sddm
+    sudo dinitctl enable $dm
 elif [ $init == runit ]; then
     sudo ln -s /etc/runit/sv/ntpd /run/runit/service
     sudo ln -s /etc/runit/sv/cupsd /run/runit/service
-    sudo ln -s /etc/runit/sv/sddm /run/runit/service
+    sudo ln -s /etc/runit/sv/$dm /run/runit/service
 elif [ $init == openrc ]; then
     sudo rc-update add ntpd boot
     sudo rc-update add cupsd boot
-    sudo rc-update add sddm boot
+    sudo rc-update add $dm boot
 elif [ $init == s6 ];then
     sudo touch /etc/s6/adminsv/default/contents.d/ntpd
-    sudo touch /etc/s6/adminsv/default/contents.d/sddm
+    sudo touch /etc/s6/adminsv/default/contents.d/$dm
     sudo touch /etc/s6/adminsv/default/contents.d/cupsd
     sudo s6-db-reload
 fi
