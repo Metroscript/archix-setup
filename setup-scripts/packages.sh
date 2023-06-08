@@ -55,16 +55,32 @@ if [ $suas == y ];then
 fi
 if [ $bin == y ]; then
     if [ $artix == y ]; then
-    	paru -S downgrade prismlauncher-bin sddm-git archlinux-themes-sddm
-	    sudo pacman -S librewolf timeshift
+        if [ $de == 1 ];then
+            paru -S sddm-git archlinux-themes-sddm
+        else
+            paru -S downgrade prismlauncher-bin archlinux-themes-sddm
+        fi
+        sudo pacman -S librewolf timeshift
     else
-    	paru -S librewolf-bin timeshift-bin downgrade prismlauncher-bin sddm-git archlinux-sddm-themes
+        if [ $de == 1 ];then
+            paru -S sddm-git archlinux-themes-sddm
+        else
+            paru -S librewolf-bin timeshift-bin downgrade prismlauncher-bin archlinux-sddm-themes
+        fi
     fi
 elif [ $artix == y ];then
+    if [ $de == 1 ];then
+        paru -S sddm-git archlinux-themes-sddm
+    else
+        paru -S downgrade prismlauncher archlinux-themes-sddm
+    fi
     sudo pacman -S librewolf timeshift
-    paru -S downgrade prismlauncher sddm-git archlinux-themes-sddm
 else
-    paru -S librewolf timeshift downgrade prismlauncher sddm-git archlinux-themes-sddm
+    if [ $de == 1 ];then
+        paru -S sddm-git archlinux-themes-sddm
+    else
+        paru -S librewolf timeshift downgrade prismlauncher archlinux-themes-sddm
+    fi
 fi
 
 #Artix Exclusive packages
