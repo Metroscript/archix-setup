@@ -39,7 +39,12 @@ fi
 #Final Configuration
 gsettings set org.cinnamon.desktop.privacy remember-recent-files false
 gsettings set org.cinnamon.desktop.default-applications.terminal exec alacritty
-echo -e "[Theme]\nCurrent=archlinux-simplyblack" > sddm.conf
+if [ $de == 1 ] || [ $de == 2 ];then
+    if [ $de == 2 ];then
+    echo -e "[Theme]\nCurrent=breeze" > sddm.conf;else
+    echo -e "[Theme]\nCurrent=archlinux-simplyblack" > sddm.conf
+    fi
+fi
 sudo chown root:root sddm.conf
 sudo mv sddm.conf /etc/
 if ! grep -E "sysctl.d" <<< $(ls /etc/);then

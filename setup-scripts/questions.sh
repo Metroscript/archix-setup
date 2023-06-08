@@ -76,15 +76,15 @@ done
 #############################################################################
 ################## HAVE SOMETHING OTHER THAN KDE OR HYPRLAND WORK ###########
 #############################################################################
-echo "Which DE would you like to install? 1.Hyprland, 2.KDE Plasma"
-# 3.Cinnamon, 4.Gnome, 5.MATE" #or 6.A WM?"
-printf "[1/2]: "
+echo "Which DE/WM would you like to install? 1.Hyprland, 2.KDE Plasma, 3.Gnome"
+# 4.Cinnamon 5.MATE" #or 6.A WM?"
+printf "[1/2/3]: "
 read de
-until [ $de == 1 ] || [ $de == 2 ];do
-    # || [ $de == 3 ] || [ $de == 4 ] || [ $de == 5 ];do #|| [ $de == 6 ];do
-    echo "Please try again. Which DE would you like to install? 1.Hyprland, 2.KDE Plasma"
-    # 3.Cinnamon, 4.Gnome, 5.MATE"#or 6.A WM?"
-    printf "[1/2]: "
+until [ $de == 1 ] || [ $de == 2 ] || [ $de == 3 ];do
+    # [ $de == 4 ] || [ $de == 5 ];do #|| [ $de == 6 ];do
+    echo "Please try again. Which DE/WM would you like to install? 1.Hyprland, 2.KDE Plasma, 3.Gnome"
+    #4.Cinnamon, 5.MATE"#or 6.A WM?"
+    printf "[1/2/3]: "
     read de
 done
 ############################################################################

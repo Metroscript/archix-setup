@@ -1,12 +1,12 @@
 #CPU Ucode
-if grep -E "AuthenticAMD" <<< $(lscpu);then
+if grep -E "AuthenticAMD" <<< $(lscpu) && ! grep "amd-ucode" <<< $(pacman -Q);then
    sudo pacman -S --needed --noconfirm amd-ucode
    if [ $artix == y ] || [ $grub == y ];then
    	sudo grub-mkconfig -o /boot/grub/grub.cfg
    else
    	sudo sed -i '/vmlinuz/a initrd /amd-ucode.img' /boot/loader/entries/arch.conf
    fi
-elif grep -E "GenuineIntel" <<< $(lscpu);then
+elif grep -E "GenuineIntel" <<< $(lscpu) && ! grep -E "intel-ucode" <<< $(pacman -Q);then
     sudo pacman -S --needed --noconfirm intel-ucode
     if [ $artix == y ] || [ $grub == y ];then
             sudo grub-mkconfig -o /boot/grub/grub.cfg
@@ -62,36 +62,37 @@ fi
 if [ $bin == y ]; then
     if [ $artix == y ]; then
         if [ $de == 1 ];then
-            paru -S sddm-git archlinux-themes-sddm
-        else
-            paru -S downgrade prismlauncher-bin archlinux-themes-sddm
+            paru -S sddm-git archlinux-themes-sddm;else
+            paru -S downgrade prismlauncher-bin
         fi
-        sudo pacman -S librewolf timeshift
+        sudo pacman -S --needed --noconfirm librewolf timeshift
     else
         if [ $de == 1 ];then
-            paru -S sddm-git archlinux-themes-sddm
-        else
-            paru -S librewolf-bin timeshift-bin downgrade prismlauncher-bin archlinux-sddm-themes
+            paru -S sddm-git archlinux-themes-sddm;else
+            paru -S librewolf-bin timeshift-bin downgrade prismlauncher-bin
         fi
     fi
 elif [ $artix == y ];then
     if [ $de == 1 ];then
-        paru -S sddm-git archlinux-themes-sddm
-    else
-        paru -S downgrade prismlauncher archlinux-themes-sddm
+        paru -S sddm-git archlinux-themes-sddm;else
+        paru -S downgrade prismlauncher
     fi
     sudo pacman -S --needed --noconfirm librewolf timeshift
 else
     if [ $de == 1 ];then
-        paru -S sddm-git archlinux-themes-sddm
-    else
-        paru -S librewolf timeshift downgrade prismlauncher archlinux-themes-sddm
+        paru -S sddm-git archlinux-themes-sddm;else
+        paru -S librewolf timeshift downgrade prismlauncher
     fi
 fi
 
 #Artix Exclusive packages
 if [ $artix == y ]; then
-    sudo pacman -S sddm-$init cups-$init openntpd-$init firewalld-$init power-profiles-daemon-$init avahi-$init
+    sudo pacman -S --needed --noconfirm cups-$init openntpd-$init firewalld-$init power-profiles-daemon-$init avahi-$init
+    if [ $de == 1 ] || [ $de == 2 ];then
+        sudo pacman -S --needed --noconfirm sddm-$init
+    elif [ $de == 3 ];then
+        sudo pacman -S --needed --noconfirm gdm-$init
+    fi
 fi
 
 #Hyprland 
@@ -102,10 +103,9 @@ paru -S --needed rofi-lbonn-wayland-git waybar-hyprland-git hyprpicker-git swww 
 sudo pacman -Syu --needed --noconfirm rofi-calc
 elif [ $de == 2 ];then
     sudo pacman -Syu --needed --noconfirm plasma{,-wayland-session} kde-applications
+elif [ $de == 3 ];then
+    sudo pacman -Syu --needed gnome{,-extra} 
 fi
-#elif [ $de == 3 ];then
-#    sudo pacman -Syu --needed 
-
 #Flatpak
 sudo pacman -Syu --needed --noconfirm flatpak
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
