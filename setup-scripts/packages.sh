@@ -1,13 +1,12 @@
 #CPU Ucode
-if grep -E "AuthenticAMD" <<< $(lscpu) && grep -E "error" <<< $(pacman -Q amd-ucode);then
+if grep -E "AuthenticAMD" <<< $(lscpu);then
    sudo pacman -S --needed --noconfirm amd-ucode
    if [ $artix == y ] || [ $grub == y ];then
    	sudo grub-mkconfig -o /boot/grub/grub.cfg
    else
    	sudo sed -i '/vmlinuz/a initrd /amd-ucode.img' /boot/loader/entries/arch.conf
    fi
-elif grep -E "error" <<< $(pacman -Q intel-ucode);then
-
+elif grep -E "GenuineIntel" <<< $(lscpu);then
     sudo pacman -S --needed --noconfirm intel-ucode
     if [ $artix == y ] || [ $grub == y ];then
             sudo grub-mkconfig -o /boot/grub/grub.cfg
@@ -42,8 +41,12 @@ cd grapejuice-git
 bat PKGBUILD
 makepkg -si --noconfirm
 cd
-git clone https://aur.archlinux.org/paru.git
-cd paru
+if [ $bin == y ];then
+    git clone https://github.com/aur.archlinux.org/paru-bin.git
+    cd paru-bin;else
+    git clone https://aur.archlinux.org/paru.git
+    cd paru
+fi
 bat PKGBUILD
 makepkg -si --noconfirm
 cd
