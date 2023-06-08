@@ -50,7 +50,10 @@ fi
 bat PKGBUILD
 makepkg -si --noconfirm
 cd
-mkdir -p .config/paru/
+if ! grep -E ".config" <<< $(ls -a);then
+    mkdir -p .config/paru/;else
+    mkdir .config/paru/
+fi
 cp /etc/paru.conf .config/paru/
 sed -i -e 's/#Clean/Clean/' -i -e 's/#News/News/' .config/paru/paru.conf
 if [ $suas == y ];then

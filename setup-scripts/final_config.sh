@@ -42,7 +42,9 @@ gsettings set org.cinnamon.desktop.default-applications.terminal exec alacritty
 echo -e "[Theme]\nCurrent=archlinux-simplyblack" > sddm.conf
 sudo chown root:root sddm.conf
 sudo mv sddm.conf /etc/
-sudo mkdir /etc/sysctl.d/
+if ! grep -E "sysctl.d" <<< $(ls /etc/);then
+    sudo mkdir /etc/sysctl.d/
+fi
 echo "vm.max_map_count=2147483642" > 90-override.conf
 sudo chown root:root 90-override.conf
 sudo mv 90-override.conf /etc/sysctl.d/
@@ -100,7 +102,11 @@ if [ $doch == y ];then
     sudo chmod 0400 doas.conf
     sudo mv doas.conf /etc/
 fi
-rm -rf grapejuice-git/ ${repo}/ paru/
+rm -rf grapejuice-git/ ${repo}/ 
+if [ $bin == y ];then
+    rm -rf paru-bin/;else
+    rm -rf paru/
+fi
 if [ $artix == y ]; then
     loginctl reboot
 else
