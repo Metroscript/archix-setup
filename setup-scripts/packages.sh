@@ -99,7 +99,7 @@ sudo pacman -Syu --needed --noconfirm rofi-calc
 elif [ $de == 2 ];then
     sudo pacman -Syu --needed --noconfirm plasma{,-wayland-session} kde-applications
 elif [ $de == 3 ];then
-    sudo pacman -Syu --needed gnome{,-extra} 
+    sudo pacman -Syu --needed gnome{,-{terminal,extra}} nautilus
 fi
 #Flatpak
 sudo pacman -Syu --needed --noconfirm flatpak
