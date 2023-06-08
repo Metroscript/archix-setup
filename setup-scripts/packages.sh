@@ -17,12 +17,12 @@ fi
 	#Graphics drivers
 gpu=$(lspci)
 if lspci | grep 'VGA' | grep -E "Radeon|AMD";then
-   sudo pacman -S --noconfirm --needed xf86-video-amdgpu vulkan-{radeon,icd-loader} lib{va-mesa-driver,32-{libva-mesa-driver,mesa,vulkan-{radeon,icd-loader}}}
+   sudo pacman -S --noconfirm --needed xf86-video-amdgpu vulkan-{radeon,icd-loader} mesa lib{va-mesa-driver,32-{libva-mesa-driver,mesa,vulkan-{radeon,icd-loader}}}
 elif grep -E "NVIDIA|GeForce" <<< $gpu;then
    sudo pacman -S --noconfirm --needed nvidia{,-utils} lib32-{nvidia-utils,vulkan-icd-loader} vulkan-icd-loader
    nvidia-xconfig
 elif grep -E "Integrated Graphics Controller" <<< $gpu || grep -E "Intel Corporation UHD" <<< $gpu;then
-     sudo pacman -S --noconfirm --needed xf86-video-intel vulkan-{intel,icd-loader} lib{va-{intel-driver,utils},vdpau-va-gl,32-{vulkan-{intel,icd-loader},mesa,libva-intel-driver}}
+     sudo pacman -S --noconfirm --needed xf86-video-intel vulkan-{intel,icd-loader} mesa lib{va-{intel-driver,utils},vdpau-va-gl,32-{vulkan-{intel,icd-loader},mesa,libva-intel-driver}}
 fi
 sudo pacman -Syu --needed --noconfirm vkd3d lib32-vkd3d
 
@@ -42,7 +42,7 @@ bat PKGBUILD
 makepkg -si --noconfirm
 cd
 if [ $bin == y ];then
-    git clone https://github.com/aur.archlinux.org/paru-bin.git
+    git clone https://aur.archlinux.org/paru-bin.git
     cd paru-bin;else
     git clone https://aur.archlinux.org/paru.git
     cd paru
@@ -80,7 +80,7 @@ elif [ $artix == y ];then
     else
         paru -S downgrade prismlauncher archlinux-themes-sddm
     fi
-    sudo pacman -S librewolf timeshift
+    sudo pacman -S --needed --noconfirm librewolf timeshift
 else
     if [ $de == 1 ];then
         paru -S sddm-git archlinux-themes-sddm
