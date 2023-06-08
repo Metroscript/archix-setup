@@ -76,7 +76,7 @@ mv ${repo}/dotfiles/bashrc .bashrc
 mv ${repo}/dotfiles/inputrc .inputrc
 mv ${repo}/dotfiles/thumbnailers .local/share/
 mv ${repo}/dotfiles/set-as-background.nemo_action .local/share/nemo/actions
-sudo sed -i -e 's/#unix_sock_group = "libvirt"/unix_sock_group = "libvirt"/' -i -e 's/#unix_sock_ro_perms = "0777"/unix_sock_ro_perms = "0777"' -i -e 's/#unix_sock_rw_perms = "0770"/#unix_sock_rw_perms = "0770"/' /etc/libvirt/libvirtd.conf
+sudo sed -i -e 's/#unix_sock_group = "libvirt"/unix_sock_group = "libvirt"/' -i -e 's/#unix_sock_ro_perms = "0777"/unix_sock_ro_perms = "0777"/' -i -e 's/#unix_sock_rw_perms = "0770"/unix_sock_rw_perms = "0770"/' /etc/libvirt/libvirtd.conf
 vir=$(whoami)
 sudo usermod -aG libvirt $vir
 if [ $artix == n ]; then
