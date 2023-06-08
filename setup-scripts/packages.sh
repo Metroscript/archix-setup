@@ -51,8 +51,7 @@ mkdir -p .config/paru/
 cp /etc/paru.conf .config/paru/
 sed -i -e 's/#Clean/Clean/' -i -e 's/#News/News/' .config/paru/paru.conf
 if [ $suas == y ];then
-    #alias paru='paru --sudo /bin/doas'
-    sed -i -e 's/#[bin]/[bin]/' -i -e 's\Sudo = doas\Sudo = /bin/doas\' .config/paru/paru.conf
+    sed -i -e 's/#\[bin\]/\[bin\]/' -i -e 's\#Sudo = doas\Sudo = /bin/doas\' .config/paru/paru.conf
 fi
 if [ $bin == y ]; then
     if [ $artix == y ]; then
@@ -91,12 +90,12 @@ fi
 
 #Hyprland 
 if [ $de == 1 ];then
-sudo pacman -Syu --needed alacritty obs-studio btop simple-scan mpv gparted gnome-{font-viewer,boxes} kdenlive bigsh0t dvgrab mediainfo noise-suppression-for-voice open{cv,timelineio} recordmydesktop rhythmbox lollypop krita okular deluge-gtk
+sudo pacman -Syu --needed --noconfirm alacritty obs-studio btop simple-scan mpv gparted gnome-{font-viewer,boxes} kdenlive bigsh0t dvgrab mediainfo noise-suppression-for-voice open{cv,timelineio} recordmydesktop rhythmbox lollypop krita okular deluge-gtk
 sudo pacman -Syu --needed --noconfirm wl-clipboard cliphist qt{5{ct,-wayland},6{ct,-wayland}} pavucontrol nemo{,-{fileroller,share}} catdoc odt2txt poppler libgsf gvfs-{mtp,afc,nfs,smb} ffmpegthumbnailer polkit-gnome imv calcurse gamescope brightnessctl udiskie gammastep swayidle hyprland xdg-desktop-portal-hyprland breeze-{icons,gtk}
 paru -S --needed rofi-lbonn-wayland-git waybar-hyprland-git hyprpicker-git swww nwg-look swaync wlr-randr grimblast swaylock-effects-git psuinfo
 sudo pacman -Syu --needed --noconfirm rofi-calc
 elif [ $de == 2 ];then
-    sudo pacman -Syu --needed plasma{,-wayland-session} kde-applications
+    sudo pacman -Syu --needed --noconfirm plasma{,-wayland-session} kde-applications
 fi
 #elif [ $de == 3 ];then
 #    sudo pacman -Syu --needed 

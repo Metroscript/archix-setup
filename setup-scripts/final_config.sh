@@ -41,20 +41,21 @@ fi
 gsettings set org.cinnamon.desktop.privacy remember-recent-files false
 gsettings set org.cinnamon.desktop.default-applications.terminal exec alacritty
 sudo echo -e "[Theme]\nCurrent=archlinux-simplyblack" > /etc/sddm.conf
-sudo echo "vm.max_map_count=2147483642" > etc/sysctl.d/90-override.conf
-sudo sed -i 's/#IgnorePkg   =/IgnorePkg   =linux linux-headers linux-firmware/' /etc/pacman.conf
+sudo mkdir /etc/sysctl.d/
+sudo echo "vm.max_map_count=2147483642" > /etc/sysctl.d/90-override.conf
+sudo sed -i 's/#IgnorePkg   =/IgnorePkg   =linux-lts linux-lts-headers linux linux-headers linux-firmware/' /etc/pacman.conf
 ######################################################################################################
 ############################### NEEDS WORKING ON!!! (bashrc editing) #################################
 ######################################################################################################
-if grep -E linux-lts <<< $kernel;then
-    sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-lts linux-lts-headers ' /etc/pacman.conf
-fi
-if grep -E linux-zen <<< $kernel;then
-    sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-zen linux-zen-headers ' /etc/pacman.conf
-fi
-if grep -E linux-hardened <<< $kernel;then
-    sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-hardened linux-hardened-headers ' /etc/pacman.conf
-fi
+#if grep -E linux-lts <<< $kernel;then
+#    sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-lts linux-lts-headers ' /etc/pacman.conf
+#fi
+#if grep -E linux-zen <<< $kernel;then
+#    sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-zen linux-zen-headers ' /etc/pacman.conf
+#fi
+#if grep -E linux-hardened <<< $kernel;then
+#    sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-hardened linux-hardened-headers ' /etc/pacman.conf
+#fi
 ######################################################################################################
 ######################################## END OF PROBLEM AREA #########################################
 ######################################################################################################
@@ -92,9 +93,9 @@ fi
 sudo pkgfile --update
 if [ $doch == y ];then
     doasconf > doas.conf
-    sudo chown -c root:root doas.conf
-    sudo chmod -c 0400 doas.conf
     sudo mv doas.conf /etc/
+    sudo chown root:root /etc/doas.conf
+    sudo chmod 0400 /etc/doas.conf
 fi
 rm -rf grapejuice-git/ ${repo}/ paru/
 if [ $artix == y ]; then
