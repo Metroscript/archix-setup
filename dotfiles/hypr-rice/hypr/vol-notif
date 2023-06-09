@@ -1,0 +1,22 @@
+#!/bin/bash
+idir=~/.config/mako/icons/
+n="notify-send -h string:x-canonical-private-synchronous:sys-notify -i"
+v="$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | sed 's/0.00/0/' | sed 's/Volume: 0.//' | sed 's/Volume: 1.00/100/' | sed 's/Volume: 0/0/' | sed 's/05/5/')"
+icon_get() {
+    vl="$v"
+    if [ "$vl" -eq "0" ]; then
+        echo "${idir}volume-mute.png"
+    elif [ "$vl" -ge "0" ] && [ "$vl" -le "30" ]; then
+        echo "${idir}volume-low.png"
+    elif [ "$vl" -ge "30" ] && [ "$vl" -le "60" ]; then
+        echo "${idir}volume-mid.png"
+    elif [ "$vl" -ge "60" ] && [ "$vl" -le "100" ];then
+        echo "${idir}volume-high.png"
+    fi
+}
+if grep -E "[MUTED]" <<< $v;then
+    $n "${idir}volume-mute.png" "Mute"
+    mpv --config=no /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga;else
+    $n "$(icon_get)" "$v%"
+    mpv --config=no /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga
+fi

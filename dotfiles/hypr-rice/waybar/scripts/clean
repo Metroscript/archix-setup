@@ -1,0 +1,9 @@
+#!/bin/bash
+c=" pacman -Sc --noconfirm"
+s=$(which doas)
+if grep -E /usr/bin/doas <<< $s;then
+    clear
+    doas$c;else
+    clear
+    sudo$c
+fi
