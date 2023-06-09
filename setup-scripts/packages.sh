@@ -107,7 +107,7 @@ fi
 if [ $de == 1 ];then
 sudo pacman -Syu --needed --noconfirm alacritty obs-studio btop simple-scan mpv gparted gnome-font-viewer kdenlive bigsh0t dvgrab mediainfo noise-suppression-for-voice open{cv,timelineio} recordmydesktop rhythmbox lollypop krita okular deluge-gtk
 sudo pacman -Syu --needed --noconfirm wl-clipboard cliphist qt{5{ct,-wayland},6{ct,-wayland}} pavucontrol nemo{,-{fileroller,share}} catdoc odt2txt poppler libgsf gvfs-{mtp,afc,nfs,smb} ffmpegthumbnailer polkit-gnome imv calcurse gamescope brightnessctl udiskie gammastep swayidle hyprland xdg-desktop-portal-hyprland breeze-{icons,gtk}
-paru -S --needed rofi-lbonn-wayland-git waybar-hyprland-git hyprpicker-git swww nwg-look swaync wlr-randr grimblast swaylock-effects-git psuinfo
+paru -S --needed wlogout rofi-lbonn-wayland-git waybar-hyprland-git hyprpicker-git swww nwg-look swaync wlr-randr grimblast swaylock-effects-git psuinfo
 sudo pacman -Syu --needed --noconfirm rofi-calc
 elif [ $de == 2 ];then
     sudo pacman -Syu --needed --noconfirm plasma{,-wayland-session} kde-applications

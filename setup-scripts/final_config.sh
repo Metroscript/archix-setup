@@ -6,7 +6,8 @@ if grep -E plymouth <<< $(pacman -Q plymouth);then
         sudo grub-mkconfig -o /boot/grub/grub.cfg
     fi
     sudo sed -i -e 's/DialogVerticalAlignment=.382/DialogVerticalAlignment=.75/' -i -e 's/WatermarkVerticalAlignment=.96/WatermarkVerticalAlignment=.5/' /usr/share/plymouth/themes/spinner/spinner.plymouth
-    sudo plymouth-set-default-theme -R breeze-text
+    #sudo plymouth-set-default-theme -R breeze-text
+    sudo plymouth-set-default-theme -R spinner
 fi
 
 #SystemD Boot Kernel Fallbacks
@@ -37,8 +38,13 @@ if [ $artix == n ] || [ $grub == n ];then
 fi
 
 #Final Configuration
-gsettings set org.cinnamon.desktop.privacy remember-recent-files false
-gsettings set org.cinnamon.desktop.default-applications.terminal exec alacritty
+if [ $de == 1 ];then
+    mv ${repo}/dotfiles/hypr-rice/* .config/
+    mv ${repo}/dotfiles/thumbnailers .local/share/
+    mv ${repo}/dotfiles/set-as-background.nemo_action .local/share/nemo/actions
+    gsettings set org.cinnamon.desktop.privacy remember-recent-files false
+    gsettings set org.cinnamon.desktop.default-applications.terminal exec alacritty
+fi
 if [ $dm == sddm ];then
     if [ $de == 2 ];then
     echo -e "[Theme]\nCurrent=breeze" > sddm.conf;else
@@ -70,12 +76,12 @@ sudo sed -i 's/#IgnorePkg   =/IgnorePkg   =linux-lts linux-lts-headers linux lin
 ######################################## END OF PROBLEM AREA #########################################
 ######################################################################################################
 mv ${repo}/dotfiles/config/* .config/
-mkdir .config/retroarch
+if ! grep -E "retroarch" <<< $(ls .config);then
+    mkdir .config/retroarch
+fi
 mv ${repo}/dotfiles/retroarch.cfg .config/retroarch
 mv ${repo}/dotfiles/bashrc .bashrc
 mv ${repo}/dotfiles/inputrc .inputrc
-mv ${repo}/dotfiles/thumbnailers .local/share/
-mv ${repo}/dotfiles/set-as-background.nemo_action .local/share/nemo/actions
 sudo sed -i -e 's/#unix_sock_group = "libvirt"/unix_sock_group = "libvirt"/' -i -e 's/#unix_sock_ro_perms = "0777"/unix_sock_ro_perms = "0777"/' -i -e 's/#unix_sock_rw_perms = "0770"/unix_sock_rw_perms = "0770"/' /etc/libvirt/libvirtd.conf
 vir=$(whoami)
 sudo usermod -aG libvirt $vir
@@ -106,12 +112,12 @@ elif [ $init == s6 ];then
     sudo s6-db-reload
 fi
 sudo pkgfile --update
-if [ $doch == y ];then
-    doasconf > doas.conf
-    sudo chown root:root doas.conf
-    sudo mv doas.conf /etc/
-fi
-rm -rf grapejuice-git/ ${repo}/ 
+#if [ $doch == y ];then
+#    doasconf > doas.conf
+#    sudo chown root:root doas.conf
+#    sudo mv doas.conf /etc/
+#fi
+rm -rf ${repo}
 if [ $bin == y ];then
     rm -rf paru-bin/;else
     rm -rf paru/
