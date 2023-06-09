@@ -27,7 +27,7 @@ fi
 sudo pacman -Syu --needed --noconfirm vkd3d lib32-vkd3d
 
 #Basic packages
-sudo pacman -Syu --needed --noconfirm linux-{headers,lts{,-headers}} pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber man-db wayland xorg-xwayland smartmontools v4l2loopback-dkms pkgfile gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{jetbrains-mono-nerd,hack-nerd,ubuntu-nerd,noto-nerd} cups{,-pk-helper,-pdf} gutenprint foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley firewalld fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{rar,zip,arj,ace} xz zip zstd squashfs-tools fd bat lsd fortune-mod ponysay mesa jre{-openjdk,11-openjdk,8-openjdk} rust libreoffice-fresh{,-en-gb} hunspell{,-en_au} coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp mythes-en lib{paper,wpg,pulse,mythes,32-{gnutls,libpulse,alsa-{lib,plugins},pipewire{,-jack,-v4l2},mesa}} keepassxc gst-{libav,plugins-{base,good}} phonon-qt5-gstreamer imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq qemu virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat
+sudo pacman -Syu --needed --noconfirm linux-{headers,lts{,-headers}} pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber man-db wayland xorg-xwayland smartmontools v4l2loopback-dkms pkgfile gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{jetbrains-mono-nerd,hack-nerd,ubuntu-nerd,noto-nerd} cups{,-pk-helper,-pdf} gutenprint foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley firewalld fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{rar,zip,arj,ace} xz zip zstd squashfs-tools fd bat lsd fortune-mod ponysay mesa jre{-openjdk,11-openjdk,8-openjdk} rust libreoffice-fresh{,-en-gb} hunspell{,-en_au} coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp mythes-en lib{paper,wpg,pulse,mythes,32-{gnutls,libpulse,alsa-{lib,plugins},pipewire{,-jack,-v4l2},mesa}} keepassxc gst-{libav,plugins-{base,good}} phonon-qt5-gstreamer imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq qemu-full virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat
 
     #Games, etc
 if [ $gayms == y ];then
@@ -37,13 +37,6 @@ fi
 	#AUR
 if [ $suas == y ];then
     sudo sed -i 's\#PACMAN_AUTH=()\PACMAN_AUTH=(/bin/doas)\' /etc/makepkg.conf
-fi
-if [ $gayms == y ] && [ $rlx == y ];then
-    git clone --depth=1 https://aur.archlinux.org/grapejuice-git.git
-    cd grapejuice-git
-#    bat PKGBUILD
-    makepkg -si --noconfirm
-    cd
 fi
 if [ $bin == y ];then
     git clone https://aur.archlinux.org/paru-bin.git
@@ -59,16 +52,24 @@ if ! grep -E ".config" <<< $(ls -a);then
     mkdir .config/paru/
 fi
 cp /etc/paru.conf .config/paru/
-sed -i -e 's/#Clean/Clean/' -i -e 's/#News/News/' .config/paru/paru.conf
+sed -i -e 's/#Clean/Clean/' -i -e 's/#UpgradeMenu/UpgradeMenu/' -i -e 's/#News/News/' .config/paru/paru.conf
 if [ $suas == y ];then
     sed -i -e 's/#\[bin\]/\[bin\]/' -i -e 's\#Sudo = doas\Sudo = /bin/doas\' .config/paru/paru.conf
 fi
-if [ $bin == y ]; then
+if [ $bin == y ];then
     if [ $de == 1 ];then
         paru -S sddm-git archlinux-themes-sddm
     fi
-    if [ $min == y ];then
-        paru -S prismlauncher-bin
+    if [ $gayms == y ];then
+        if [ $rlx == y ];then
+            paru -S grapejuice-git
+        fi
+        if [ $min == y ];then
+            paru -S prismlauncher-bin
+        fi
+        if [ $waydroid == y ];then
+            paru -S waydroid
+        fi
     fi
     if [ $artix == y ];then
         paru -S downgrade
@@ -79,8 +80,16 @@ else
     if [ $de == 1 ];then
         paru -S sddm-git archlinux-themes-sddm
     fi
-    if [ $min == y ];then
-        paru -S prismlauncher
+    if [ $gayms == y ];then
+        if [ $rlx == y ];then
+            paru -S grapejuice-git
+        fi
+        if [ $min == y ];then
+            paru -S prismlauncher
+        fi
+        if [ $waydroid == y ];then
+            paru -S waydroid
+        fi
     fi
     if [ $artix == y ];then
         paru -S downgrade

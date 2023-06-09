@@ -99,6 +99,15 @@ if [ $gayms == y ];then
         printf "Install Prismlauncher? (A custom Minecraft launcher with mod support) [y/n]: "
         read min
     done
+    if [ $de == 1 ] || [ $de == 2 ] || [ $de == 3 ];then
+        printf "Install WayDroid? (An Android emulator that exclusively runs on Wayland) [y/n]: "
+        read waydroid
+        until [ $waydroid == y ] || [ $waydroid == n ];do
+            echo "Sorry, please try again."
+            printf "Install WayDroid? (An Android emulator that exclusively runs on Wayland) [y/n]: "
+            read waydroid
+    done
+    fi
 fi
 
 #############################################################################
