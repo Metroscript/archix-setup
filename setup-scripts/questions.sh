@@ -8,8 +8,8 @@ fi
 
 if grep -E "Artix" <<< $(cat /etc/issue);then
     artix=y
-    sed -i -e 's/#exec-once/exec-once/' -i -e '/--systemd/d' -i -e '/systemctl/d' ${repo}/dotfiles/hypr-rice/hypr/hyprland.conf
-    sed -i -e 's/action" : "reboot/action" : "loginctl reboot/' -i -e 's/poweroff/loginctl poweroff/' -i -e 's/action" : "suspend/action" : "loginctl suspend/' ${repo}/dotfiles/hypr-rice/wlogout/layout
+    sed -i -e 's/#exec-once/exec-once/' -i -e '/--systemd/d' -i -e '/systemctl/d' ${repo}dotfiles/hypr-rice/hypr/hyprland.conf
+    sed -i -e 's/action" : "reboot/action" : "loginctl reboot/' -i -e 's/poweroff/loginctl poweroff/' -i -e 's/action" : "suspend/action" : "loginctl suspend/' ${repo}dotfiles/hypr-rice/wlogout/layout
     if grep -E openrc <<< $(pacman -Q openrc);then
         init=openrc
     elif grep -E runit <<< $(pacman -Q runit);then
@@ -29,7 +29,9 @@ fi
 if grep -E opendoas <<< $(pacman -Q opendoas);then
     suas=y
     alias sudo='doas'
-    sed -i "/stuff/a alias sudo='doas'" ${repo}/dotfiles/bashrc
+    sed -i "/stuff/a alias sudo='doas'" ${repo}dotfiles/bashrc
+    echo -e "SudoLoop is enabled on paru, when tweaking doas.conf, put 'permit persist :wheel as root cmd true' so SudloLoop works\nYou should make any changes & run 'chmod 0400 /etc/doas.conf' as root after install"
+    sleep 5
     ###################################################
     ######### MORE PERMS FOR INIT COMMANDS? ###########
     ###################################################
@@ -65,10 +67,6 @@ if grep -E opendoas <<< $(pacman -Q opendoas);then
     suas=n
 fi
 
-#if [ $doch == y ];then
-#    echo "You should make any changes & run 'chmod 0400 /etc/doas.conf' as root after install"
-#    sleep 5
-#fi
 #############################################################################
 ################## HAVE SOMETHING OTHER THAN KDE OR HYPRLAND WORK ###########
 #############################################################################

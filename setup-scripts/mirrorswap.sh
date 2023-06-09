@@ -18,7 +18,7 @@ fi
 sudo pacman -S --needed --noconfirm reflector rsync pacman-contrib
 if [ $artix == y ];then
     sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.pacnew
-    sudo rankmirrors /etc/pacman.d/mirrorlist.pacnew > mirrorlist
+    rankmirrors /etc/pacman.d/mirrorlist.pacnew > mirrorlist
     sudo rm /etc/pacman.d/mirrorlist
     sudo mv mirrorlist /etc/pacman.d/
     countr=$(curl https://ipapi.co/timezone)
@@ -52,7 +52,6 @@ if [ $artix == y ];then
     sudo reflector --save /etc/pacman.d/mirrorlist-arch --sort rate -c ${country} -p https,rsync;else
     sudo reflector --save /etc/pacman.d/mirrorlist --sort rate -c ${country} -p https,rsync
 fi
-
 sudo pacman -Sy
 
 #Make Swapfile
