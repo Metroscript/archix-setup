@@ -1,9 +1,6 @@
 #!/bin/bash
-w=$(which doas)
-u=" pacman -Syu"
-if grep -E /usr/bin/doas <<< $w;then
+if grep -E opendoas <<< $(pacman -Q);then
     clear
-    doas$u;else
-    clear
-    sudo$u
+    alias sudo='doas'
 fi
+sudo pacman -Syu

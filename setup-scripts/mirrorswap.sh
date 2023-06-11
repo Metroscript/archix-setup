@@ -1,8 +1,3 @@
-if [ $artix == y ] || [ $grub == y ];then
-    bootdir=/etc/default/grub;else
-    bootdir=/boot/loader/entries/arch.conf
-fi
-
 #Repo config + doas base-devel packages
 if [ $artix == y ];then
     sudo sed -i -z -e 's,\[galaxy\]\nInclude = /etc/pacman.d/mirrorlist,\[galaxy\]\nInclude = /etc/pacman.d/mirrorlist\n\n\[universe\]\nServer = https://universe.artixlinux.org/$arch\nServer = https://mirror1.artixlinux.org/universe/$arch\nServer = https://mirror.pascalpuffke.de/artix-universe/$arch\nServer = https://mirrors.qontinuum.space/artixlinux-universe/$arch\nServer = https://mirror1.cl.netactuate.com/artix/universe/$arch\nServer = https://ftp.crifo.org/artix-universe/$arch\nServer = https://artix.sakamoto.pl/universe/$arch,' -i -z -e 's,\[lib32\]\n#Include = /etc/pacman.d/mirrorlist,\[lib32\]\n#Include = /etc/pacman.d/mirrorlist\n\n#Arch Repos\n\n#\[extra-testing\]\n#Include = /etc/pacman.d/mirrorlist-arch\n\n#\[extra\]\n#Include = /etc/pacman.d/mirrorlist-arch\n\n#\[multilib-testing\]\n#Include = /etc/pacman.d/mirrorlist-arch\n\n#\[multilib\]\n#Include = /etc/pacman.d/mirrorlist-arch,' /etc/pacman.conf
@@ -20,25 +15,25 @@ countr=$(curl https://ipapi.co/timezone)
     #####################################
     ### ADD SUPPORT FOR MORE COUNTRIES ##
     #####################################
-    if grep -E "Australia" <<< ${countr};then
+    if grep -E "Australia" <<< $countr;then
         country=Australia
-    elif grep -E "Canada" <<< ${countr};then
+    elif grep -E "Canada" <<< $countr;then
         country=Canada
-    elif grep -E "France" <<< ${countr};then
+    elif grep -E "France" <<< $countr;then
         country=France
-    elif grep -E "Germany" <<< ${countr};then
+    elif grep -E "Germany" <<< $countr;then
         country=Germany
-    elif grep -E "US" <<< ${countr};then
+    elif grep -E "US" <<< $countr;then
         country=US
-    elif grep -E "Mexico" <<< ${countr};then
+    elif grep -E "Mexico" <<< $countr;then
         country=Mexico
-    elif grep -E "Chile" <<< ${countr};then
+    elif grep -E "Chile" <<< $countr;then
         country=Chile
-    elif grep -E "Japan" <<< ${countr};then
+    elif grep -E "Japan" <<< $countr;then
         country=Japan
-    elif grep -E "China" <<< ${countr};then
+    elif grep -E "China" <<< $countr;then
         country=China
-    elif grep -E "America" <<< ${countr};then
+    elif grep -E "America" <<< $countr;then
         country=America
     fi
     ###################################
@@ -49,8 +44,8 @@ if [ $artix == y ];then
     rankmirrors /etc/pacman.d/mirrorlist.pacnew > mirrorlist
     sudo rm /etc/pacman.d/mirrorlist
     sudo mv mirrorlist /etc/pacman.d/
-    sudo reflector --save /etc/pacman.d/mirrorlist-arch --sort rate -c ${country} -p https,rsync;else
-    sudo reflector --save /etc/pacman.d/mirrorlist --sort rate -c ${country} -p https,rsync
+    sudo reflector --save /etc/pacman.d/mirrorlist-arch --sort rate -c $country -p https,rsync;else
+    sudo reflector --save /etc/pacman.d/mirrorlist --sort rate -c $country -p https,rsync
 fi
 sudo pacman -Sy
 

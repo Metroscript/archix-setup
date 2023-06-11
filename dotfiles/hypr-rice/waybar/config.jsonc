@@ -216,7 +216,7 @@
             "disconnected": "⚠"
         },
         "on-click": "nmcli device wifi rescan&&hyprctl dispatch exec '[workspace e;float 1;opacity 1.0 override 1.0 override] alacritty -e nmtui'",
-        "on-click-right": "n=\"nmcli networking\"; p=\"notify-send -u low \"; if grep -E enabled <<< $($n);then ${p}\"Disabled Networking\"; ${n} off;else ${p}\"Enabling Networking...\"; ${n} on;fi",
+        "on-click-right": "n=\"nmcli networking\"; p=\"notify-send\"; if grep -E enabled <<< $($n);then $p -u low\"Disabled Networking\"; ${n} off;else $p \"Enabling Networking...\"; ${n} on;fi",
         "tooltip": true,
         "tooltip-format-disconnected": "Disconnected",
         "tooltip-format-ethernet": "{ifname}: {ipaddr}/{cidr}  {bandwidthDownBits}  {bandwidthUpBits}",
