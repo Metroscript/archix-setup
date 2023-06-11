@@ -25,8 +25,8 @@ if grep -E "Artix" <<< $(cat /etc/issue);then
     fi
 fi
 
-if grep -E opendoas <<< $(pacman -Q opendoas);then
-    suas=y
+if grep -E "opendoas" <<< $(pacman -Q opendoas);then
+    export suas=y
     alias sudo='doas'
     sed -i "/stuff/a alias sudo='doas'" ${repo}dotfiles/bashrc
     echo -e "SudoLoop is enabled on paru, when tweaking doas.conf, put 'permit persist :wheel as root cmd true' so SudoLoop works\nYou should make any changes & run 'chmod 0400 /etc/doas.conf' as root after install"
