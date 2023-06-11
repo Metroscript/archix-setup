@@ -52,7 +52,7 @@ if [ $artix == y ] && [ $de == 2 ];then
     echo -e "#\!/bin/sh\n/usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/wireplumber" > .config/autostart/pipewire
     sed -i 's/#\\!/#\!/' .config/autostart/pipewire
     chmod +x .config/autostart/pipewire
-    echo -e "[Desktop Entry]\nExec=/home/$(whoami)/.config/autostart/pipewire\nIcon=dialog-scripts\nName=pipewire\nPath=\nType=application\nX-KDE-AutostartScript=true\n" > .config/autostart/pipewire.desktop
+    echo -e "[Desktop Entry]\nExec=/home/$(whoami)/.config/autostart/pipewire\nIcon=dialog-scripts\nName=pipewire\nPath=\nType=Application\nX-KDE-AutostartScript=true" > .config/autostart/pipewire.desktop
 fi
 if [ $dm == sddm ];then
     if [ $de == 2 ];then
