@@ -5,7 +5,7 @@ fi
 
 #Repo config + doas base-devel packages
 if [ $artix == y ];then
-    sudo sed -i -z -e 's;\[galaxy\]\nInclude = /etc/pacman.d/mirrorlist;\[galaxy\]\nInclude = /etc/pacman.d/mirrorlist\n\n\[universe\]\nServer = https://universe.artixlinux.org/$arch\nServer = https://mirror1.artixlinux.org/universe/$arch\nServer = https://mirror.pascalpuffke.de/artix-universe/$arch\nServer = https://mirrors.qontinuum.space/artixlinux-universe/$arch\nServer = https://mirror1.cl.netactuate.com/artix/universe/$arch\nServer = https://ftp.crifo.org/artix-universe/$arch\nServer = https://artix.sakamoto.pl/universe/$arch;' -i -z -e 's;\[lib32\]\n#Include = /etc/pacman.d/mirrorlist;\[lib32\]\n#Include = /etc/pacman.d/mirrorlist\n\n#Arch Repos\n\n#\[testing\]\n#Include = /etc/pacman.d/mirrorlist-arch\n\n#\[extra\]\n#Include = /etc/pacman.d/mirrorlist-arch\n\n#\[multilib-testing\]\n#Include = /etc/pacman.d/mirrorlist-arch\n\n#\[multilib\]\n#Include = /etc/pacman.d/mirrorlist-arch;' /etc/pacman.conf
+    sudo sed -i -z -e 's;\[galaxy\]\nInclude = /etc/pacman.d/mirrorlist;\[galaxy\]\nInclude = /etc/pacman.d/mirrorlist\n\n\[universe\]\nServer = https://universe.artixlinux.org/$arch\nServer = https://mirror1.artixlinux.org/universe/$arch\nServer = https://mirror.pascalpuffke.de/artix-universe/$arch\nServer = https://mirrors.qontinuum.space/artixlinux-universe/$arch\nServer = https://mirror1.cl.netactuate.com/artix/universe/$arch\nServer = https://ftp.crifo.org/artix-universe/$arch\nServer = https://artix.sakamoto.pl/universe/$arch;' -i -z -e 's;\[lib32\]\n#Include = /etc/pacman.d/mirrorlist;\[lib32\]\n#Include = /etc/pacman.d/mirrorlist\n\n#Arch Repos\n\n#\[extra-testing\]\n#Include = /etc/pacman.d/mirrorlist-arch\n\n#\[extra\]\n#Include = /etc/pacman.d/mirrorlist-arch\n\n#\[multilib-testing\]\n#Include = /etc/pacman.d/mirrorlist-arch\n\n#\[multilib\]\n#Include = /etc/pacman.d/mirrorlist-arch;' /etc/pacman.conf
     sudo pacman -Syu --needed --noconfirm artix-archlinux-support
     sudo sed -i -e "/\[lib32\]/,/Include/"'s/^#//' -i -e "/\[extra\]/,/Include/"'s/^#//' /etc/pacman.conf
     sudo pacman-key --populate
@@ -16,12 +16,7 @@ if [ $suas == y ];then
     sudo pacman -S --needed --noconfirm autoconf automake binutils bison debugedit fakeroot flex gcc groff libtool m4 make patch pkgconf texinfo which
 fi
 sudo pacman -S --needed --noconfirm reflector rsync pacman-contrib
-if [ $artix == y ];then
-    sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.pacnew
-    rankmirrors /etc/pacman.d/mirrorlist.pacnew > mirrorlist
-    sudo rm /etc/pacman.d/mirrorlist
-    sudo mv mirrorlist /etc/pacman.d/
-    countr=$(curl https://ipapi.co/timezone)
+countr=$(curl https://ipapi.co/timezone)
     #####################################
     ### ADD SUPPORT FOR MORE COUNTRIES ##
     #####################################
@@ -49,6 +44,11 @@ if [ $artix == y ];then
     ###################################
     ######## END OF PROBLEM AREA ######
     ###################################
+if [ $artix == y ];then
+    sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.pacnew
+    rankmirrors /etc/pacman.d/mirrorlist.pacnew > mirrorlist
+    sudo rm /etc/pacman.d/mirrorlist
+    sudo mv mirrorlist /etc/pacman.d/
     sudo reflector --save /etc/pacman.d/mirrorlist-arch --sort rate -c ${country} -p https,rsync;else
     sudo reflector --save /etc/pacman.d/mirrorlist --sort rate -c ${country} -p https,rsync
 fi

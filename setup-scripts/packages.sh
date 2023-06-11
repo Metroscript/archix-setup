@@ -1,5 +1,5 @@
 #CPU Ucode
-if grep -E "AuthenticAMD" <<< $(lscpu) && ! grep "amd-ucode" <<< $(pacman -Q);then
+if grep -E "AuthenticAMD" <<< $(lscpu) && ! grep -E "amd-ucode" <<< $(pacman -Q);then
    sudo pacman -S --needed --noconfirm amd-ucode
    if [ $artix == y ] || [ $grub == y ];then
    	sudo grub-mkconfig -o /boot/grub/grub.cfg
@@ -27,11 +27,11 @@ fi
 sudo pacman -Syu --needed --noconfirm vkd3d lib32-vkd3d
 
 #Basic packages
-sudo pacman -Syu --needed --noconfirm linux-{headers,lts{,-headers}} pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber man-db wayland xorg-xwayland smartmontools v4l2loopback-dkms pkgfile gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{jetbrains-mono-nerd,hack-nerd,ubuntu-nerd,noto-nerd} cups{,-pk-helper,-pdf} gutenprint foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley firewalld fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{rar,zip,arj,ace} xz zip zstd squashfs-tools fd bat lsd fortune-mod ponysay mesa jre{-openjdk,11-openjdk,8-openjdk} rust libreoffice-fresh{,-en-gb} hunspell{,-en_au} coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp mythes-en lib{paper,wpg,pulse,mythes,32-{gnutls,libpulse,alsa-{lib,plugins},pipewire{,-jack,-v4l2},mesa}} keepassxc gst-{libav,plugins-{base,good}} phonon-qt5-gstreamer imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq qemu-full virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat
+sudo pacman -Syu --needed --noconfirm linux-{headers,lts{,-headers}} pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber man-db wayland xorg-xwayland smartmontools v4l2loopback-dkms pkgfile gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{jetbrains-mono-nerd,ubuntu-nerd,noto-nerd} cups{,-pk-helper,-pdf} gutenprint foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley firewalld fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{rar,zip,arj,ace} xz zip zstd squashfs-tools fd bat lsd fortune-mod ponysay mesa jre{-openjdk,11-openjdk,8-openjdk} rust libreoffice-fresh{,-en-gb} hunspell{,-en_au} coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp mythes-en lib{paper,wpg,pulse,mythes,32-{gnutls,libpulse,alsa-{lib,plugins},pipewire{,-jack,-v4l2},mesa}} keepassxc gst-{libav,plugins-{base,good}} phonon-qt5-gstreamer imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq qemu-full virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat plymouth
 
     #Games, etc
 if [ $gayms == y ];then
-    sudo pacman -Syu --needed --noconfirm wine{,-gecko,-mono} lutris steam plymouth breeze-plymouth retroarch{,-assets-{glui,ozone,xmb}} gamemode lib{32-gamemode,retro-{dolphin,pcsx2,citra,melonds,duckstation}}
+    sudo pacman -Syu --needed --noconfirm wine{,-gecko,-mono} lutris steam retroarch{,-assets-{glui,ozone,xmb}} gamemode lib{32-gamemode,retro-{dolphin,pcsx2,citra,melonds,duckstation}}
 fi
 
 	#AUR
@@ -98,7 +98,7 @@ else
     fi
 fi
 
-#Artix Exclusive packages
+#Artix Init Services
 if [ $artix == y ]; then
     sudo pacman -S --needed --noconfirm ${dm}-$init cups-$init openntpd-$init firewalld-$init power-profiles-daemon-$init avahi-$init libvirt-$init
 fi
@@ -112,7 +112,7 @@ sudo pacman -Syu --needed --noconfirm rofi-calc
 elif [ $de == 2 ];then
     sudo pacman -Syu --needed --noconfirm plasma{,-wayland-session} kde-applications
 elif [ $de == 3 ];then
-    sudo pacman -Syu --needed gnome{,-{terminal,extra}} nautilus
+    sudo pacman -Syu --needed gnome gnome-extra
 fi
 #Flatpak
 sudo pacman -Syu --needed --noconfirm flatpak
