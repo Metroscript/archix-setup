@@ -51,10 +51,7 @@ fi
 cp /etc/paru.conf .config/paru/
 #sed -i -e 's/#SudoLoop/SudoLoop/' 
 sed -i -e 's/#Clean/Clean/' -i -e 's/#UpgradeMenu/UpgradeMenu/' -i -e 's/#News/News/' .config/paru/paru.conf
-if [ $suas == y ];then
-    #sed -i -e 's/SudoLoop/SudoLoop = true/'
-    sed -i -e 's/#\[bin\]/\[bin\]/' -i -e 's\#Sudo = doas\Sudo = /bin/doas\' .config/paru/paru.conf
-fi
+
 if [ $bin == y ];then
     if [ $de == 1 ];then
         paru -S sddm-git archlinux-themes-sddm
