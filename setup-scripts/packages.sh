@@ -2,16 +2,14 @@
 if grep -E "AuthenticAMD" <<< $(lscpu) && ! grep -E "amd-ucode" <<< $(pacman -Q);then
    sudo pacman -S --needed --noconfirm amd-ucode
    if [ $artix == y ] || [ $grub == y ];then
-   	sudo grub-mkconfig -o /boot/grub/grub.cfg
-   else
+   	sudo grub-mkconfig -o /boot/grub/grub.cfg;else
    	sudo sed -i '/vmlinuz/a initrd /amd-ucode.img' /boot/loader/entries/arch.conf
    fi
 elif grep -E "GenuineIntel" <<< $(lscpu) && ! grep -E "intel-ucode" <<< $(pacman -Q);then
     sudo pacman -S --needed --noconfirm intel-ucode
     if [ $artix == y ] || [ $grub == y ];then
-            sudo grub-mkconfig -o /boot/grub/grub.cfg
-    else
-    	    sudo sed -i '/vmlinuz/a initrd /intel-ucode.img' /boot/loader/entries/arch.conf
+        sudo grub-mkconfig -o /boot/grub/grub.cfg;else
+    	sudo sed -i '/vmlinuz/a initrd /intel-ucode.img' /boot/loader/entries/arch.conf
     fi
 fi
 	#Graphics drivers
@@ -54,7 +52,7 @@ fi
 cp /etc/paru.conf .config/paru/
 sed -i -e 's/#SudoLoop/SudoLoop/' -i -e 's/#Clean/Clean/' -i -e 's/#UpgradeMenu/UpgradeMenu/' -i -e 's/#News/News/' .config/paru/paru.conf
 if [ $suas == y ];then
-    sed -i -e 's/SudoLoop/SudoLoop = true/' -i -e 's/#\[bin\]/\[bin\]' -i -e 's,#Sudo = doas,Sudo = /bin/doas,' ~/.config/paru/paru.conf
+    sed -i -e 's/SudoLoop/SudoLoop = true/' -i -e 's/#\[bin\]/\[bin\]/' -i -e 's,#Sudo = doas,Sudo = /bin/doas,' .config/paru/paru.conf
 fi
 
 if [ $bin == y ];then
