@@ -45,6 +45,15 @@ if [ $de == 1 ];then
     gsettings set org.cinnamon.desktop.privacy remember-recent-files false
     gsettings set org.cinnamon.desktop.default-applications.terminal exec alacritty
 fi
+if [ $artix == y ] && [ $de == 2 ];then
+    if ! grep -E "autostart" <<< $(ls .config/);then
+        mkdir .config/autostart
+    fi
+    echo -e "#\!/bin/sh\n/usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/wireplumber" > .config/autostart/pipewire
+    sed -i 's/#\\!/#\!/' .config/autostart/pipewire
+    chmod +x .config/autostart/pipewire
+    echo -e "[Desktop Entry]\nExec=/home/$(whoami)/.config/autostart/pipewire\nIcon=dialog-scripts\nName=pipewire\nPath=\nType=application\nX-KDE-AutostartScript=true\n" > .config/autostart/pipewire.desktop
+fi
 if [ $dm == sddm ];then
     if [ $de == 2 ];then
     echo -e "[Theme]\nCurrent=breeze" > sddm.conf;else
