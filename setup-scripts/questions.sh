@@ -2,7 +2,7 @@
 if grep -E neovim <<< $(pacman -Q neovim);then
     alias vim='nvim'
 elif grep -E nano <<< $(pacman -Q nano);then
-        alias vim='nano'
+    alias vim='nano'
 fi
 
 if grep -E "Artix" <<< $(cat /etc/issue);then
@@ -26,10 +26,10 @@ if grep -E "Artix" <<< $(cat /etc/issue);then
 fi
 
 if grep -E opendoas <<< $(pacman -Q opendoas);then
-    suas=y
+    export suas=y
     alias sudo='doas'
     sed -i "/stuff/a alias sudo='doas'" ${repo}dotfiles/bashrc
-    sudo sed -i 's\#PACMAN_AUTH=()\PACMAN_AUTH=(/bin/doas)\' /etc/makepkg.conf
+    doas sed -i 's\#PACMAN_AUTH=()\PACMAN_AUTH=(/bin/doas)\' /etc/makepkg.conf
     echo -e "SudoLoop is enabled on paru, when tweaking doas.conf, put 'permit persist :wheel as root cmd true' so SudoLoop works\nYou should make any changes & run 'chmod 0400 /etc/doas.conf' as root after install"
     sleep 5
     ###################################################
