@@ -1,9 +1,8 @@
 #SET EDITOR#
 if grep -E neovim <<< $(pacman -Q neovim);then
-    alias vim='nvim';else
-    if grep -E nano <<< $(pacman -Q nano);then
+    alias vim='nvim'
+elif grep -E nano <<< $(pacman -Q nano);then
         alias vim='nano'
-    fi
 fi
 
 if grep -E "Artix" <<< $(cat /etc/issue);then
@@ -30,8 +29,8 @@ if grep -E opendoas <<< $(pacman -Q opendoas);then
     suas=y
     alias sudo='doas'
     sed -i "/stuff/a alias sudo='doas'" ${repo}dotfiles/bashrc
-    echo -e "SudoLoop is enabled on paru, when tweaking doas.conf, put 'permit persist :wheel as root cmd true' so SudloLoop works\nYou should make any changes & run 'chmod 0400 /etc/doas.conf' as root after install"
-    sleep 5
+    echo -e "SudoLoop is enabled on paru, when tweaking doas.conf, put 'permit persist :wheel as root cmd true' so SudoLoop works\nYou should make any changes & run 'chmod 0400 /etc/doas.conf' as root after install"
+#    sleep 5
     ###################################################
     ######### MORE PERMS FOR INIT COMMANDS? ###########
     ###################################################
