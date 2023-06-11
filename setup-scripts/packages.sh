@@ -35,9 +35,6 @@ if [ $gayms == y ];then
 fi
 
 	#AUR
-if [ $suas == y ];then
-    sudo sed -i 's\#PACMAN_AUTH=()\PACMAN_AUTH=(/bin/doas)\' /etc/makepkg.conf
-fi
 if [ $bin == y ];then
     git clone https://aur.archlinux.org/paru-bin.git
     cd paru-bin;else
@@ -52,9 +49,11 @@ if ! grep -E ".config" <<< $(ls -a);then
     mkdir .config/paru/
 fi
 cp /etc/paru.conf .config/paru/
-sed -i -e 's/#SudoLoop/SudoLoop/' -i -e 's/#Clean/Clean/' -i -e 's/#UpgradeMenu/UpgradeMenu/' -i -e 's/#News/News/' .config/paru/paru.conf
+#sed -i -e 's/#SudoLoop/SudoLoop/' 
+sed -i -e 's/#Clean/Clean/' -i -e 's/#UpgradeMenu/UpgradeMenu/' -i -e 's/#News/News/' .config/paru/paru.conf
 if [ $suas == y ];then
-    sed -i -e 's/SudoLoop/SudoLoop = true/' -i -e 's/#\[bin\]/\[bin\]/' -i -e 's\#Sudo = doas\Sudo = /bin/doas\' .config/paru/paru.conf
+    #sed -i -e 's/SudoLoop/SudoLoop = true/'
+    sed -i -e 's/#\[bin\]/\[bin\]/' -i -e 's\#Sudo = doas\Sudo = /bin/doas\' .config/paru/paru.conf
 fi
 if [ $bin == y ];then
     if [ $de == 1 ];then
