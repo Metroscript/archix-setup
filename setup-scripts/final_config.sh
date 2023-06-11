@@ -124,6 +124,7 @@ if [ $bin == y ];then
     rm -rf paru-bin/;else
     rm -rf paru/
 fi
-if [ $artix == n ]; then
+if [ $artix == y ];then
+    loginctl reboot;else
     reboot
 fi
