@@ -16,7 +16,5 @@ i() {
 }
 if grep -E "[MUTED]" <<< $v;then
     $n "${id}volume-mute.png" "Mute";else
-#    mpv --config=no /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga;else
     $n "$(i)" "$v%"
-#    mpv --config=no /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga
 fi

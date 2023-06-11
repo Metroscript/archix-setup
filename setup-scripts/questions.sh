@@ -1,8 +1,11 @@
 #SET EDITOR#
-if grep -E neovim <<< $(pacman -Q neovim);then
+if grep -E neovim <<< $(pacman -Q);then
     alias vim='nvim'
-elif grep -E nano <<< $(pacman -Q nano);then
+    sed -i 's,VISUAL=,VISUAL="/usr/bin/nvim",' ${repo}dotfiles/bashrc
+elif grep -E nano <<< $(pacman -Q);then
     alias vim='nano'
+    sed -i 's,VISUAL=,VISUAL="/usr/bin/nano",' ${repo}dotfiles/bashrc;else
+    sed -i 's,VISUAL=,VISUAL="/usr/bin/vim",' ${repo}dotfiles/bashrc
 fi
 
 if grep -E "Artix" <<< $(cat /etc/issue);then
