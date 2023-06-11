@@ -29,10 +29,10 @@ if grep -E "opendoas" <<< $(pacman -Q opendoas);then
     suas=y
     alias sudo='doas'
     sed -i "/stuff/a alias sudo='doas'" ${repo}dotfiles/bashrc
-    echo "--------------------------------------------------------------------------------"
+    echo "-----------------------------------------------------------------------------------------"
     echo -e "SudoLoop is enabled on paru, when tweaking doas.conf, put 'permit persist :wheel as root cmd true' so SudoLoop works\nYou should make any changes & run 'chmod 0400 /etc/doas.conf' as root after install"
-    echo "--------------------------------------------------------------------------------"
-#    sleep 5
+    echo "-----------------------------------------------------------------------------------------"
+    sleep 5;else
     ###################################################
     ######### MORE PERMS FOR INIT COMMANDS? ###########
     ###################################################
