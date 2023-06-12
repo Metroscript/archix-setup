@@ -1,5 +1,5 @@
 #Plymouth check & conf
-if grep -E plymouth <<< $(pacman -Q plymouth);then
+if rg plymouth <<< $(pacman -Q);then
     sudo sed -i 's/udev/udev plymouth/g' /etc/mkinitcpio.conf
     sudo sed -i 's/splash/splash plymouth.nolog/' $bootdir
     if [ $artix == y ] || [ $grub == y ];then
@@ -17,20 +17,20 @@ if [ $artix == n ] || [ $grub == n ];then
     cd /boot/loader/entries
     sudo cp arch.conf arch-fallback.conf
     sudo sed -i -e 's/Arch Linux/Arch Linux Fallback/' -i -e 's/initramfs-linux/initramfs-linux-fallback/' arch-fallback.conf
-    kernel=$(pacman -Q | grep linux)
-    if grep -E linux-lts <<< $kernel;then
+    kernel=$(pacman -Q)
+    if rg linux-lts <<< $kernel;then
         sudo cp arch.conf lts.conf
         sudo sed -i -e 's/Arch Linux/Arch Linux-LTS/' -i -e 's/vmlinuz-linux/vmlinuz-linux-lts/' -i -e 's/initramfs-linux/initramfs-linux-lts/' lts.conf
         sudo cp lts.conf lts-fallback.conf
         sudo sed -i -e 's/Arch Linux/Arch Linux-LTS Fallback/' -i -e 's/initramfs-linux-lts/initramfs-linux-lts-fallback/' lts-fallback.conf
     fi
-    if grep -E linux-zen <<< $kernel;then
+    if rg linux-zen <<< $kernel;then
         sudo cp arch.conf zen.conf
         sudo sed -i -e 's/Arch Linux/Arch Linux-Zen/' -i -e 's/vmlinuz-linux/vmlinuz-linux-zen/' -i -e 's/initramfs-linux/initramfs-linux-zen/' zen.conf
         sudo cp zen.conf zen-fallback.conf
         sudo sed -i -e 's/Arch Linux/Arch Linux-Zen Fallback/' -i -e 's/initramfs-linux-zen/initramfs-linux-zen-fallback/' zen-fallback.conf
     fi
-    if grep -E linux-hardened <<< $kernel;then
+    if rg linux-hardened <<< $kernel;then
         sudo cp arch.conf hardened.conf
         sudo sed -i -e 's/Arch Linux/Arch Linux-Hardened/' -i -e 's/vmlinuz-linux/vmlinuz-linux-hardened/' -i -e 's/initramfs-linux/initramfs-linux-hardened/' hardened.conf
         sudo cp hardened.conf hardened-fallback.conf
@@ -48,7 +48,7 @@ if [ $de == 1 ];then
     gsettings set org.cinnamon.desktop.default-applications.terminal exec alacritty
 fi
 if [ $artix == y ] && [ $de == 2 ];then
-    if ! grep -E "autostart" <<< $(ls .config/);then
+    if ! rg "autostart" <<< $(ls .config/);then
         mkdir .config/autostart
     fi
     echo -e "#\!/bin/sh\n/usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/wireplumber" > .config/autostart/pipewire
@@ -64,12 +64,22 @@ if [ $dm == sddm ];then
     sudo chown root:root sddm.conf
     sudo mv sddm.conf /etc/
 fi
-if ! grep -E "sysctl.d" <<< $(ls /etc/);then
+if ! rg "sysctl.d" <<< $(ls /etc/);then
     sudo mkdir /etc/sysctl.d/
 fi
-echo "vm.max_map_count=2147483642" > 90-override.conf
-sudo chown root:root 90-override.conf
-sudo mv 90-override.conf /etc/sysctl.d/
+mkdir sys
+echo -e "kernel.kptr_restrict=1\nkernel.dmesg_restrict=2\nkernel.printk=3 3 3 3\nkernel.unpriviledged_bpf_disabled=1\nnet.core.bpf_jit_harden=2\ndev.tty.ldisc_autoload=0\nvm.unprivileged_userfaultfd=0\nkernel.kexec_load_disabled=1\nkernel.sysrq=4\nkernel.unprivileged_userns_clone=0\nkernel.perf_event_paranoid=3" > sys/99-kernel-hardening.conf
+echo -e "net.ipv4.tcp_syncookies=1\nnet.ipv4.tcp_rfc1337=1\nnet.ipv4.conf.all.rp_filter=1\nnet.ipv4.conf.default.rp_filter=1\n" > sys/99-network-security.conf
+echo -e "net.ipv6.conf.all.use_tempaddr = 2\nnet.ipv6.conf.default.use_tempaddr = 2" > 99-ipv6-privacy.conf
+echo -e "kernel.yama.ptrace_scope=2\nfs.protected_symlinks=1\nfs.protected_hardlinks=1fs.protected_fios=2\nfs.protected_regular=2" > sys/99-userspace.conf
+echo "vm.max_map_count=2147483642" > sys/90-map-count.conf
+sudo chown root:root sys/*
+sudo mv sys/* /etc/sysctl.d/
+rmdir sys/
+#sudo sed -i 's/quiet/spectre_v2=on spec_store_bypass_disable=on l1tf=full,force mds=full tsx=off tsx_async_abort=full kvm.nx_huge_pages=force l1d_flush=on mmio_stale_data=full 
+sudo sed -i 's/quiet/slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off loglevel=0 quiet/' $bootdir
+if [ $artix == y ] || [ $grub == y ];then
+    sudo grub-mkconfig -o /boot/grub/grub.cfg
 sudo sed -i 's/#IgnorePkg   =/IgnorePkg   =linux-lts linux-lts-headers linux linux-headers linux-firmware/' /etc/pacman.conf
 ######################################################################################################
 ############################### NEEDS WORKING ON!!! (bashrc editing) #################################
@@ -88,7 +98,7 @@ sudo sed -i 's/#IgnorePkg   =/IgnorePkg   =linux-lts linux-lts-headers linux lin
 ######################################################################################################
 mv ${repo}dotfiles/config/* .config/
 if [ $gayms == y ];then
-    if ! grep -E "retroarch" <<< $(ls .config);then
+    if ! rg "retroarch" <<< $(ls .config);then
         mkdir .config/retroarch
     fi
     mv ${repo}dotfiles/retroarch.cfg .config/retroarch
@@ -128,9 +138,7 @@ if [ $bin == y ];then
     rm -rf paru-bin/;else
     rm -rf paru/
 fi
-if [ $artix == y ];then
-    if ! [ $init == dinit ];then
-        loginctl reboot
-    fi;else
+if [ $artix == y ] && ! [ $init == dinit ];then
+    loginctl reboot;else
     reboot
 fi

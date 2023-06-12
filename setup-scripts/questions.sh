@@ -2,10 +2,32 @@
 if grep -E neovim <<< $(pacman -Q);then
     alias vim='nvim'
     sed -i 's,VISUAL=,VISUAL="/usr/bin/nvim",' ${repo}dotfiles/bashrc
+elif grep -E emacs <<< $(pacman -Q);then
+    alias vim='emacs -nw'
+    sed -i 's,VISUAL=,VISUAL="/usr/bin/emacs",' ${repo}dotfiles/bashrc
 elif grep -E nano <<< $(pacman -Q);then
     alias vim='nano'
     sed -i 's,VISUAL=,VISUAL="/usr/bin/nano",' ${repo}dotfiles/bashrc;else
     sed -i 's,VISUAL=,VISUAL="/usr/bin/vim",' ${repo}dotfiles/bashrc
+fi
+
+if grep -E networkmanager <<< $(pacman -Q);then
+    echo -e "[device]\nwifi.scan-rand-mac-address=yes\n\n[connection]\nwifi.cloned-mac-address=random\nethernet.cloned-mac-address=random" > 99-random-mac.conf
+    sudo chown root:root 99-random-mac.conf
+    sudo mv 99-random-mac.conf /etc/NetworkManager/conf.d/
+    printf "Change hostname to 'localhost'? (Improves DHC privacy) [y/n]: "
+    read host
+    until [ $host == y ] || [ $host == n ];do
+        echo "Sorry, please try again."
+        printf "Change hostname to 'localhost'? (Improves DHC privacy) [y/n]: "
+        read host
+    done
+    if [ $host == y ];then
+        echo "localhost" > hostname
+        sudo chown root:root hostname
+        sudo mv hostname /etc/
+    fi
+    sudo nmcli general reload conf
 fi
 
 if grep -E "Artix" <<< $(cat /etc/issue);then
