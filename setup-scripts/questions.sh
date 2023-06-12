@@ -11,25 +11,6 @@ elif grep -E nano <<< $(pacman -Q);then
     sed -i 's,VISUAL=,VISUAL="/usr/bin/vim",' ${repo}dotfiles/bashrc
 fi
 
-if grep -E networkmanager <<< $(pacman -Q);then
-    echo -e "[device]\nwifi.scan-rand-mac-address=yes\n\n[connection]\nwifi.cloned-mac-address=random\nethernet.cloned-mac-address=random" > 99-random-mac.conf
-    sudo chown root:root 99-random-mac.conf
-    sudo mv 99-random-mac.conf /etc/NetworkManager/conf.d/
-    printf "Change hostname to 'localhost'? (Improves DHC privacy) [y/n]: "
-    read host
-    until [ $host == y ] || [ $host == n ];do
-        echo "Sorry, please try again."
-        printf "Change hostname to 'localhost'? (Improves DHC privacy) [y/n]: "
-        read host
-    done
-    if [ $host == y ];then
-        echo "localhost" > hostname
-        sudo chown root:root hostname
-        sudo mv hostname /etc/
-    fi
-    sudo nmcli general reload conf
-fi
-
 if grep -E "Artix" <<< $(cat /etc/issue);then
     artix=y
     sed -i -e 's/#exec-once/exec-once/' -i -e '/--systemd/d' -i -e '/systemctl/d' ${repo}dotfiles/hypr-rice/hypr/hyprland.conf
@@ -65,6 +46,26 @@ if grep -E "opendoas" <<< $(pacman -Q opendoas);then
     sleep 5;else
     suas=n
 fi
+
+if grep -E networkmanager <<< $(pacman -Q);then
+    echo -e "[device]\nwifi.scan-rand-mac-address=yes\n\n[connection]\nwifi.cloned-mac-address=random\nethernet.cloned-mac-address=random" > 99-random-mac.conf
+    sudo chown root:root 99-random-mac.conf
+    sudo mv 99-random-mac.conf /etc/NetworkManager/conf.d/
+    printf "Change hostname to 'localhost'? (Improves DHC privacy) [y/n]: "
+    read host
+    until [ $host == y ] || [ $host == n ];do
+        echo "Sorry, please try again."
+        printf "Change hostname to 'localhost'? (Improves DHC privacy) [y/n]: "
+        read host
+    done
+    if [ $host == y ];then
+        echo "localhost" > hostname
+        sudo chown root:root hostname
+        sudo mv hostname /etc/
+    fi
+    sudo nmcli general reload conf
+fi
+
 ############################################################################
 ########### ADD SUPPORT FOR OTHER GUIs? ####################################
 echo "Which DE/WM would you like to install? 1.Hyprland or 2.KDE Plasma"
