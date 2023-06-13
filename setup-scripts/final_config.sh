@@ -82,19 +82,22 @@ if [ $artix == n ] || [ $grub == n ];then
     cd
 fi
 
-sudo sed -i 's/#IgnorePkg   =/IgnorePkg   =linux-lts linux-lts-headers linux linux-headers linux-firmware/' /etc/pacman.conf
+sudo sed -i 's/#IgnorePkg   =/IgnorePkg   =linux-firmware/' /etc/pacman.conf
 ######################################################################################################
 ############################### NEEDS WORKING ON!!! (bashrc editing) #################################
 ######################################################################################################
-#if grep -E linux-lts <<< $kernel;then
-#    sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-lts linux-lts-headers ' /etc/pacman.conf
-#fi
-#if grep -E linux-zen <<< $kernel;then
-#    sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-zen linux-zen-headers ' /etc/pacman.conf
-#fi
-#if grep -E linux-hardened <<< $kernel;then
-#    sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-hardened linux-hardened-headers ' /etc/pacman.conf
-#fi
+if rg linux <<< $(pacman -Q linux-headers | sed 's/-headers//');then
+    sudo sed -i 's/IgnorePkg    =/IgnorePkg   =linux linux-headers /' /etc/pacman.conf
+fi
+if rg linux-lts <<< $(pacman -Q);then
+    sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-lts linux-lts-headers /' /etc/pacman.conf
+fi
+if rg linux-zen <<< $(pacman -Q);then
+    sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-zen linux-zen-headers /' /etc/pacman.conf
+fi
+if rg linux-hardened <<< $(pacman -Q);then
+    sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-hardened linux-hardened-headers /' /etc/pacman.conf
+fi
 ######################################################################################################
 ######################################## END OF PROBLEM AREA #########################################
 ######################################################################################################
@@ -140,7 +143,9 @@ if [ $bin == y ];then
     rm -rf paru-bin/;else
     rm -rf paru/
 fi
-if [ $artix == y ] && ! [ $init == dinit ];then
-    loginctl reboot;else
+if [ $artix == y ];then
+    if ! [ $init == dinit ];then
+        loginctl reboot
+    fi;else
     reboot
 fi
