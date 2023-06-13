@@ -93,45 +93,23 @@ fi
 ####################### END OF PROBLEM AREA ################################
 ############################################################################
 echo "--------------------------------------------------------------------------------"
-if grep "linux-headers" <<< $(pacman -Q);then
-    echo "Standard"
-fi
-if grep "linux-lts" <<< $(pacman -Q);then
-    echo "LTS"
-fi
-if grep "linux-hardened" <<< $(pacman -Q);then
-    echo "Hardened"
-fi
-if grep "linux-zen" <<< $(pacman -Q);then
-    echo "Zen"
-fi
+grep "linux" <<< $(pacman -Q linux-headers | sed 's/-headers//')
+grep "linux-lts" <<< $(pacman -Q)
+grep "linux-hardened" <<< $(pacman -Q)
+grep "linux-zen" <<< $(pacman -Q)
 echo "--------------------------------------------------------------------------------"
 printf "Install another Kernel? Thos currently installed have been listed above [y/n]: "
 read kern
 until [ $kern == y ] || [ $kern == n ];do
     echo "--------------------------------------------------------------------------------"
-    if grep "linux-headers" <<< $(pacman -Q);then
-        echo "Standard"
-    fi
-    if grep "linux-lts" <<< $(pacman -Q);then
-        echo "LTS"
-    fi
-    if grep "linux-hardened" <<< $(pacman -Q);then
-        echo "Hardened"
-    fi
-    if grep "linux-zen" <<< $(pacman -Q);then
-        echo "Zen"
-    fi
+    grep "linux" <<< $(pacman -Q linux-headers | sed 's/-headers//')
+    grep "linux-lts" <<< $(pacman -Q)
+    grep "linux-hardened" <<< $(pacman -Q)
+    grep "linux-zen" <<< $(pacman -Q)
     echo "--------------------------------------------------------------------------------"
     printf "Install another Kernel? Thos currently installed have been listed above [y/n]: "
     read kern
-    printf "Use precompiled AUR binaries where availiable? [y/n]: "
-    read bin
-    until [ $bin == y ] || [ $bin == n ];do
-        echo "Sorry, please try again."
-        printf "Use precompiled binaries where availiable? [y/n]: "
-        read bin
-    done
+done
 if [ $kern == y ];then
     echo "--------------------------------------------------------------------------------"
     if ! grep "linux-headers" <<< $(pacman -Q);then
@@ -170,6 +148,14 @@ if [ $kern == y ];then
         read kerinst
     done
 fi
+
+printf "Use precompiled AUR binaries where availiable? [y/n]: "
+read bin
+until [ $bin == y ] || [ $bin == n ];do
+    echo "Sorry, please try again."
+    printf "Use precompiled binaries where availiable? [y/n]: "
+    read bin
+done
 
 printf "Install Emulation & Steam/WINE support? [y/n]: "
 read gayms
