@@ -92,14 +92,84 @@ fi
 ############################################################################
 ####################### END OF PROBLEM AREA ################################
 ############################################################################
-
-printf "Use precompiled AUR binaries where availiable? [y/n]: "
-read bin
-until [ $bin == y ] || [ $bin == n ];do
-  echo "Sorry, please try again."
-  printf "Use precompiled binaries where availiable? [y/n]: "
-  read bin
-done
+echo "--------------------------------------------------------------------------------"
+if grep "linux-headers" <<< $(pacman -Q);then
+    echo "Standard"
+fi
+if grep "linux-lts" <<< $(pacman -Q);then
+    echo "LTS"
+fi
+if grep "linux-hardened" <<< $(pacman -Q);then
+    echo "Hardened"
+fi
+if grep "linux-zen" <<< $(pacman -Q);then
+    echo "Zen"
+fi
+echo "--------------------------------------------------------------------------------"
+printf "Install another Kernel? Thos currently installed have been listed above [y/n]: "
+read kern
+until [ $kern == y ] || [ $kern == n ];do
+    echo "--------------------------------------------------------------------------------"
+    if grep "linux-headers" <<< $(pacman -Q);then
+        echo "Standard"
+    fi
+    if grep "linux-lts" <<< $(pacman -Q);then
+        echo "LTS"
+    fi
+    if grep "linux-hardened" <<< $(pacman -Q);then
+        echo "Hardened"
+    fi
+    if grep "linux-zen" <<< $(pacman -Q);then
+        echo "Zen"
+    fi
+    echo "--------------------------------------------------------------------------------"
+    printf "Install another Kernel? Thos currently installed have been listed above [y/n]: "
+    read kern
+    printf "Use precompiled AUR binaries where availiable? [y/n]: "
+    read bin
+    until [ $bin == y ] || [ $bin == n ];do
+        echo "Sorry, please try again."
+        printf "Use precompiled binaries where availiable? [y/n]: "
+        read bin
+    done
+if [ $kern == y ];then
+    echo "--------------------------------------------------------------------------------"
+    if ! grep "linux-headers" <<< $(pacman -Q);then
+        echo "1.Standard"
+    fi
+    if ! grep "linux-lts" <<< $(pacman -Q);then
+        echo "2.LTS"
+    fi
+    if ! grep "linux-hardened" <<< $(pacman -Q);then
+        echo "3.Hardened"
+    fi
+    if ! grep "linux-zen" <<< $(pacman -Q);then
+        echo "4.Zen"
+    fi
+    echo "0.Don't install another Kernel"
+    echo "--------------------------------------------------------------------------------"
+    printf "Which Kernel would you like to install? [1/2/3/4/0]: "
+    read kerinst
+    until [ $kerinst == 1 ] || [ $kerinst == 2 ] || [ $kerinst == 3 ] || [ $kerinst == 4 ] || [ $kerinst == 0 ];do
+        echo "--------------------------------------------------------------------------------"
+        if ! grep "linux-headers" <<< $(pacman -Q);then
+            echo "1.Standard"
+        fi
+        if ! grep "linux-lts" <<< $(pacman -Q);then
+            echo "2.LTS"
+        fi
+        if ! grep "linux-hardened" <<< $(pacman -Q);then
+            echo "3.Hardened"
+        fi
+        if ! grep "linux-zen" <<< $(pacman -Q);then
+            echo "4.Zen"
+        fi
+        echo "0.Don't install another Kernel"
+        echo "--------------------------------------------------------------------------------"
+        printf "Which Kernel would you like to install? [1/2/3/4/0]: "
+        read kerinst
+    done
+fi
 
 printf "Install Emulation & Steam/WINE support? [y/n]: "
 read gayms

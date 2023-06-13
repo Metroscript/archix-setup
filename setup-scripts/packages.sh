@@ -13,19 +13,34 @@ elif grep -E "GenuineIntel" <<< $(lscpu) && ! grep -E "intel-ucode" <<< $(pacman
     fi
 fi
 	#Graphics drivers
-gpu=$(lspci)
-if lspci | grep 'VGA' | grep -E "Radeon|AMD";then
-   sudo pacman -S --noconfirm --needed xf86-video-amdgpu vulkan-{radeon,icd-loader} mesa lib{va-mesa-driver,32-{libva-mesa-driver,mesa,vulkan-{radeon,icd-loader}}}
-elif grep -E "NVIDIA|GeForce" <<< $gpu;then
-   sudo pacman -S --noconfirm --needed nvidia{,-utils} lib32-{nvidia-utils,vulkan-icd-loader} vulkan-icd-loader
-   nvidia-xconfig
-elif grep -E "Integrated Graphics Controller" <<< $gpu || grep -E "Intel Corporation UHD" <<< $gpu;then
-     sudo pacman -S --noconfirm --needed xf86-video-intel vulkan-{intel,icd-loader} mesa lib{va-{intel-driver,utils},vdpau-va-gl,32-{vulkan-{intel,icd-loader},mesa,libva-intel-driver}}
-fi
+    #######################################
+    ##### NVIDIA DRIVERS MAY NOT WORK #####
+    #######################################
+# AMD DRIVERS #
+sudo pacman -S --noconfirm --needed xf86-video-amdgpu vulkan-{radeon,icd-loader} mesa lib{va-mesa-driver,32-{libva-mesa-driver,mesa,vulkan-{radeon,icd-loader}}}
+#gpu=$(lspci)
+#if lspci | grep 'VGA' | grep -E "Radeon|AMD";then
+#   sudo pacman -S --noconfirm --needed xf86-video-amdgpu vulkan-{radeon,icd-loader} mesa lib{va-mesa-driver,32-{libva-mesa-driver,mesa,vulkan-{radeon,icd-loader}}}
+#elif grep -E "NVIDIA|GeForce" <<< $gpu;then
+#   sudo pacman -S --noconfirm --needed nvidia{,-utils} lib32-{nvidia-utils,vulkan-icd-loader} vulkan-icd-loader
+#   nvidia-xconfig
+#elif grep -E "Integrated Graphics Controller" <<< $gpu || grep -E "Intel Corporation UHD" <<< $gpu;then
+#     sudo pacman -S --noconfirm --needed xf86-video-intel vulkan-{intel,icd-loader} mesa lib{va-{intel-driver,utils},vdpau-va-gl,32-{vulkan-{intel,icd-loader},mesa,libva-intel-driver}}
+#fi
 sudo pacman -Syu --needed --noconfirm vkd3d lib32-vkd3d
 
 #Basic packages
-sudo pacman -Syu --needed --noconfirm linux-{headers,lts{,-headers}} pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber man-db wayland xorg-xwayland smartmontools v4l2loopback-dkms pkgfile gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{jetbrains-mono-nerd,ubuntu-nerd,noto-nerd} cups{,-pk-helper,-pdf} gutenprint foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley firewalld fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay mesa jre{-openjdk,11-openjdk,8-openjdk} libreoffice-fresh{,-en-gb} hunspell{,-en_au} coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp mythes-en lib{paper,wpg,pulse,mythes,32-{gnutls,libpulse,alsa-{lib,plugins},pipewire{,-jack,-v4l2},mesa}} keepassxc gst-{libav,plugins-{base,good}} phonon-qt5-gstreamer imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq qemu-full virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat plymouth
+if [ $kerinst -gt 0 ];then
+    if [ $kerinst == 1 ];then
+        sudo pacman -Syu --needed --noconfirm linux{,-headers}
+    elif [ $kerinst == 2 ];then
+        sudo pacman -Syu --needed --noconfirm linux-lts{,-headers}
+    elif [ $kerinst == 3 ];then
+        sudo pacman -Syu --needed --noconfirm linux-hardened{,-headers};else
+        sudo pacman -Syu --needed --noconfirm linux-zen{,-headers}
+    fi
+fi
+sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber man-db wayland xorg-xwayland smartmontools v4l2loopback-dkms pkgfile gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{jetbrains-mono-nerd,ubuntu-nerd,noto-nerd} cups{,-pk-helper,-pdf} gutenprint foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley firewalld fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay mesa jre{-openjdk,11-openjdk,8-openjdk} libreoffice-fresh{,-en-gb} hunspell{,-en_au} coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp mythes-en lib{paper,wpg,pulse,mythes,32-{gnutls,libpulse,alsa-{lib,plugins},pipewire{,-jack,-v4l2},mesa}} keepassxc gst-{libav,plugins-{base,good}} phonon-qt5-gstreamer imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq qemu-full virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat plymouth
 
     #Games, etc
 if [ $gayms == y ];then
