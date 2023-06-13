@@ -12,33 +12,6 @@ if rg plymouth <<< $(pacman -Q);then
     fi
 fi
 
-#SystemD Boot Kernel Fallbacks
-if [ $artix == n ] || [ $grub == n ];then
-    cd /boot/loader/entries
-    sudo cp arch.conf arch-fallback.conf
-    sudo sed -i -e 's/Arch Linux/Arch Linux Fallback/' -i -e 's/initramfs-linux/initramfs-linux-fallback/' arch-fallback.conf
-    kernel=$(pacman -Q)
-    if rg linux-lts <<< $kernel;then
-        sudo cp arch.conf lts.conf
-        sudo sed -i -e 's/Arch Linux/Arch Linux-LTS/' -i -e 's/vmlinuz-linux/vmlinuz-linux-lts/' -i -e 's/initramfs-linux/initramfs-linux-lts/' lts.conf
-        sudo cp lts.conf lts-fallback.conf
-        sudo sed -i -e 's/Arch Linux/Arch Linux-LTS Fallback/' -i -e 's/initramfs-linux-lts/initramfs-linux-lts-fallback/' lts-fallback.conf
-    fi
-    if rg linux-zen <<< $kernel;then
-        sudo cp arch.conf zen.conf
-        sudo sed -i -e 's/Arch Linux/Arch Linux-Zen/' -i -e 's/vmlinuz-linux/vmlinuz-linux-zen/' -i -e 's/initramfs-linux/initramfs-linux-zen/' zen.conf
-        sudo cp zen.conf zen-fallback.conf
-        sudo sed -i -e 's/Arch Linux/Arch Linux-Zen Fallback/' -i -e 's/initramfs-linux-zen/initramfs-linux-zen-fallback/' zen-fallback.conf
-    fi
-    if rg linux-hardened <<< $kernel;then
-        sudo cp arch.conf hardened.conf
-        sudo sed -i -e 's/Arch Linux/Arch Linux-Hardened/' -i -e 's/vmlinuz-linux/vmlinuz-linux-hardened/' -i -e 's/initramfs-linux/initramfs-linux-hardened/' hardened.conf
-        sudo cp hardened.conf hardened-fallback.conf
-        sudo sed -i -e 's/Arch Linux/Arch Linux-Hardened Fallback/' -i -e 's/initramfs-linux-hardened/initramfs-linux-hardened-fallback/' hardened-fallback.conf
-    fi
-    cd
-fi
-
 #Final Configuration
 if [ $de == 1 ];then
     mv ${repo}dotfiles/hypr-rice/* .config/
@@ -80,6 +53,35 @@ rmdir sys/
 sudo sed -i 's/quiet/slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off loglevel=0 quiet/' $bootdir
 if [ $artix == y ] || [ $grub == y ];then
     sudo grub-mkconfig -o /boot/grub/grub.cfg
+fi
+
+#SystemD Boot Kernel Fallbacks
+if [ $artix == n ] || [ $grub == n ];then
+    cd /boot/loader/entries
+    sudo cp arch.conf arch-fallback.conf
+    sudo sed -i -e 's/Arch Linux/Arch Linux Fallback/' -i -e 's/initramfs-linux/initramfs-linux-fallback/' arch-fallback.conf
+    kernel=$(pacman -Q)
+    if rg linux-lts <<< $kernel;then
+        sudo cp arch.conf lts.conf
+        sudo sed -i -e 's/Arch Linux/Arch Linux-LTS/' -i -e 's/vmlinuz-linux/vmlinuz-linux-lts/' -i -e 's/initramfs-linux/initramfs-linux-lts/' lts.conf
+        sudo cp lts.conf lts-fallback.conf
+        sudo sed -i -e 's/Arch Linux/Arch Linux-LTS Fallback/' -i -e 's/initramfs-linux-lts/initramfs-linux-lts-fallback/' lts-fallback.conf
+    fi
+    if rg linux-zen <<< $kernel;then
+        sudo cp arch.conf zen.conf
+        sudo sed -i -e 's/Arch Linux/Arch Linux-Zen/' -i -e 's/vmlinuz-linux/vmlinuz-linux-zen/' -i -e 's/initramfs-linux/initramfs-linux-zen/' zen.conf
+        sudo cp zen.conf zen-fallback.conf
+        sudo sed -i -e 's/Arch Linux/Arch Linux-Zen Fallback/' -i -e 's/initramfs-linux-zen/initramfs-linux-zen-fallback/' zen-fallback.conf
+    fi
+    if rg linux-hardened <<< $kernel;then
+        sudo cp arch.conf hardened.conf
+        sudo sed -i -e 's/Arch Linux/Arch Linux-Hardened/' -i -e 's/vmlinuz-linux/vmlinuz-linux-hardened/' -i -e 's/initramfs-linux/initramfs-linux-hardened/' hardened.conf
+        sudo cp hardened.conf hardened-fallback.conf
+        sudo sed -i -e 's/Arch Linux/Arch Linux-Hardened Fallback/' -i -e 's/initramfs-linux-hardened/initramfs-linux-hardened-fallback/' hardened-fallback.conf
+    fi
+    cd
+fi
+
 sudo sed -i 's/#IgnorePkg   =/IgnorePkg   =linux-lts linux-lts-headers linux linux-headers linux-firmware/' /etc/pacman.conf
 ######################################################################################################
 ############################### NEEDS WORKING ON!!! (bashrc editing) #################################
