@@ -48,26 +48,36 @@ if grep -E "opendoas" <<< $(pacman -Q opendoas);then
 fi
 
 if grep -E networkmanager <<< $(pacman -Q);then
-    echo -e "[device]\nwifi.scan-rand-mac-address=yes\n\n[connection]\nwifi.cloned-mac-address=random\nethernet.cloned-mac-address=random" > 99-random-mac.conf
-    sudo chown root:root 99-random-mac.conf
-    sudo mv 99-random-mac.conf /etc/NetworkManager/conf.d/
-    printf "Change hostname to 'localhost'? (Improves DHC privacy) [y/n]: "
-    read host
-    until [ $host == y ] || [ $host == n ];do
-        echo "Sorry, please try again."
+    printf "Enable Network Privacy features for NetworkManager? (May cause network instability) [y/n]: "
+    read nmp
+    until [ $nmp == y ] || [ $nmp == n ];do
+        echo "Sorry, please try again"
+        printf "Enable Network Privacy features for NetworkManager? (May cause network instability) [y/n]: "
+        read nmp
+    done
+    if [ $nmp == y ];then
+        echo -e "[device]\nwifi.scan-rand-mac-address=yes\n\n[connection]\nwifi.cloned-mac-address=random\nethernet.cloned-mac-address=random" > 99-random-mac.conf
+        sudo chown root:root 99-random-mac.conf
+        sudo mv 99-random-mac.conf /etc/NetworkManager/conf.d/
         printf "Change hostname to 'localhost'? (Improves DHC privacy) [y/n]: "
         read host
-    done
-    if [ $host == y ];then
-        echo "localhost" > hostname
-        sudo chown root:root hostname
-        sudo mv hostname /etc/
+        until [ $host == y ] || [ $host == n ];do
+            echo "Sorry, please try again."
+            printf "Change hostname to 'localhost'? (Improves DHC privacy) [y/n]: "
+            read host
+        done
+        if [ $host == y ];then
+            echo "localhost" > hostname
+            sudo chown root:root hostname
+            sudo mv hostname /etc/
+        fi
+        sudo nmcli general reload conf
     fi
-    sudo nmcli general reload conf
 fi
 
 ############################################################################
 ########### ADD SUPPORT FOR OTHER GUIs? ####################################
+############################################################################
 echo "Which DE/WM would you like to install? 1.Hyprland or 2.KDE Plasma"
 printf "[1/2]: "
 read de

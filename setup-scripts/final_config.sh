@@ -43,8 +43,8 @@ fi
 mkdir sys
 echo -e "kernel.kptr_restrict=1\nkernel.dmesg_restrict=2\nkernel.printk=3 3 3 3\nkernel.unpriviledged_bpf_disabled=1\nnet.core.bpf_jit_harden=2\ndev.tty.ldisc_autoload=0\nvm.unprivileged_userfaultfd=0\nkernel.kexec_load_disabled=1\nkernel.sysrq=4\nkernel.unprivileged_userns_clone=0\nkernel.perf_event_paranoid=3" > sys/99-kernel-hardening.conf
 echo -e "net.ipv4.tcp_syncookies=1\nnet.ipv4.tcp_rfc1337=1\nnet.ipv4.conf.all.rp_filter=1\nnet.ipv4.conf.default.rp_filter=1\n" > sys/99-network-security.conf
-echo -e "net.ipv6.conf.all.use_tempaddr = 2\nnet.ipv6.conf.default.use_tempaddr = 2" > 99-ipv6-privacy.conf
-echo -e "kernel.yama.ptrace_scope=2\nfs.protected_symlinks=1\nfs.protected_hardlinks=1fs.protected_fios=2\nfs.protected_regular=2" > sys/99-userspace.conf
+echo -e "net.ipv6.conf.all.use_tempaddr = 2\nnet.ipv6.conf.default.use_tempaddr = 2" > sys/99-ipv6-privacy.conf
+echo -e "kernel.yama.ptrace_scope=2\nfs.protected_symlinks=1\nfs.protected_hardlinks=1\nfs.protected_fios=2\nfs.protected_regular=2" > sys/99-userspace.conf
 echo "vm.max_map_count=2147483642" > sys/90-map-count.conf
 sudo chown root:root sys/*
 sudo mv sys/* /etc/sysctl.d/
