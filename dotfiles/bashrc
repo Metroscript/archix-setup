@@ -27,8 +27,11 @@ export VISUAL=
 export EDITOR="$VISUAL"
 source /usr/share/doc/pkgfile/command-not-found.bash
 HISTCONTROL=ignoreboth
+HISTSIZE=1000
+HISTFILESIZE=2000
 shopt -s cmdhist
 shopt -s lithist
+shopt -s histappend
 shopt -sq autocd
 shopt -sq checkwinsize
 complete -cf sudo
@@ -42,7 +45,7 @@ alias yay='paru'
 alias update='sudo pacman -Syu && yt-dlp -U'
 alias clean='sudo pacman -Sc'
 alias ukernel="sudo pacman -Syu --needed linux{,-{headers,firmware,lts{,-headers}}}"
-alias aur='paru -Syu --aur'
+alias aur='paru -Syua'
 
 #YT-DLP
 alias ytm='yt-dlp -x -f ba/b --audio-quality 0 --audio-format flac --add-metadata --embed-thumbnail -o ~/Music/%"(title)s.%(ext)"s'

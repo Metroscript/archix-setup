@@ -11,6 +11,20 @@ elif grep -E nano <<< $(pacman -Q);then
     sed -i 's,VISUAL=,VISUAL="/usr/bin/vim",' ${repo}dotfiles/bashrc
 fi
 
+if grep -E "cronie" <<< $(pacman -Q);then
+    cron=cronie
+elif grep -E "fcron" <<< $(pacman -Q)
+    cron=fcron
+else
+    echo "What cron provider would you like to use? 1.Cronie (Default) or 2. Fcron?"
+    printf "[1/2]: "
+    read croninst
+    until [ $croninst == 1 ] || [ $croninst == 2 ];do
+        echo "What cron provider would you like to use? 1.Cronie (Default) or 2. Fcron?"
+        printf "[1/2]: "
+        read croninst
+    done
+fi
 if grep -E "Artix" <<< $(cat /etc/issue);then
     artix=y
     sed -i -e 's/#exec-once/exec-once/' -i -e '/--systemd/d' -i -e '/systemctl/d' ${repo}dotfiles/hypr-rice/hypr/hyprland.conf

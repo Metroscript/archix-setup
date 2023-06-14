@@ -1,6 +1,0 @@
-#!/bin/bash
-if grep -E opendoas <<< $(pacman -Q);then
-    clear
-    alias sudo='doas'
-fi
-sudo pacman -Sc --noconfirm
