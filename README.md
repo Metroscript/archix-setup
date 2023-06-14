@@ -9,5 +9,7 @@ It should be noted that this script assumes that: You have no current loglevel k
 
 KEEP IN MIND: gpu driver detection and support is sketchy at best for NVIDIA cards (I guess you'd know that if you're using Linux, heh?), so maybe offer some suggestions or just fix the problems yourself.
 
+BIGGEST THING TO KEEP IN MIND: This script was made with unrestricted sudo/doas privileges in mind, though I highly suggest tweaking them after you've booted into you GUI
+
 To summarise:
 This script was designed to support the "final installation process" of Arch and/or Artix Linux providing some hardening & personal dotfiles mainly for use in the Hyprland Window Compositor. 
