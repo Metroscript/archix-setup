@@ -114,30 +114,30 @@ sudo sed -i -e 's/#unix_sock_group = "libvirt"/unix_sock_group = "libvirt"/' -i 
 vir=$(whoami)
 sudo usermod -aG libvirt $vir
 if [ $artix == n ];then
-    sudo systemctl enable systemd-timesyncd cups $dm $cron pkgfile-update.timer
+    sudo systemctl enable systemd-timesyncd cups $dm cronie pkgfile-update.timer
     systemctl --user --now enable wireplumber.service pipewire.service pipewire-pulse.service
 elif [ $init == dinit ]; then
     sudo dinitctl enable ntpd
     sudo dinitctl enable cupsd
     sudo dinitctl enable $dm
-    sudo dinitctl enable $cron
+    sudo dinitctl enable cronie
     sudo dinitctl enable libvirtd
 elif [ $init == runit ]; then
     sudo ln -s /etc/runit/sv/ntpd /run/runit/service
     sudo ln -s /etc/runit/sv/cupsd /run/runit/service
     sudo ln -s /etc/runit/sv/$dm /run/runit/service
-    sudo ln -s /etc/runit/sv/$cron /run/runit/service
+    sudo ln -s /etc/runit/sv/cronie /run/runit/service
 elif [ $init == openrc ]; then
     sudo rc-update add ntpd boot
     sudo rc-update add cupsd boot
     sudo rc-update add $dm boot
-    sudo rc-update add $cron default
+    sudo rc-update add cronie default
     sudo rc-update add libvirtd default
 elif [ $init == s6 ];then
     sudo touch /etc/s6/adminsv/default/contents.d/ntpd
     sudo touch /etc/s6/adminsv/default/contents.d/$dm
     sudo touch /etc/s6/adminsv/default/contents.d/cupsd
-    sudo touch /etc/s6/adminsv/default/contends.d/$cron
+    sudo touch /etc/s6/adminsv/default/contends.d/cronie
     sudo s6-db-reload
 fi
 sudo pkgfile --update
