@@ -112,7 +112,7 @@ fi
 
 #Artix Init Services
 if [ $artix == y ]; then
-    sudo pacman -S --needed --noconfirm ${dm}-$init cups-$init openntpd-$init firewalld-$init power-profiles-daemon-$init avahi-$init libvirt-$init
+    sudo pacman -S --needed --noconfirm ${dm}-$init cups-$init openntpd-$init firewalld-$init power-profiles-daemon-$init avahi-$init libvirt-$init ${init}-system
 fi
 
 #Hyprland 
