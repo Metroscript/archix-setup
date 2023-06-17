@@ -8,9 +8,9 @@ fi
     sudo sed -i -e 's/#Color/Color/' -i -e '/Color/a ILoveCandy' -i -e 's/#Verbose/Verbose/' -i -e 's/#Parallel/Parallel/' -i -e "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
     sudo pacman -Sy
 if [ $suas == y ];then
-    sudo pacman -S --needed --noconfirm autoconf automake binutils bison debugedit fakeroot flex gcc groff libtool m4 make patch pkgconf texinfo which
+    sudo pacman -S --needed --noconfirm autoconf automake bison debugedit fakeroot flex gcc groff libtool m4 make patch pkgconf texinfo which
 fi
-sudo pacman -S --needed --noconfirm reflector rsync pacman-contrib
+sudo pacman -S --needed --noconfirm reflector rsync pacman-contrib pkgfile
 countr=$(curl https://ipapi.co/timezone)
     #####################################
     ### ADD SUPPORT FOR MORE COUNTRIES ##
@@ -48,6 +48,7 @@ if [ $artix == y ];then
     sudo reflector --save /etc/pacman.d/mirrorlist --sort rate -c $country -p https,rsync
 fi
 sudo pacman -Sy
+sudo pkgfile -u
 
 #Make Swapfile
 if [ $swap -gt 0 ];then
@@ -58,10 +59,9 @@ if [ $swap -gt 0 ];then
     sudo echo '/swapfile none swap 0 0' | sudo tee -a /etc/fstab
     sudo mount -a
     sudo swapon -a
-    free -m
-    sudo sed -i -e 's/#resume=/resume=/' -i -e 's/quiet/swap_offset= quiet/' $bootdir
-    sudo filefrag -v /swapfile | awk '$1=="0:" {print substr($4, 1, length($4)-2)}'
-    printf "Remember the above value and place it in the swap offset value in your boot config (Press enter to continue)"
-    read blank
-    sudo vim $bootdir
+    #sudo sed -i -e 's/#resume=/resume=/' -i -e 's/quiet/swap_offset= quiet/' $bootdir
+    #sudo filefrag -v /swapfile | awk '$1=="0:" {print substr($4, 1, length($4)-2)}'
+    #printf "Remember the above value and place it in the swap offset value in your boot config (Press enter to continue)"
+    #read blank
+    #sudo vim $bootdir
 fi

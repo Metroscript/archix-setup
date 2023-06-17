@@ -1,15 +1,13 @@
 #CPU Ucode
 if grep -E "AuthenticAMD" <<< $(lscpu) && ! grep -E "amd-ucode" <<< $(pacman -Q);then
    sudo pacman -S --needed --noconfirm amd-ucode
-   if [ $artix == y ] || [ $grub == y ];then
-   	sudo grub-mkconfig -o /boot/grub/grub.cfg;else
-   	sudo sed -i '/vmlinuz/a initrd /amd-ucode.img' /boot/loader/entries/arch.conf
+   if [ $artix == n ] && [ $grub == n ];then
+   	sudo sed -i '/vmlinuz/a initrd /amd-ucode.img' $bootdir
    fi
 elif grep -E "GenuineIntel" <<< $(lscpu) && ! grep -E "intel-ucode" <<< $(pacman -Q);then
     sudo pacman -S --needed --noconfirm intel-ucode
-    if [ $artix == y ] || [ $grub == y ];then
-        sudo grub-mkconfig -o /boot/grub/grub.cfg;else
-    	sudo sed -i '/vmlinuz/a initrd /intel-ucode.img' /boot/loader/entries/arch.conf
+    if [ $artix == n ] || [ $grub == n ];then
+    	sudo sed -i '/vmlinuz/a initrd /intel-ucode.img' $bootdir
     fi
 fi
 	#Graphics drivers
@@ -28,7 +26,7 @@ fi
 sudo pacman -Syu --needed --noconfirm vkd3d lib32-vkd3d
 
 #Basic packages
-sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber cronie man-db wayland xorg-xwayland smartmontools v4l2loopback-dkms pkgfile gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{jetbrains-mono-nerd,ubuntu-nerd,noto-nerd} cups{,-pk-helper,-pdf} gutenprint foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley firewalld fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay mesa jre{-openjdk,11-openjdk,8-openjdk} libreoffice-fresh{,-en-gb} hunspell{,-en_au} coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp mythes-en lib{paper,wpg,pulse,mythes,32-{gnutls,libpulse,alsa-{lib,plugins},pipewire{,-jack,-v4l2},mesa}} keepassxc gst-{libav,plugins-{base,good}} phonon-qt5-gstreamer imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq qemu-full virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat plymouth nvme-cli
+sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber cronie man-db wayland xorg-xwayland smartmontools v4l2loopback-dkms gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{jetbrains-mono-nerd,ubuntu-nerd,noto-nerd} cups{,-pk-helper,-pdf} gutenprint foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley firewalld fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay mesa jre{-openjdk,11-openjdk,8-openjdk} libreoffice-fresh{,-en-gb} hunspell{,-en_au} coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp mythes-en lib{paper,wpg,pulse,mythes,32-{gnutls,libpulse,alsa-{lib,plugins},pipewire{,-jack,-v4l2},mesa}} keepassxc gst-{libav,plugins-{base,good}} phonon-qt5-gstreamer imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq qemu-full virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat plymouth nvme-cli apparmor audit python-{notify2,psutil}
 
     #Games, etc
 if [ $gayms == y ];then
@@ -102,7 +100,7 @@ fi
 
 #Artix Init Services
 if [ $artix == y ]; then
-    sudo pacman -S --needed --noconfirm ${dm}-$init cups-$init openntpd-$init firewalld-$init power-profiles-daemon-$init avahi-$init libvirt-$init ${init}-system
+    sudo pacman -S --needed --noconfirm ${dm}-$init cups-$init openntpd-$init firewalld-$init power-profiles-daemon-$init avahi-$init libvirt-$init ${init}-system apparmor-$init audit-$init
 fi
 
 #Hyprland 

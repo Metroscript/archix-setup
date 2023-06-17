@@ -2,9 +2,6 @@
 if rg plymouth <<< $(pacman -Q);then
     sudo sed -i 's/udev/udev plymouth/g' /etc/mkinitcpio.conf
     sudo sed -i 's/splash/splash plymouth.nolog/' $bootdir
-    if [ $artix == y ] || [ $grub == y ];then
-        sudo grub-mkconfig -o /boot/grub/grub.cfg
-    fi
     sudo sed -i -e 's/DialogVerticalAlignment=.382/DialogVerticalAlignment=.75/' -i -e 's/WatermarkVerticalAlignment=.96/WatermarkVerticalAlignment=.5/' /usr/share/plymouth/themes/spinner/spinner.plymouth
     if [ $de == 2 ];then
         sudo plymouth-set-default-theme -R breeze;else
@@ -17,6 +14,11 @@ if [ $de == 1 ];then
     mv ${repo}dotfiles/hypr-rice/* .config/
     mv ${repo}dotfiles/thumbnailers .local/share/
     mv ${repo}dotfiles/set-as-background.nemo_action .local/share/nemo/actions
+    cd .local/share/applications/
+    echo -e '[Desktop Entry]\nName=Rofi-Calc\nExec=rofi -show calc -modi calc -no-show-match -no-sort -theme ~/.config/rofi/themes/arthur-dark.rasi\nTerminal=false\nX-MultipleArgs=false\nType=Application\nIcon=/usr/share/icons/breeze-dark/apps/48/kcalc.svg' > rofi-calc.desktop
+    echo -e '[Desktop Entry]\nName=PowerMenu\nExec=wlogout\nTerminal=false\nX-MultipleArgs=false\nType=Application\nIcon=~/.config/wlogout/power.png' > powermenu.desktop
+    chmod +x rofi-calc.desktop powermenu.desktop
+    cd
     gsettings set org.cinnamon.desktop.privacy remember-recent-files false
     gsettings set org.cinnamon.desktop.default-applications.terminal exec alacritty
 fi
@@ -28,6 +30,7 @@ if [ $artix == y ] && [ $de == 2 ];then
     sed -i 's/#\\!/#\!/' .config/autostart/pipewire
     chmod +x .config/autostart/pipewire
     echo -e "[Desktop Entry]\nExec=/home/$(whoami)/.config/autostart/pipewire\nIcon=dialog-scripts\nName=pipewire\nPath=\nType=Application\nX-KDE-AutostartScript=true" > .config/autostart/pipewire.desktop
+    echo -e "[Desktop Entry]\nType=Application\nName=Apparmor Notify\nComment=Notify User of Apparmor Denials\nTryExec=aa-notify\nExec=aa-notify -p -s 1 -w 60 -f /var/log/audit/audit.log\nStartupNotify=false\nNoDisplay=true" > .config/autostart/apparmor-notify.desktop
 fi
 if [ $dm == sddm ];then
     if [ $de == 2 ];then
@@ -45,15 +48,20 @@ echo -e "kernel.kptr_restrict=1\nkernel.dmesg_restrict=2\nkernel.printk=3 3 3 3\
 echo -e "net.ipv4.tcp_syncookies=1\nnet.ipv4.tcp_rfc1337=1\nnet.ipv4.conf.all.rp_filter=1\nnet.ipv4.conf.default.rp_filter=1\n" > sys/99-network-security.conf
 echo -e "net.ipv6.conf.all.use_tempaddr = 2\nnet.ipv6.conf.default.use_tempaddr = 2" > sys/99-ipv6-privacy.conf
 echo -e "kernel.yama.ptrace_scope=2\nfs.protected_symlinks=1\nfs.protected_hardlinks=1\nfs.protected_fios=2\nfs.protected_regular=2" > sys/99-userspace.conf
-echo "vm.max_map_count=2147483642" > sys/90-map-count.conf
+echo "vm.max_map_count=2147483642" > sys/99-map-count.conf
 sudo chown root:root sys/*
 sudo mv sys/* /etc/sysctl.d/
 rmdir sys/
 #sudo sed -i 's/quiet/spectre_v2=on spec_store_bypass_disable=on l1tf=full,force mds=full tsx=off tsx_async_abort=full kvm.nx_huge_pages=force l1d_flush=on mmio_stale_data=full 
-sudo sed -i 's/quiet/slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off loglevel=0 quiet/' $bootdir
+sudo sed -i 's/quiet/lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off loglevel=0 quiet/' $bootdir
 if [ $artix == y ] || [ $grub == y ];then
     sudo grub-mkconfig -o /boot/grub/grub.cfg
 fi
+sudo sed -i 's/#write-cache/write-cache/' /etc/apparmor/parser.conf
+sudo groupadd -r audit
+usr=$(whoami)
+sudo gpasswd -a $usr audit
+sudo sed -i '/log_group/a log_group = audit/' /etc/audit/auditd.conf 
 
 #SystemD Boot Kernel Fallbacks
 if [ $artix == n ] || [ $grub == n ];then
@@ -101,6 +109,11 @@ fi
 ######################################################################################################
 ######################################## END OF PROBLEM AREA #########################################
 ######################################################################################################
+if ! rg .config <<< $(sudo ls -a /root/);then
+    sudo mkdir /root/.config/
+fi
+sudo cp -r ${repo}dotfiles/nvim /root/.config/
+sudo mv ${repo}dotfiles/root/* /root/.config/
 mv ${repo}dotfiles/config/* .config/
 if [ $gayms == y ];then
     if ! rg "retroarch" <<< $(ls .config);then
@@ -111,36 +124,41 @@ fi
 mv ${repo}dotfiles/bashrc .bashrc
 mv ${repo}dotfiles/inputrc .inputrc
 sudo sed -i -e 's/#unix_sock_group = "libvirt"/unix_sock_group = "libvirt"/' -i -e 's/#unix_sock_ro_perms = "0777"/unix_sock_ro_perms = "0777"/' -i -e 's/#unix_sock_rw_perms = "0770"/unix_sock_rw_perms = "0770"/' /etc/libvirt/libvirtd.conf
-vir=$(whoami)
-sudo usermod -aG libvirt $vir
+sudo usermod -aG libvirt $usr
 if [ $artix == n ];then
-    sudo systemctl enable systemd-timesyncd cups $dm cronie pkgfile-update.timer
-    systemctl --user --now enable wireplumber.service pipewire.service pipewire-pulse.service
+    sudo systemctl enable --now systemd-timesyncd cups $dm cronie libvirtd apparmor auditd pkgfile-update.timer
 elif [ $init == dinit ]; then
     sudo dinitctl enable ntpd
     sudo dinitctl enable cupsd
-    sudo dinitctl enable $dm
     sudo dinitctl enable cronie
     sudo dinitctl enable libvirtd
+    sudo dinitctl enable apparmor
+    sudo dinitctl enable auditd
+    sudo dinitctl enable $dm
 elif [ $init == runit ]; then
     sudo ln -s /etc/runit/sv/ntpd /run/runit/service
     sudo ln -s /etc/runit/sv/cupsd /run/runit/service
     sudo ln -s /etc/runit/sv/$dm /run/runit/service
     sudo ln -s /etc/runit/sv/cronie /run/runit/service
+    sudo ln -s /etc/runit/sv/apparmor /run/runit/service
+    sudo ln -s /etc/runit/sv/auditd /run/runit/service
 elif [ $init == openrc ]; then
     sudo rc-update add ntpd boot
     sudo rc-update add cupsd boot
     sudo rc-update add $dm boot
+    sudo rc-update add apparmor default
+    sudo rc-update add auditd default
     sudo rc-update add cronie default
     sudo rc-update add libvirtd default
 elif [ $init == s6 ];then
     sudo touch /etc/s6/adminsv/default/contents.d/ntpd
     sudo touch /etc/s6/adminsv/default/contents.d/$dm
     sudo touch /etc/s6/adminsv/default/contents.d/cupsd
-    sudo touch /etc/s6/adminsv/default/contends.d/cronie
+    sudo touch /etc/s6/adminsv/default/contents.d/cronie
+    sudo touch /etc/s6/adminsv/default/contents.d/apparmor
+    sudo touch /etc/s6/adminsv/default/contents.d/auditd
     sudo s6-db-reload
 fi
-sudo pkgfile --update
 
 rm -rf ${repo}
 if [ $bin == y ];then
