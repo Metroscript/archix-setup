@@ -1,17 +1,15 @@
 #!/bin/bash
 id=~/.config/mako/icons/
-br="$(brightnessctl -m | cut -d, -f4 | sed 's/%//')"
+br=$(brightnessctl -m | cut -d, -f4 | sed 's/%//')
 
-i() {
-    if [ "$br" -le "20" ];then
-	    echo "${id}brightness-20.png"
-    elif [ "$br" -le "40" ];then
-	    echo "${id}brightness-40.png"
-    elif [ "$br" -le "60" ];then
-	    echo "${id}brightness-60.png"
-    elif [ "$br" -le "80" ];then
-	    echo "${id}brightness-80.png";else
-	    echo "${id}brightness-100.png"
-    fi
-}
-notify-send -h string:x-canonical-private-synchronous:sys-notify -t 2000 -i "$(i)" "$br%"
+if [ $br -le 20 ];then
+    i="${id}brightness-20.png"
+elif [ $br -le 40 ];then
+    i="${id}brightness-40.png"
+elif [ $br -le 60 ];then
+    i="${id}brightness-60.png"
+elif [ $br -le 80 ];then
+    i="${id}brightness-80.png";else
+    i="${id}brightness-100.png"
+fi
+notify-send -h string:x-canonical-private-synchronous:sys-notify -t 2000 -i "$i" "$br%"

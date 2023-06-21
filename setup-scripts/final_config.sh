@@ -26,10 +26,10 @@ if [ $artix == y ] && [ $de == 2 ];then
     if ! rg "autostart" <<< $(ls .config/);then
         mkdir .config/autostart
     fi
-    echo -e "#\!/bin/sh\n/usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/wireplumber" > .config/autostart/pipewire
-    sed -i 's/#\\!/#\!/' .config/autostart/pipewire
-    chmod +x .config/autostart/pipewire
-    echo -e "[Desktop Entry]\nExec=/home/$(whoami)/.config/autostart/pipewire\nIcon=dialog-scripts\nName=pipewire\nPath=\nType=Application\nX-KDE-AutostartScript=true" > .config/autostart/pipewire.desktop
+    #echo -e "#\!/bin/sh\n/usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/wireplumber" > .config/autostart/pipewire
+    #sed -i 's/#\\!/#\!/' .config/autostart/pipewire
+    #chmod +x .config/autostart/pipewire
+    echo -e "[Desktop Entry]\nExec=/usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/wireplumber\nIcon=dialog-scripts\nName=pipewire\nPath=\nType=Application\nX-KDE-AutostartScript=true" > .config/autostart/pipewire.desktop
     echo -e "[Desktop Entry]\nType=Application\nName=Apparmor Notify\nComment=Notify User of Apparmor Denials\nTryExec=aa-notify\nExec=aa-notify -p -s 1 -w 60 -f /var/log/audit/audit.log\nStartupNotify=false\nNoDisplay=true" > .config/autostart/apparmor-notify.desktop
 fi
 if [ $dm == sddm ];then
@@ -64,7 +64,7 @@ sudo gpasswd -a $usr audit
 sudo sed -i '/log_group/a log_group = audit/' /etc/audit/auditd.conf 
 
 #SystemD Boot Kernel Fallbacks
-if [ $artix == n ] || [ $grub == n ];then
+if [ $artix == n ] || [ "$grub" == n ];then
     cd /boot/loader/entries
     sudo cp arch.conf arch-fallback.conf
     sudo sed -i -e 's/Arch Linux/Arch Linux Fallback/' -i -e 's/initramfs-linux/initramfs-linux-fallback/' arch-fallback.conf
