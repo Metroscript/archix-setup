@@ -160,7 +160,7 @@
     "custom/updates": {
         "format": "󰇚 {}",
         "tooltip": false,
-        "interval": 3600,                     // 3600=every hour
+        "interval": 60,
         "exec": "(checkupdates ; paru -Qua) | wc -l",       // # of updates and tooltip details
         "on-click": "hyprctl dispatch exec '[workspace e;float 1;opacity 1.0 override 1.0 override] alacritty -e ./.config/waybar/scripts/upgrade'", // update system
         "on-click-right": "hyprctl dispatch exec '[workspace e;float 1;opacity 1.0 override 1.0 override] alacritty -e paru -Syua'",

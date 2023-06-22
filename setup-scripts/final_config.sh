@@ -29,7 +29,7 @@ if [ $artix == y ] && [ $de == 2 ];then
     #echo -e "#\!/bin/sh\n/usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/wireplumber" > .config/autostart/pipewire
     #sed -i 's/#\\!/#\!/' .config/autostart/pipewire
     #chmod +x .config/autostart/pipewire
-    echo -e "[Desktop Entry]\nExec=/usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/wireplumber\nIcon=dialog-scripts\nName=pipewire\nPath=\nType=Application\nX-KDE-AutostartScript=true" > .config/autostart/pipewire.desktop
+    echo -e "[Desktop Entry]\nExec=/usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/wireplumber &\nIcon=dialog-scripts\nName=pipewire\nPath=\nType=Application\nX-KDE-AutostartScript=true" > .config/autostart/pipewire.desktop
     echo -e "[Desktop Entry]\nType=Application\nName=Apparmor Notify\nComment=Notify User of Apparmor Denials\nTryExec=aa-notify\nExec=aa-notify -p -s 1 -w 60 -f /var/log/audit/audit.log\nStartupNotify=false\nNoDisplay=true" > .config/autostart/apparmor-notify.desktop
 fi
 if [ $dm == sddm ];then
