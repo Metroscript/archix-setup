@@ -40,10 +40,8 @@ tz=$(curl https://ipapi.co/timezone)
     ######## END OF PROBLEM AREA ######
     ###################################
 if [ $artix == y ];then
-    sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.pacnew
-    rankmirrors /etc/pacman.d/mirrorlist.pacnew > mirrorlist
-    sudo rm /etc/pacman.d/mirrorlist
-    sudo mv mirrorlist /etc/pacman.d/
+    sudo mv /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.pacnew
+    sudo sh -c "rankmirrors /etc/pacman.d/mirrorlist.pacnew > /etc/pacman.d/mirrorlist"
     sudo reflector --save /etc/pacman.d/mirrorlist-arch --sort rate -c $country -p https,rsync;else
     sudo reflector --save /etc/pacman.d/mirrorlist --sort rate -c $country -p https,rsync
 fi

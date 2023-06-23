@@ -26,32 +26,23 @@ if [ $artix == y ] && [ $de == 2 ];then
     if ! rg "autostart" <<< $(ls .config/);then
         mkdir .config/autostart
     fi
-    #echo -e "#\!/bin/sh\n/usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/wireplumber" > .config/autostart/pipewire
-    #sed -i 's/#\\!/#\!/' .config/autostart/pipewire
-    #chmod +x .config/autostart/pipewire
-    echo -e "[Desktop Entry]\nExec=/usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/wireplumber &\nIcon=dialog-scripts\nName=pipewire\nPath=\nType=Application\nX-KDE-AutostartScript=true" > .config/autostart/pipewire.desktop
+    echo -e "[Desktop Entry]\nExec=/usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/wireplumber\nName=pipewire\nPath=\nType=Application\nX-KDE-AutostartScript=true" > .config/autostart/pipewire.desktop
     echo -e "[Desktop Entry]\nType=Application\nName=Apparmor Notify\nComment=Notify User of Apparmor Denials\nTryExec=aa-notify\nExec=aa-notify -p -s 1 -w 60 -f /var/log/audit/audit.log\nStartupNotify=false\nNoDisplay=true" > .config/autostart/apparmor-notify.desktop
 fi
 if [ $dm == sddm ];then
     if [ $de == 2 ];then
-    echo -e "[Theme]\nCurrent=breeze" > sddm.conf;else
-    echo -e "[Theme]\nCurrent=archlinux-simplyblack" > sddm.conf
+    sudo sh -c "echo -e '[Theme]\nCurrent=breeze' > /etc/sddm.conf";else
+    sudo sh -c "echo -e '[Theme]\nCurrent=archlinux-simplyblack' > /etc/sddm.conf"
     fi
-    sudo chown root:root sddm.conf
-    sudo mv sddm.conf /etc/
 fi
 if ! rg "sysctl.d" <<< $(ls /etc/);then
     sudo mkdir /etc/sysctl.d/
 fi
-mkdir sys
-echo -e "kernel.kptr_restrict=1\nkernel.dmesg_restrict=2\nkernel.printk=3 3 3 3\nkernel.unpriviledged_bpf_disabled=1\nnet.core.bpf_jit_harden=2\ndev.tty.ldisc_autoload=0\nvm.unprivileged_userfaultfd=0\nkernel.kexec_load_disabled=1\nkernel.sysrq=4\nkernel.unprivileged_userns_clone=0\nkernel.perf_event_paranoid=3" > sys/99-kernel-hardening.conf
-echo -e "net.ipv4.tcp_syncookies=1\nnet.ipv4.tcp_rfc1337=1\nnet.ipv4.conf.all.rp_filter=1\nnet.ipv4.conf.default.rp_filter=1\n" > sys/99-network-security.conf
-echo -e "net.ipv6.conf.all.use_tempaddr = 2\nnet.ipv6.conf.default.use_tempaddr = 2" > sys/99-ipv6-privacy.conf
-echo -e "kernel.yama.ptrace_scope=2\nfs.protected_symlinks=1\nfs.protected_hardlinks=1\nfs.protected_fios=2\nfs.protected_regular=2" > sys/99-userspace.conf
-echo "vm.max_map_count=2147483642" > sys/99-map-count.conf
-sudo chown root:root sys/*
-sudo mv sys/* /etc/sysctl.d/
-rmdir sys/
+sudo sh -c "echo -e 'kernel.kptr_restrict=1\nkernel.dmesg_restrict=2\nkernel.printk=3 3 3 3\nkernel.unpriviledged_bpf_disabled=1\nnet.core.bpf_jit_harden=2\ndev.tty.ldisc_autoload=0\nvm.unprivileged_userfaultfd=0\nkernel.kexec_load_disabled=1\nkernel.sysrq=4\nkernel.unprivileged_userns_clone=0\nkernel.perf_event_paranoid=3' > /etc/sysctl.d/99-kernel-hardening.conf"
+sudo sh -c "echo -e 'net.ipv4.tcp_syncookies=1\nnet.ipv4.tcp_rfc1337=1\nnet.ipv4.conf.all.rp_filter=1\nnet.ipv4.conf.default.rp_filter=1\n' > /etc/sysctl.d/99-network-security.conf"
+sudo sh -c "echo -e 'net.ipv6.conf.all.use_tempaddr = 2\nnet.ipv6.conf.default.use_tempaddr = 2' > /etc/sysctl.d/99-ipv6-privacy.conf"
+sudo sh -c "echo -e 'kernel.yama.ptrace_scope=2\nfs.protected_symlinks=1\nfs.protected_hardlinks=1\nfs.protected_fios=2\nfs.protected_regular=2' > /etc/sysctl.d/99-userspace.conf"
+sudo sh -c "echo 'vm.max_map_count=2147483642' > /etc/sysctl.d/99-map-count.conf"
 #sudo sed -i 's/quiet/spectre_v2=on spec_store_bypass_disable=on l1tf=full,force mds=full tsx=off tsx_async_abort=full kvm.nx_huge_pages=force l1d_flush=on mmio_stale_data=full 
 sudo sed -i 's/quiet/lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off loglevel=0 quiet/' $bootdir
 if [ $artix == y ] || [ $grub == y ];then
