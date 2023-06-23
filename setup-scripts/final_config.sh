@@ -125,6 +125,10 @@ mv ${repo}dotfiles/bashrc .bashrc
 mv ${repo}dotfiles/inputrc .inputrc
 sudo sed -i -e 's/#unix_sock_group = "libvirt"/unix_sock_group = "libvirt"/' -i -e 's/#unix_sock_ro_perms = "0777"/unix_sock_ro_perms = "0777"/' -i -e 's/#unix_sock_rw_perms = "0770"/unix_sock_rw_perms = "0770"/' /etc/libvirt/libvirtd.conf
 sudo usermod -aG libvirt $usr
+if ! rg localtime <<< $tz;then
+    sudo ln -sf /usr/share/zoneinfo/$tz /etc/localtime
+    sudo hwclock --systohc
+fi
 if [ $artix == n ];then
     sudo systemctl enable --now systemd-timesyncd cups $dm cronie libvirtd apparmor auditd pkgfile-update.timer
 elif [ $init == dinit ]; then

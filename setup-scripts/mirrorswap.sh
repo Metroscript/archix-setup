@@ -11,29 +11,29 @@ if [ $suas == y ];then
     sudo pacman -S --needed --noconfirm autoconf automake bison debugedit fakeroot flex gcc groff libtool m4 make patch pkgconf texinfo which
 fi
 sudo pacman -S --needed --noconfirm reflector rsync pacman-contrib pkgfile
-countr=$(curl https://ipapi.co/timezone)
-    #####################################
+tz=$(curl https://ipapi.co/timezone)
+#####################################
     ### ADD SUPPORT FOR MORE COUNTRIES ##
     #####################################
-    if grep -E "Australia" <<< $countr;then
+    if grep "Australia" <<< $tz;then
         country=Australia
-    elif grep -E "Canada" <<< $countr;then
+    elif grep "Canada" <<< $tz;then
         country=Canada
-    elif grep -E "France" <<< $countr;then
+    elif grep "France" <<< $tz;then
         country=France
-    elif grep -E "Germany" <<< $countr;then
+    elif grep "Germany" <<< $tz;then
         country=Germany
-    elif grep -E "US" <<< $countr;then
+    elif grep "US" <<< $tz;then
         country=US
-    elif grep -E "Mexico" <<< $countr;then
+    elif grep "Mexico" <<< $tz;then
         country=Mexico
-    elif grep -E "Chile" <<< $countr;then
+    elif grep "Chile" <<< $tz;then
         country=Chile
-    elif grep -E "Japan" <<< $countr;then
+    elif grep "Japan" <<< $tz;then
         country=Japan
-    elif grep -E "China" <<< $countr;then
+    elif grep "China" <<< $tz;then
         country=China
-    elif grep -E "America" <<< $countr;then
+    elif grep "America" <<< $tz;then
         country=America
     fi
     ###################################

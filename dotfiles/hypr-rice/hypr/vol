@@ -1,61 +1,52 @@
 #!/bin/bash
 w=wpctl
 a=@DEFAULT_AUDIO_
-o=${a}SINK@
-i=${a}SOURCE@
-s=set-volume
+if [ "$q" == y ];then
+    so=${a}SOURCE@;else
+    so=${a}SINK@
+fi
+mi=microphone
+vo=volume
+s=set-$vo
 u=set-mute
-ic=$($w get-volume $i)
-oc=$($w get-volume $o)
+c=$($w get-$vo $so)
 id=~/.config/mako/icons/
 n="notify-send -h string:x-canonical-private-synchronous:sys-notify -t 2000 -i"
-if [ "$q" == y ];then
-    if [ "$m" == y ];then
-        $w $u $i toggle
-    elif rg [MUTED] <<< $ic;then
-        $w $u $i 0
-    elif [ $d == y ];then
-        $w $s $i 5%-;else
-        $w $s -l 1.0 $i 5%+
-    fi
-else
-    if [ "$m" == y ];then
-        $w $u $o toggle
-    elif rg [MUTED] <<< $oc;then
-        $w $u $o 0
-    elif [ "$d" == y ];then
-        $w $s $o 5%-;else
-        $w $s -l 1.0 $o 5%+
-    fi
+if [ "$m" == y ];then
+    $w $u $so toggle
+elif rg [MUTED] <<< $c;then
+    $w $u $so 0
+    um=y
+elif [ $d == y ];then
+    $w $s $so 5%-;else
+    $w $s -l 1.0 $so 5%+
 fi
 
 if [ $q == y ];then
-    v=$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@ | sed 's/Volume: //' | sed 's/0.00/0/' | sed 's/0\.//' | sed 's/1\./1/' | sed 's/05/5/')
-    c=$ic
+    v=$(wpctl get-$vo @DEFAULT_AUDIO_SOURCE@ | sed 's/Volume: //' | sed 's/0.00/0/' | sed 's/0\.//' | sed 's/1\./1/' | sed 's/05/5/')
     if [ $v -eq 0 ];then
-        ic=${id}microphone-mute.png;else
-        ic=${id}microphone.png
+        ic=${id}${mi}-mute.png;else
+        ic=${id}${mi}.png
     fi;else
-    v=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | sed 's/Volume: //' | sed 's/0.00/0/' | sed 's/0\.//' | sed 's/1\./1/' | sed 's/05/5/')
-    c=$oc
+    v=$(wpctl get-$vo @DEFAULT_AUDIO_SINK@ | sed 's/Volume: //' | sed 's/0.00/0/' | sed 's/0\.//' | sed 's/1\./1/' | sed 's/05/5/')
     if [ $v -eq 0 ];then
-        ic=${id}volume-mute.png
+        ic=${id}${vo}-mute.png
     elif [ $v -ge 0 ] && [ $v -le 30 ];then
-        ic=${id}volume-low.png
+        ic=${id}${vo}-low.png
     elif [ $v -ge 30 ] && [ $v -le 60 ];then
-        ic=${id}volume-mid.png
+        ic=${id}${vo}-mid.png
     elif [ $v -ge 60 ] && [ $v -le 100 ];then
-        ic=${id}volume-high.png
+        ic=${id}${vo}-high.png
     fi
 fi
 if rg [MUTED] <<< $v;then
     if [ $q == y ];then
-        $n "${id}microphone-mute.png" "Mute";else
-        $n "${id}volume-mute.png" "Mute"
+        $n "${id}${mi}-mute.png" "Mute";else
+        $n "${id}${vo}-mute.png" "Mute"
     fi
-    elif rg 0.00 <<< $c && [ "$d" == y ];then
+    elif rg 0.00 <<< $c && [ "$d" == y ] && ! [ "$um" == y ];then
         x=1
-    elif rg 1.00 <<< $c && ! [ "$d" == y ];then
+    elif rg 1.00 <<< $c && ! [ "$d" == y ] && ! [ "$m" == y ] && ! [ "$um" == y ];then
         x=1;else
         $n "$ic" "$v%"
 fi
