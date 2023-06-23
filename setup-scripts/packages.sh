@@ -56,45 +56,34 @@ if [ $suas == y ];then
     sed -i -e 's/SudoLoop/SudoLoop = true/' -i -e 's/#\[bin\]/\[bin\]/' -i -e 's,#Sudo = doas,Sudo = /bin/doas,' .config/paru/paru.conf
 fi
 
+if [ $de == 1 ];then
+    paru -S sddm-git archlinux-themes-sddm
+fi
+if [ "$rlx" == y ];then
+    paru -S grapejuice-git
+fi
+if [ "$waydroid" == y ];then
+    paru -S waydroid
+fi
+if [ "$makemkv" == y ];then
+    paru -S makemkv
+fi
+paru -S downgrade
 if [ $bin == y ];then
-    if [ $de == 1 ];then
-        paru -S sddm-git archlinux-themes-sddm
-    fi
-    if [ $gayms == y ];then
-        if [ $rlx == y ];then
-            paru -S grapejuice-git
-        fi
-        if [ $min == y ];then
-            paru -S prismlauncher-bin
-        fi
-        if [ $waydroid == y ];then
-            paru -S waydroid
-        fi
+    if [ "$min" == y ];then
+        paru -S prismlauncher-bin
     fi
     if [ $artix == y ];then
-        paru -S downgrade
         sudo pacman -S --needed --noconfirm librewolf timeshift;else
-        paru -S downgrade librewolf-bin timeshift-bin
+        paru -S librewolf-bin timeshift-bin
     fi
 else
-    if [ $de == 1 ];then
-        paru -S sddm-git archlinux-themes-sddm
-    fi
-    if [ $gayms == y ];then
-        if [ $rlx == y ];then
-            paru -S grapejuice-git
-        fi
-        if [ $min == y ];then
-            paru -S prismlauncher
-        fi
-        if [ $waydroid == y ];then
-            paru -S waydroid
-        fi
+    if [ "$min" == y ];then
+        paru -S prismlauncher
     fi
     if [ $artix == y ];then
-        paru -S downgrade
         sudo pacman -S --needed --noconfirm librewolf timeshift;else
-        paru -S librewolf timeshift downgrade
+        paru -S librewolf timeshift
     fi
 fi
 
@@ -105,7 +94,7 @@ fi
 
 #Hyprland 
 if [ $de == 1 ];then
-sudo pacman -Syu --needed --noconfirm alacritty obs-studio btop simple-scan mpv gnome-font-viewer kdenlive bigsh0t dvgrab mediainfo open{cv,timelineio} recordmydesktop rhythmbox lollypop krita okular deluge-gtk blender libdecor handbrake
+sudo pacman -Syu --needed --noconfirm alacritty obs-studio btop simple-scan mpv gnome-font-viewer kdenlive bigsh0t dvgrab mediainfo open{cv,timelineio} recordmydesktop rhythmbox lollypop krita okular deluge-gtk blender libdecor
 sudo pacman -Syu --needed --noconfirm wl-clipboard cliphist qt{5{ct,-wayland},6{ct,-wayland}} pavucontrol nemo{,-{fileroller,share}} catdoc odt2txt poppler libgsf gvfs-{mtp,afc,nfs,smb} ffmpegthumbnailer polkit-gnome imv calcurse gamescope brightnessctl udiskie gammastep swayidle hyprland xdg-desktop-portal-hyprland breeze-{icons,gtk}
 paru -S --needed wlogout rofi-lbonn-wayland-git waybar-hyprland-git hyprpicker-git swww nwg-look swaync wlr-randr grimblast swaylock-effects-git psuinfo
 sudo pacman -Syu --needed --noconfirm rofi-calc

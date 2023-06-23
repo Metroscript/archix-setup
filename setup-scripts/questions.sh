@@ -133,6 +133,12 @@ if [ $gayms == y ];then
     done
     fi
 fi
+printf "Install MakeMKV? (A DVD/Bluray ripper) [y/n]: "
+read makemkv
+until [ $makemkv == y ] || [ $makemkv == n ];do
+    printf "Install MakeMKV? (A DVD/Bluray ripper) [y/n]: "
+    read makemkv
+done
 
 echo "Swapfile size. 2048Mib is usually a good choice. Put '0' for no swapfile."
 printf "Size of swapfile in Mib: "
