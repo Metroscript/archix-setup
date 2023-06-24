@@ -129,7 +129,7 @@ elif [ $init == dinit ]; then
     sudo dinitctl enable libvirtd
     sudo dinitctl enable apparmor
     sudo dinitctl enable auditd
-    sudo dinitctl enable $dm
+    sudo ln -s /etc/dinit.d/$dm /etc/dinit.d/boot.d/
 elif [ $init == runit ]; then
     sudo ln -s /etc/runit/sv/ntpd /run/runit/service
     sudo ln -s /etc/runit/sv/cupsd /run/runit/service
@@ -161,8 +161,6 @@ if [ $bin == y ];then
     rm -rf paru/
 fi
 if [ $artix == y ];then
-    if ! [ $init == dinit ];then
-        loginctl reboot
-    fi;else
+    loginctl reboot;else
     reboot
 fi
