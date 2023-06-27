@@ -22,13 +22,12 @@ elif [ $d == y ];then
     $w $s -l 1.0 $so 5%+
 fi
 
+v=$(wpctl get-$vo $so | cut -d\  -f2-3 | sed 's/0.00/0/' | sed 's/0\.//' | sed 's/1\./1/' | sed 's/05/5/')
 if [ $q == y ];then
-    v=$(wpctl get-$vo @DEFAULT_AUDIO_SOURCE@ | sed 's/Volume: //' | sed 's/0.00/0/' | sed 's/0\.//' | sed 's/1\./1/' | sed 's/05/5/')
     if [ $v -eq 0 ];then
         ic=${id}${mi}-mute.png;else
         ic=${id}${mi}.png
     fi;else
-    v=$(wpctl get-$vo @DEFAULT_AUDIO_SINK@ | sed 's/Volume: //' | sed 's/0.00/0/' | sed 's/0\.//' | sed 's/1\./1/' | sed 's/05/5/')
     if [ $v -eq 0 ];then
         ic=${id}${vo}-mute.png
     elif [ $v -ge 0 ] && [ $v -le 30 ];then
@@ -44,9 +43,6 @@ if rg [MUTED] <<< $v;then
         $n "${id}${mi}-mute.png" "Mute";else
         $n "${id}${vo}-mute.png" "Mute"
     fi
-    elif rg 0.00 <<< $c && [ "$d" == y ] && ! [ "$um" == y ];then
-        x=1
-    elif rg 1.00 <<< $c && ! [ "$d" == y ] && ! [ "$m" == y ] && ! [ "$um" == y ];then
-        x=1;else
+elif ! (rg 0.00 <<< $c && [ "$d" == y ] && ! [ "$um" == y ]) && ! (rg 1.00 <<< $c && ! [ "$d" == y ] && ! [ "$m" == y ] && ! [ "$um" == y ]);then
         $n "$ic" "$v%"
 fi
