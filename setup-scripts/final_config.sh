@@ -10,8 +10,29 @@ if rg plymouth <<< $(pacman -Q);then
 fi
 
 #Final Configuration
+usr=$(whoami)
 if [ $de == 1 ];then
+    if ! rg Desktop <<< $(ls);then
+        mkdir Desktop
+    fi
+    if ! rg Documents <<< $(ls);then
+        mkdir Documents
+    fi
+    if ! rg Music <<< $(ls);then
+        mkdir Music
+    fi
+    if ! rg Pictures <<< $(ls);then
+        mkdir Pictures
+    fi
+    if ! rg Videos <<< $(ls);then
+        mkdir Videos
+    fi
+    if ! rg Downloads <<< $(ls);then
+        mkdir Downloads
+    fi
     mv ${repo}dotfiles/hypr-rice/* .config/
+    bmpath=file:///home/$usr/
+    echo -e '${bmpath}Documents Documents\n${bmpath}Music Music\n${bmpath}Pictures Pictures\n${bmpath}Videos Videos\n${bmpath}Downloads Downloads' > .config/gtk-3.0/bookmarks
     mv ${repo}dotfiles/thumbnailers .local/share/
     mv ${repo}dotfiles/set-as-background.nemo_action .local/share/nemo/actions
     cd .local/share/applications/
@@ -50,7 +71,6 @@ if [ $artix == y ] || [ $grub == y ];then
 fi
 sudo sed -i 's/#write-cache/write-cache/' /etc/apparmor/parser.conf
 sudo groupadd -r audit
-usr=$(whoami)
 sudo gpasswd -a $usr audit
 sudo sed -i '/log_group/a log_group = audit/' /etc/audit/auditd.conf 
 
@@ -107,6 +127,9 @@ sudo cp -r ${repo}dotfiles/config/nvim /root/.config/
 sudo mv ${repo}dotfiles/root/* /root/.config/
 mv ${repo}dotfiles/config/* .config/
 if [ $gayms == y ];then
+    if ! rg Games <<< $(ls);then
+        mkdir Games
+    fi
     if ! rg "retroarch" <<< $(ls .config);then
         mkdir .config/retroarch
     fi
