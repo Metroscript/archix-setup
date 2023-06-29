@@ -103,7 +103,7 @@ fi
 if ! rg .config <<< $(sudo ls -a /root/);then
     sudo mkdir /root/.config/
 fi
-sudo cp -r ${repo}dotfiles/nvim /root/.config/
+sudo cp -r ${repo}dotfiles/config/nvim /root/.config/
 sudo mv ${repo}dotfiles/root/* /root/.config/
 mv ${repo}dotfiles/config/* .config/
 if [ $gayms == y ];then

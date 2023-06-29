@@ -1,7 +1,7 @@
 #SET EDITOR#
 if grep -E neovim <<< $(pacman -Q);then
     alias vim='nvim'
-    sed -i 's,VISUAL=,VISUAL="/usr/bin/nvim",' ${repo}dotfiles/bashrc
+    sed -i -e 's,VISUAL=,VISUAL="/usr/bin/nvim",' -i -e "/cl=/a alias vim='nvim'" ${repo}dotfiles/bashrc
 elif grep -E emacs <<< $(pacman -Q);then
     alias vim='emacs -nw'
     sed -i 's,VISUAL=,VISUAL="/usr/bin/emacs",' ${repo}dotfiles/bashrc
@@ -36,7 +36,7 @@ if [ $artix == y ] || [ $grub == y ];then
     bootdir=/boot/loader/entries/arch.conf
 fi
 
-if grep -E "opendoas" <<< $(pacman -Q opendoas);then
+if grep opendoas <<< $(pacman -Q opendoas);then
     suas=y
     alias sudo='doas'
     sed -i "/stuff/a alias sudo='doas'" ${repo}dotfiles/bashrc
@@ -47,7 +47,7 @@ if grep -E "opendoas" <<< $(pacman -Q opendoas);then
     suas=n
 fi
 
-if grep -E networkmanager <<< $(pacman -Q);then
+if grep networkmanager <<< $(pacman -Q);then
     printf "Enable Network Privacy features for NetworkManager? (May cause network instability) [y/n]: "
     read nmp
     until [ $nmp == y ] || [ $nmp == n ];do
@@ -138,6 +138,12 @@ read makemkv
 until [ $makemkv == y ] || [ $makemkv == n ];do
     printf "Install MakeMKV? (A DVD/Bluray ripper) [y/n]: "
     read makemkv
+done
+printf "Install OpenRGB? (RGB management software) [y/n]: "
+read rgb
+until [ $rgb == y ] || [ $rgb == n ];do
+    printf "Install OpenRGB? (RGB management software) [y/n]: "
+    read rgb
 done
 
 echo "Swapfile size. 2048Mib is usually a good choice. Put '0' for no swapfile."

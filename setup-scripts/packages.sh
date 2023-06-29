@@ -26,7 +26,7 @@ fi
 sudo pacman -Syu --needed --noconfirm vkd3d lib32-vkd3d
 
 #Basic packages
-sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber cronie man-db wayland xorg-xwayland smartmontools v4l2loopback-dkms gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{jetbrains-mono-nerd,ubuntu-nerd,noto-nerd} cups{,-pk-helper,-pdf} gutenprint foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley firewalld fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay mesa jre{-openjdk,11-openjdk,8-openjdk} libreoffice-fresh{,-en-gb} hunspell{,-en_au} coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp mythes-en lib{paper,wpg,pulse,mythes,32-{gnutls,libpulse,alsa-{lib,plugins},pipewire{,-jack,-v4l2},mesa}} keepassxc gst-{libav,plugins-{base,good}} phonon-qt5-gstreamer imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq qemu-full edk2-ovmf virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat plymouth nvme-cli apparmor audit python-{notify2,psutil} noise-suppression-for-voice
+sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber cronie man-db wayland xorg-xwayland smartmontools v4l2loopback-dkms gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{jetbrains-mono-nerd,ubuntu-nerd,noto-nerd} cups{,-pk-helper,-pdf} gutenprint foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley firewalld fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay libreoffice-fresh{,-en-gb} hunspell{,-en_au} coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp mythes-en lib{paper,wpg,pulse,mythes,32-{gnutls,libpulse,alsa-{lib,plugins},pipewire{,-jack,-v4l2}}} keepassxc gst-{libav,plugins-{base,good}} phonon-qt5-gstreamer imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq qemu-full edk2-ovmf virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat plymouth nvme-cli apparmor audit python-{notify2,psutil} noise-suppression-for-voice
 
     #Games, etc
 if [ $gayms == y ];then
@@ -65,13 +65,16 @@ fi
 if [ "$waydroid" == y ];then
     paru -S waydroid
 fi
-if [ "$makemkv" == y ];then
+if [ $makemkv == y ];then
     paru -S makemkv
+fi
+if [ $rgb == y ];then
+    paru -S openrgb
 fi
 paru -S downgrade
 if [ $bin == y ];then
     if [ "$min" == y ];then
-        paru -S prismlauncher-bin
+        paru -S prismlauncher-bin jre{-openjdk,11-openjdk,8-openjdk}
     fi
     if [ $artix == y ];then
         sudo pacman -S --needed --noconfirm librewolf timeshift;else
@@ -79,7 +82,7 @@ if [ $bin == y ];then
     fi
 else
     if [ "$min" == y ];then
-        paru -S prismlauncher
+        paru -S prismlauncher jre{-openjdk,11-openjdk,8-openjdk}
     fi
     if [ $artix == y ];then
         sudo pacman -S --needed --noconfirm librewolf timeshift;else
