@@ -65,7 +65,11 @@ sudo sh -c "echo -e 'net.ipv6.conf.all.use_tempaddr = 2\nnet.ipv6.conf.default.u
 sudo sh -c "echo -e 'fs.protected_symlinks=1\nfs.protected_hardlinks=1\nfs.protected_fios=2\nfs.protected_regular=2' > /etc/sysctl.d/99-userspace.conf"
 sudo sh -c "echo 'vm.max_map_count=2147483642' > /etc/sysctl.d/99-map-count.conf"
 #sudo sed -i 's/quiet/spectre_v2=on spec_store_bypass_disable=on l1tf=full,force mds=full tsx=off tsx_async_abort=full kvm.nx_huge_pages=force l1d_flush=on mmio_stale_data=full 
-sudo sed -i 's/quiet/lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off loglevel=0 quiet/' $bootdir
+sudo sed -i 's/quiet/lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off quiet/' $bootdir
+if ! rg loglevel <<< $(cat $bootdir);then
+    sudo sed -i 's/quiet/loglevel=0 quiet/' $bootdir;else
+    sudo sed -i 's/loglevel=./loglevel=0/' $bootdir
+fi
 if [ "$artix" == y ] || [ "$grub" == y ];then
     sudo grub-mkconfig -o /boot/grub/grub.cfg
 fi
@@ -75,7 +79,7 @@ sudo gpasswd -a $usr audit
 sudo sed -i '/log_group/a log_group = audit/' /etc/audit/auditd.conf 
 
 #SystemD Boot Kernel Fallbacks
-if [ $artix == n ] || [ "$grub" == n ];then
+if ! [ "$artix" == y ] || ! [ "$grub" == y ];then
     cd /boot/loader/entries
     sudo cp arch.conf arch-fallback.conf
     sudo sed -i -e 's/Arch Linux/Arch Linux Fallback/' -i -e 's/initramfs-linux/initramfs-linux-fallback/' arch-fallback.conf

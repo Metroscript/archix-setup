@@ -57,10 +57,13 @@ if [ $swap -gt 0 ];then
     sudo echo '/swapfile none swap defaults 0 0' | sudo tee -a /etc/fstab
     sudo mount -a
     sudo swapon -a
-    sudo sed -i "s/quiet/resume=$(lsblk -oMOUNTPOINT,UUID -P -M | grep 'MOUNTPOINT="/"' | cut -d\  -f2 | sed 's/"//g') resume_offset=$(sudo filefrag -v /swapfile | awk '$1=="0:" {print substr($4, 1, length($4)-2)}') quiet" $bootdir
+    sudo sed -i "s/quiet/resume=$(cat /etc/fstab | grep '/ ' | cut -d\  -f1) resume_offset=$(sudo filefrag -v /swapfile | awk '$1=="0:" {print substr($4, 1, length($4)-2)}') quiet/" $bootdir
     if [ "$artix" == y ] || [ "$grub" == y ];then
         sudo grub-mkconfig -o /boot/grub/grub.cfg
     fi
     sudo sed -i 's/filesystems/filesystems resume/' /etc/mkinitcpio.conf
     sudo mkinitcpio -P
+fi
+if grep nvme <<< $(lsblk) && ! grep nvme_load <<< $(cat $bootdir);then
+    sudo sed -i 's/quiet/nvme_load=YES quiet/' $bootdir
 fi
