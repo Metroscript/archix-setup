@@ -26,12 +26,11 @@ if grep -E "Artix" <<< $(cat /etc/issue);then
     fi;else
     artix=n
     if grep -E grub <<< $(pacman -Q grub);then
-        grub=y;else
-        grub=n
+        grub=y
     fi
 fi
 
-if [ $artix == y ] || [ $grub == y ];then
+if [ "$artix" == y ] || [ "$grub" == y ];then
     bootdir=/etc/default/grub;else
     bootdir=/boot/loader/entries/arch.conf
 fi

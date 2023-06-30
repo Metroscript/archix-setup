@@ -43,7 +43,7 @@ if [ $de == 1 ];then
     gsettings set org.cinnamon.desktop.privacy remember-recent-files false
     gsettings set org.cinnamon.desktop.default-applications.terminal exec alacritty
 fi
-if [ $artix == y ] && [ $de == 2 ];then
+if [ "$artix" == y ] && ! [ $de == 1 ];then
     if ! rg "autostart" <<< $(ls .config/);then
         mkdir .config/autostart
     fi
@@ -66,7 +66,7 @@ sudo sh -c "echo -e 'fs.protected_symlinks=1\nfs.protected_hardlinks=1\nfs.prote
 sudo sh -c "echo 'vm.max_map_count=2147483642' > /etc/sysctl.d/99-map-count.conf"
 #sudo sed -i 's/quiet/spectre_v2=on spec_store_bypass_disable=on l1tf=full,force mds=full tsx=off tsx_async_abort=full kvm.nx_huge_pages=force l1d_flush=on mmio_stale_data=full 
 sudo sed -i 's/quiet/lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off loglevel=0 quiet/' $bootdir
-if [ $artix == y ] || [ $grub == y ];then
+if [ "$artix" == y ] || [ "$grub" == y ];then
     sudo grub-mkconfig -o /boot/grub/grub.cfg
 fi
 sudo sed -i 's/#write-cache/write-cache/' /etc/apparmor/parser.conf
@@ -143,7 +143,7 @@ if ! rg localtime <<< $(ls /etc/);then
     sudo ln -sf /usr/share/zoneinfo/$tz /etc/localtime
     sudo hwclock --systohc
 fi
-if [ $artix == n ];then
+if ! [ "$artix" == y ];then
     sudo systemctl enable --now systemd-timesyncd cups $dm cronie libvirtd apparmor auditd pkgfile-update.timer
 elif [ $init == dinit ]; then
     sudo dinitctl enable ntpd
@@ -183,7 +183,7 @@ if [ $bin == y ];then
     rm -rf paru-bin/;else
     rm -rf paru/
 fi
-if [ $artix == y ];then
+if [ "$artix" == y ];then
     loginctl reboot;else
     reboot
 fi

@@ -1,16 +1,16 @@
 #CPU Ucode
 if grep -E "AuthenticAMD" <<< $(lscpu) && ! grep -E "amd-ucode" <<< $(pacman -Q);then
    sudo pacman -S --needed --noconfirm amd-ucode
-   if [ $artix == n ] && [ $grub == n ];then
+   if ! [ "$artix" == y ] && ! [ "$grub" == y ];then
    	sudo sed -i '/vmlinuz/a initrd /amd-ucode.img' $bootdir
    fi
 elif grep -E "GenuineIntel" <<< $(lscpu) && ! grep -E "intel-ucode" <<< $(pacman -Q);then
     sudo pacman -S --needed --noconfirm intel-ucode
-    if [ $artix == n ] || [ $grub == n ];then
+    if ! [ "$artix" == n ] || ! [ "$grub" == n ];then
     	sudo sed -i '/vmlinuz/a initrd /intel-ucode.img' $bootdir
     fi
 fi
-	#Graphics drivers
+#Graphics drivers
     #######################################
     ##### NVIDIA DRIVERS MAY NOT WORK #####
     #######################################
@@ -26,7 +26,7 @@ fi
 sudo pacman -Syu --needed --noconfirm vkd3d lib32-vkd3d
 
 #Basic packages
-sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber cronie man-db wayland xorg-xwayland smartmontools v4l2loopback-dkms gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{jetbrains-mono-nerd,ubuntu-nerd,noto-nerd} cups{,-pk-helper,-pdf} gutenprint foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley firewalld fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay libreoffice-fresh{,-en-gb} hunspell{,-en_au} coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp mythes-en lib{paper,wpg,pulse,mythes,32-{gnutls,libpulse,alsa-{lib,plugins},pipewire{,-jack,-v4l2}}} keepassxc gst-{libav,plugins-{base,good}} phonon-qt5-gstreamer imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq qemu-full edk2-ovmf virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat plymouth nvme-cli apparmor audit python-{notify2,psutil} noise-suppression-for-voice
+sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber cronie man-db wayland xorg-xwayland smartmontools v4l2loopback-dkms gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{jetbrains-mono-nerd,ubuntu-nerd,noto-nerd} cups{,-pk-helper,-pdf} gutenprint foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley firewalld fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay libreoffice-fresh{,-en-gb} hunspell{,-en_au} coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp mythes-en lib{paper,wpg,pulse,mythes,32-{gnutls,libpulse,alsa-{lib,plugins},pipewire{,-jack,-v4l2}}} keepassxc gst-{libav,plugins-{base,good}} phonon-qt5-gstreamer imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq qemu-full edk2-ovmf virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat plymouth nvme-cli apparmor audit python-{notify2,psutil} noise-suppression-for-voice wl-clipboard
 
     #Games, etc
 if [ $gayms == y ];then
@@ -76,7 +76,7 @@ if [ $bin == y ];then
     if [ "$min" == y ];then
         paru -S prismlauncher-bin jre{-openjdk,11-openjdk,8-openjdk}
     fi
-    if [ $artix == y ];then
+    if [ "$artix" == y ];then
         sudo pacman -S --needed --noconfirm librewolf timeshift;else
         paru -S librewolf-bin timeshift-bin
     fi
@@ -84,21 +84,21 @@ else
     if [ "$min" == y ];then
         paru -S prismlauncher jre{-openjdk,11-openjdk,8-openjdk}
     fi
-    if [ $artix == y ];then
+    if [ "$artix" == y ];then
         sudo pacman -S --needed --noconfirm librewolf timeshift;else
         paru -S librewolf timeshift
     fi
 fi
 
 #Artix Init Services
-if [ $artix == y ]; then
+if [ "$artix" == y ]; then
     sudo pacman -S --needed --noconfirm ${dm}-$init cups-$init openntpd-$init firewalld-$init power-profiles-daemon-$init avahi-$init libvirt-$init ${init}-system apparmor-$init audit-$init
 fi
 
 #Hyprland 
 if [ $de == 1 ];then
 sudo pacman -Syu --needed --noconfirm alacritty obs-studio btop simple-scan mpv gnome-font-viewer kdenlive bigsh0t dvgrab mediainfo open{cv,timelineio} recordmydesktop rhythmbox lollypop krita okular deluge-gtk blender libdecor
-sudo pacman -Syu --needed --noconfirm wl-clipboard cliphist qt{5{ct,-wayland},6{ct,-wayland}} pavucontrol nemo{,-{fileroller,share}} catdoc odt2txt poppler libgsf gvfs-{mtp,afc,nfs,smb} ffmpegthumbnailer polkit-gnome imv calcurse gamescope brightnessctl udiskie gammastep swayidle hyprland xdg-desktop-portal-hyprland breeze-{icons,gtk}
+sudo pacman -Syu --needed --noconfirm cliphist qt{5{ct,-wayland},6{ct,-wayland}} pavucontrol nemo{,-{fileroller,share}} catdoc odt2txt poppler libgsf gvfs-{mtp,afc,nfs,smb} ffmpegthumbnailer polkit-gnome imv calcurse gamescope brightnessctl udiskie gammastep swayidle hyprland xdg-desktop-portal-hyprland breeze-{icons,gtk}
 paru -S --needed wlogout rofi-lbonn-wayland-git waybar-hyprland-git hyprpicker-git swww nwg-look swaync wlr-randr grimblast swaylock-effects-git psuinfo
 sudo pacman -Syu --needed --noconfirm rofi-calc
 elif [ $de == 2 ];then
