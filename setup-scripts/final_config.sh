@@ -3,6 +3,9 @@ if [ $ply == y ];then
     if [ $img == mkinit ];then
         sudo sed -i 's/udev/udev plymouth/g' /etc/mkinitcpio.conf
     fi
+    if ! rg splash <<< $(cat $bootdir);then
+        sudo sed -i 's/quiet/quiet splash/' $bootdir
+    fi
     sudo sed -i 's/splash/splash plymouth.nolog/' $bootdir
     sudo sed -i -e 's/DialogVerticalAlignment=.382/DialogVerticalAlignment=.75/' -i -e 's/WatermarkVerticalAlignment=.96/WatermarkVerticalAlignment=.5/' /usr/share/plymouth/themes/spinner/spinner.plymouth
     if [ $img == mkinit ];then
@@ -78,7 +81,7 @@ sudo sh -c "echo -e 'kernel.kptr_restrict=2\nkernel.dmesg_restrict=1\nkernel.pri
 sudo sh -c "echo -e 'net.ipv4.tcp_syncookies=1\nnet.ipv4.tcp_rfc1337=1\nnet.ipv4.conf.all.rp_filter=1\nnet.ipv4.conf.default.rp_filter=1' > /etc/sysctl.d/99-network-security.conf"
 sudo sh -c "echo -e 'net.ipv6.conf.all.use_tempaddr = 2\nnet.ipv6.conf.default.use_tempaddr = 2' > /etc/sysctl.d/99-ipv6-privacy.conf"
 sudo sh -c "echo -e 'fs.protected_symlinks=1\nfs.protected_hardlinks=1\nfs.protected_fios=2\nfs.protected_regular=2' > /etc/sysctl.d/99-userspace.conf"
-sudo sh -c "echo 'vm.max_map_count=2147483642\nvm.swappiness=50' > /etc/sysctl.d/99-map-count-swappiness.conf"
+sudo sh -c "echo -e 'vm.max_map_count=2147483642\nvm.swappiness=50' > /etc/sysctl.d/99-map-count-swappiness.conf"
 sudo sed -i 's/quiet/lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off quiet/' $bootdir
 if ! rg loglevel <<< $(cat $bootdir);then
     sudo sed -i 's/quiet/loglevel=0 quiet/' $bootdir;else
@@ -94,7 +97,7 @@ sudo sed -i 's/#IgnorePkg   =/IgnorePkg   =linux-firmware/' /etc/pacman.conf
 ######################################################################################################
 ############################### NEEDS WORKING ON!!! (bashrc editing) #################################
 ######################################################################################################
-if rg 'local/linux ' <<< $(pacman -Q);then
+if rg 'local/linux ' <<< $(pacman -Qs);then
     sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux linux-headers /' /etc/pacman.conf
 fi
 if rg linux-lts <<< $(pacman -Q);then
@@ -140,9 +143,10 @@ sudo ufw default deny incoming
 sudo ufw default allow outgoing
 sudo ufw enable
 if ! [ "$artix" == y ];then
-    sudo systemctl enable --now systemd-timesyncd cups $dm cronie libvirtd apparmor auditd pkgfile-update.timer
+    sudo systemctl enable --now systemd-timesyncd cups ufw $dm cronie libvirtd apparmor auditd pkgfile-update.timer
 elif [ $init == dinit ]; then
     sudo dinitctl enable ntpd
+    sudo dinitctl enable ufw
     sudo dinitctl enable cupsd
     sudo dinitctl enable cronie
     sudo dinitctl enable libvirtd
@@ -156,16 +160,19 @@ elif [ $init == runit ]; then
     sudo ln -s /etc/runit/sv/cronie /run/runit/service
     sudo ln -s /etc/runit/sv/apparmor /run/runit/service
     sudo ln -s /etc/runit/sv/auditd /run/runit/service
+    sudo ln -s /etc/runit/sv/ufw /run/runit/service
 elif [ $init == openrc ]; then
     sudo rc-update add ntpd boot
     sudo rc-update add cupsd boot
     sudo rc-update add $dm boot
+    sudo rc-update add ufw default
     sudo rc-update add apparmor default
     sudo rc-update add auditd default
     sudo rc-update add cronie default
     sudo rc-update add libvirtd default
 elif [ $init == s6 ];then
     sudo touch /etc/s6/adminsv/default/contents.d/ntpd
+    sudo touch /etc/s6/adminsv/default/contents.d/ufw
     sudo touch /etc/s6/adminsv/default/contents.d/$dm
     sudo touch /etc/s6/adminsv/default/contents.d/cupsd
     sudo touch /etc/s6/adminsv/default/contents.d/cronie
