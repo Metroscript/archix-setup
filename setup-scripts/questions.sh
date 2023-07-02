@@ -59,7 +59,7 @@ if grep opendoas <<< $(pacman -Q opendoas);then
     echo "-----------------------------------------------------------------------------------------"
     echo -e "SudoLoop is enabled on paru, when tweaking doas.conf, put 'permit persist :wheel as root cmd true' so SudoLoop works\nYou should make any changes & run 'chmod 0400 /etc/doas.conf' as root after install"
     echo "-----------------------------------------------------------------------------------------"
-    sleep 5;else
+    sleep 5
 fi
 
 if grep networkmanager <<< $(pacman -Q);then
