@@ -1,11 +1,26 @@
 #Plymouth check & conf
-if rg plymouth <<< $(pacman -Q);then
-    sudo sed -i 's/udev/udev plymouth/g' /etc/mkinitcpio.conf
+if [ $ply == y ];then
+    if [ $img == mkinit ];then
+        sudo sed -i 's/udev/udev plymouth/g' /etc/mkinitcpio.conf
+    fi
     sudo sed -i 's/splash/splash plymouth.nolog/' $bootdir
     sudo sed -i -e 's/DialogVerticalAlignment=.382/DialogVerticalAlignment=.75/' -i -e 's/WatermarkVerticalAlignment=.96/WatermarkVerticalAlignment=.5/' /usr/share/plymouth/themes/spinner/spinner.plymouth
-    if [ $de == 2 ];then
-        sudo plymouth-set-default-theme -R breeze;else
-        sudo plymouth-set-default-theme -R spinner
+    if [ $img == mkinit ];then
+        if [ $de == 2 ];then
+            sudo plymouth-set-default-theme -R breeze;else
+            sudo plymouth-set-default-theme -R spinner
+        fi
+        ###########################################
+        ###### OTHER INITRAMFS GEN SUPPORT ########
+        ###########################################;else
+        #if [ $de == 2 ];then
+        #    sudo sed -i 's/Theme=.*/Theme=breeze/' /etc/plymouth/plymouthd.conf;else
+        #    sudo sed -i 's/Theme=.*/Theme=spinner/' /etc/plymouth/plymouthd.conf
+        #fi
+        #if [ $img == dracut ];then
+        #    sudo dracut-rebuild #;else
+        #    #sudo booster build
+        #fi
     fi
 fi
 
@@ -63,54 +78,24 @@ sudo sh -c "echo -e 'kernel.kptr_restrict=2\nkernel.dmesg_restrict=1\nkernel.pri
 sudo sh -c "echo -e 'net.ipv4.tcp_syncookies=1\nnet.ipv4.tcp_rfc1337=1\nnet.ipv4.conf.all.rp_filter=1\nnet.ipv4.conf.default.rp_filter=1' > /etc/sysctl.d/99-network-security.conf"
 sudo sh -c "echo -e 'net.ipv6.conf.all.use_tempaddr = 2\nnet.ipv6.conf.default.use_tempaddr = 2' > /etc/sysctl.d/99-ipv6-privacy.conf"
 sudo sh -c "echo -e 'fs.protected_symlinks=1\nfs.protected_hardlinks=1\nfs.protected_fios=2\nfs.protected_regular=2' > /etc/sysctl.d/99-userspace.conf"
-sudo sh -c "echo 'vm.max_map_count=2147483642' > /etc/sysctl.d/99-map-count.conf"
-#sudo sed -i 's/quiet/spectre_v2=on spec_store_bypass_disable=on l1tf=full,force mds=full tsx=off tsx_async_abort=full kvm.nx_huge_pages=force l1d_flush=on mmio_stale_data=full 
+sudo sh -c "echo 'vm.max_map_count=2147483642\nvm.swappiness=50' > /etc/sysctl.d/99-map-count-swappiness.conf"
 sudo sed -i 's/quiet/lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off quiet/' $bootdir
 if ! rg loglevel <<< $(cat $bootdir);then
     sudo sed -i 's/quiet/loglevel=0 quiet/' $bootdir;else
     sudo sed -i 's/loglevel=./loglevel=0/' $bootdir
 fi
-if [ "$artix" == y ] || [ "$grub" == y ];then
-    sudo grub-mkconfig -o /boot/grub/grub.cfg
-fi
+sudo grub-mkconfig -o /boot/grub/grub.cfg
 sudo sed -i 's/#write-cache/write-cache/' /etc/apparmor/parser.conf
 sudo groupadd -r audit
 sudo gpasswd -a $usr audit
 sudo sed -i '/log_group/a log_group = audit/' /etc/audit/auditd.conf 
 
-#SystemD Boot Kernel Fallbacks
-if ! [ "$artix" == y ] || ! [ "$grub" == y ];then
-    cd /boot/loader/entries
-    sudo cp arch.conf arch-fallback.conf
-    sudo sed -i -e 's/Arch Linux/Arch Linux Fallback/' -i -e 's/initramfs-linux/initramfs-linux-fallback/' arch-fallback.conf
-    kernel=$(pacman -Q)
-    if rg linux-lts <<< $kernel;then
-        sudo cp arch.conf lts.conf
-        sudo sed -i -e 's/Arch Linux/Arch Linux-LTS/' -i -e 's/vmlinuz-linux/vmlinuz-linux-lts/' -i -e 's/initramfs-linux/initramfs-linux-lts/' lts.conf
-        sudo cp lts.conf lts-fallback.conf
-        sudo sed -i -e 's/Arch Linux/Arch Linux-LTS Fallback/' -i -e 's/initramfs-linux-lts/initramfs-linux-lts-fallback/' lts-fallback.conf
-    fi
-    if rg linux-zen <<< $kernel;then
-        sudo cp arch.conf zen.conf
-        sudo sed -i -e 's/Arch Linux/Arch Linux-Zen/' -i -e 's/vmlinuz-linux/vmlinuz-linux-zen/' -i -e 's/initramfs-linux/initramfs-linux-zen/' zen.conf
-        sudo cp zen.conf zen-fallback.conf
-        sudo sed -i -e 's/Arch Linux/Arch Linux-Zen Fallback/' -i -e 's/initramfs-linux-zen/initramfs-linux-zen-fallback/' zen-fallback.conf
-    fi
-    if rg linux-hardened <<< $kernel;then
-        sudo cp arch.conf hardened.conf
-        sudo sed -i -e 's/Arch Linux/Arch Linux-Hardened/' -i -e 's/vmlinuz-linux/vmlinuz-linux-hardened/' -i -e 's/initramfs-linux/initramfs-linux-hardened/' hardened.conf
-        sudo cp hardened.conf hardened-fallback.conf
-        sudo sed -i -e 's/Arch Linux/Arch Linux-Hardened Fallback/' -i -e 's/initramfs-linux-hardened/initramfs-linux-hardened-fallback/' hardened-fallback.conf
-    fi
-    cd
-fi
-
 sudo sed -i 's/#IgnorePkg   =/IgnorePkg   =linux-firmware/' /etc/pacman.conf
 ######################################################################################################
 ############################### NEEDS WORKING ON!!! (bashrc editing) #################################
 ######################################################################################################
-if rg linux <<< $(pacman -Q linux-headers | sed 's/-headers//');then
-    sudo sed -i 's/IgnorePkg    =/IgnorePkg   =linux linux-headers /' /etc/pacman.conf
+if rg 'local/linux ' <<< $(pacman -Q);then
+    sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux linux-headers /' /etc/pacman.conf
 fi
 if rg linux-lts <<< $(pacman -Q);then
     sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-lts linux-lts-headers /' /etc/pacman.conf
@@ -147,6 +132,13 @@ if ! rg localtime <<< $(ls /etc/);then
     sudo ln -sf /usr/share/zoneinfo/$tz /etc/localtime
     sudo hwclock --systohc
 fi
+#Enable Firewall settings
+sudo ufw limit 22/tcp
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw enable
 if ! [ "$artix" == y ];then
     sudo systemctl enable --now systemd-timesyncd cups $dm cronie libvirtd apparmor auditd pkgfile-update.timer
 elif [ $init == dinit ]; then
