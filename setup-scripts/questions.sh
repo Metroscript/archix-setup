@@ -62,34 +62,6 @@ if grep opendoas <<< $(pacman -Q opendoas);then
     sleep 5
 fi
 
-if grep networkmanager <<< $(pacman -Q);then
-    printf "Enable Network Privacy features for NetworkManager? (May cause network instability) [y/n]: "
-    read nmp
-    until [ $nmp == y ] || [ $nmp == n ];do
-        echo "Sorry, please try again"
-        printf "Enable Network Privacy features for NetworkManager? (May cause network instability) [y/n]: "
-        read nmp
-    done
-    if [ $nmp == y ];then
-        echo -e "[device]\nwifi.scan-rand-mac-address=yes\n\n[connection]\nwifi.cloned-mac-address=random\nethernet.cloned-mac-address=random" > 99-random-mac.conf
-        sudo chown root:root 99-random-mac.conf
-        sudo mv 99-random-mac.conf /etc/NetworkManager/conf.d/
-        printf "Change hostname to 'localhost'? (Improves DHC privacy) [y/n]: "
-        read host
-        until [ $host == y ] || [ $host == n ];do
-            echo "Sorry, please try again."
-            printf "Change hostname to 'localhost'? (Improves DHC privacy) [y/n]: "
-            read host
-        done
-        if [ $host == y ];then
-            echo "localhost" > hostname
-            sudo chown root:root hostname
-            sudo mv hostname /etc/
-        fi
-        sudo nmcli general reload conf
-    fi
-fi
-
 ############################################################################
 ########### ADD SUPPORT FOR OTHER GUIs? ####################################
 ############################################################################
@@ -166,7 +138,7 @@ until [ $rgb == y ] || [ $rgb == n ];do
     printf "Install OpenRGB? (RGB management software) [y/n]: "
     read rgb
 done
-if ! grep swapfile <<< $(ls /);then
+if ! grep Size <<< $(swapon -s);then
     echo "Swapfile size. 2048Mib is usually a good choice. Put '0' for no swapfile."
     printf "Size of swapfile in Mib: "
     read swap

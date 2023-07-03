@@ -74,20 +74,40 @@ if [ $dm == sddm ];then
     sudo sh -c "echo -e '[Theme]\nCurrent=archlinux-simplyblack' > /etc/sddm.conf"
     fi
 fi
+########################################
+############# HARDENING ################
+########################################
 if ! rg "sysctl.d" <<< $(ls /etc/);then
     sudo mkdir /etc/sysctl.d/
 fi
 sudo sh -c "echo -e 'kernel.kptr_restrict=2\nkernel.dmesg_restrict=1\nkernel.printk=3 3 3 3\nkernel.yama.ptrace_scope=2\nkernel.unpriviledged_bpf_disabled=1\nnet.core.bpf_jit_harden=2\ndev.tty.ldisc_autoload=0\nvm.unprivileged_userfaultfd=0\nkernel.kexec_load_disabled=1\nkernel.sysrq=4\nkernel.perf_event_paranoid=3\nvm.mmap_rnd_bits=32\nvm.mmap_rnd_compat_bits=16' > /etc/sysctl.d/99-kernel-hardening.conf"
-sudo sh -c "echo -e 'net.ipv4.tcp_syncookies=1\nnet.ipv4.tcp_rfc1337=1\nnet.ipv4.conf.all.rp_filter=1\nnet.ipv4.conf.default.rp_filter=1' > /etc/sysctl.d/99-network-security.conf"
+sudo sh -c "echo -e 'net.ipv4.tcp_syncookies=1\nnet.ipv4.tcp_rfc1337=1\nnet.ipv4.conf.all.rp_filter=1\nnet.ipv4.conf.default.rp_filter=1\nnet.ipv4.tcp_timestamps=0' > /etc/sysctl.d/99-network-security.conf"
 sudo sh -c "echo -e 'net.ipv6.conf.all.use_tempaddr = 2\nnet.ipv6.conf.default.use_tempaddr = 2' > /etc/sysctl.d/99-ipv6-privacy.conf"
 sudo sh -c "echo -e 'fs.protected_symlinks=1\nfs.protected_hardlinks=1\nfs.protected_fios=2\nfs.protected_regular=2' > /etc/sysctl.d/99-userspace.conf"
 sudo sh -c "echo -e 'vm.max_map_count=2147483642\nvm.swappiness=50' > /etc/sysctl.d/99-map-count-swappiness.conf"
-sudo sed -i 's/quiet/lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off quiet/' $bootdir
+sudo sed -i "s/quiet/lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off quiet/" $bootdir
 if ! rg loglevel <<< $(cat $bootdir);then
     sudo sed -i 's/quiet/loglevel=0 quiet/' $bootdir;else
     sudo sed -i 's/loglevel=./loglevel=0/' $bootdir
 fi
 sudo grub-mkconfig -o /boot/grub/grub.cfg
+#Enable NetworkManager ipv6 privacy features
+if rg networkmanager <<< $(pacman -Q) && ! rg 'ipv6.ip6-privacy=2' <<< $(cat /etc/NetworkManager/conf.d/*);then
+    sudo sh -c "echo -e '[connection]\nipv6.ip6-privacy=2' > /etc/NetworkManager/conf.d/99-ipv6-privacy.conf"
+fi
+#set machine ID to generic whonix machine ID
+if ! rg b08dfa6083e7567a1921a715000001fb <<< $(cat /etc/machine-id);then
+    sudo sh -c "echo b08dfa6083e7567a1921a715000001fb > /etc/machine-id ; echo b08dfa6083e7567a1921a715000001fb /var/lib/dbus/machine-id"
+fi
+#Add 5 second delay between failed password attempts
+if ! rg pam_faildelay <<< $(cat /etc/pam.d/system-login);then
+    sudo sh -c "echo 'auth       optional   pam_faildelay.so   delay=5000000' >> /etc/pam.d/system-login"
+fi
+#Restrict 'su' to :wheel
+sudo sed -i 's/#auth           required        pam_wheel.so use_uid/auth            required        pam_wheel.so use_uid/' /etc/pam.d/su /etc/pam.d/su-l
+#Prevent ssh gaining root
+sudo sed -i 's/#PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
+#Apparmor audit settings
 sudo sed -i 's/#write-cache/write-cache/' /etc/apparmor/parser.conf
 sudo groupadd -r audit
 sudo gpasswd -a $usr audit
@@ -142,6 +162,8 @@ sudo ufw allow 443/tcp
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
 sudo ufw enable
+
+#Enable init services
 if ! [ "$artix" == y ];then
     sudo systemctl enable --now systemd-timesyncd cups ufw $dm cronie libvirtd apparmor auditd pkgfile-update.timer
 elif [ $init == dinit ]; then
@@ -152,6 +174,7 @@ elif [ $init == dinit ]; then
     sudo dinitctl enable libvirtd
     sudo dinitctl enable apparmor
     sudo dinitctl enable auditd
+    sudo dinitctl enable haveged
     sudo ln -s /etc/dinit.d/$dm /etc/dinit.d/boot.d/
 elif [ $init == runit ]; then
     sudo ln -s /etc/runit/sv/ntpd /run/runit/service
@@ -161,11 +184,13 @@ elif [ $init == runit ]; then
     sudo ln -s /etc/runit/sv/apparmor /run/runit/service
     sudo ln -s /etc/runit/sv/auditd /run/runit/service
     sudo ln -s /etc/runit/sv/ufw /run/runit/service
+    sudo ln -s /etc/runit/sv/haveged /run/runit/service
 elif [ $init == openrc ]; then
     sudo rc-update add ntpd boot
     sudo rc-update add cupsd boot
     sudo rc-update add $dm boot
     sudo rc-update add ufw default
+    sudo rc-update add haveged default
     sudo rc-update add apparmor default
     sudo rc-update add auditd default
     sudo rc-update add cronie default
@@ -173,6 +198,7 @@ elif [ $init == openrc ]; then
 elif [ $init == s6 ];then
     sudo touch /etc/s6/adminsv/default/contents.d/ntpd
     sudo touch /etc/s6/adminsv/default/contents.d/ufw
+    sudo touch /etc/s6/adimsv/default/contents.d/haveged
     sudo touch /etc/s6/adminsv/default/contents.d/$dm
     sudo touch /etc/s6/adminsv/default/contents.d/cupsd
     sudo touch /etc/s6/adminsv/default/contents.d/cronie

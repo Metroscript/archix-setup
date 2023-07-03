@@ -1,15 +1,93 @@
-# archix-setup
+# Archix-setup
 A setup script with some personal dotfiles to aid you in installing Arch and/or Artix Linux!
 
-This script is designed to simplify the "final install process" of Arch, that being: Installing a GUI among other things.
+# What does the script do?
+The script is designed to install Arch/Artix Linux with my custom Hyprland rice, though it also supports KDE-Plasma for testing purposes.
+Along with installing software, it includes support for installing a swapfile if you lack swap & adding resume-from-disk/hibernate support, Plus some - to my knowledge; unintrusive security features which should have minimum compatability issues, aside from possible issues with slow hardware as vm.max_map_count is set to the 64 bit integer limit - same a Fedora.
 
-The script is quite simple in terms of installs (Only supporting 2 GUI's), but it comes with some default configuration options for both Hyprland & Plasma, along with including some nice and; to my knowledge, unintrusive security features (aside from the NetworkManager MAC randomisation, that's not fun) which should have minimum compatability issues. Though, if you are having issues with some apps, try changing the value of the unprivileged userns setting in the kernel-hardening file in sysctl.d.
+It should be noted that in order for this script to work: you have the 'quiet' kernel parameter enabled, are not using Systemd-Boot (If using Arch), are using mkinitcpio for initramfs generation (Support for others may come later) and have, until you boot into your GUI: Unrestricted sudo/doas privileges (Mainly used for pacman, sed, echoing settings to files, and obtaining disk UUIDs).
 
-It should be noted that this script assumes that: You have no current loglevel kernel parameter (one will be added & I do not know if having 2 causes problems), you've the 'quiet' kernel parameter, you have the standard linux kernel installed (Especially if you are using systemd boot) & you are fine with paru as an AUR helper.
+# What does install specifically?
+__System:__
+Pipewire (With noise-suppression-for-voice)
+cronie
+man-db
+wayland + xwayland
+cups (With gutenprint & foomatic drivers)
+ufw
+fuse
+ripgrep
+fd
+bat
+lsd
+flatpak
+apparmor + audit
+wl-clipboard
+haveged
 
-KEEP IN MIND: gpu driver detection and support is sketchy at best for NVIDIA cards (I guess you'd know that if you're using Linux, heh?), so maybe offer some suggestions or just fix the problems yourself.
+__Other non-GUI related software:__
+yt-dlp
+libreoffice
+gimp
+keepassxc
+virt-manager
 
-BIGGEST THING TO KEEP IN MIND: This script was made with unrestricted sudo/doas privileges in mind, though I highly suggest tweaking them after you've booted into you GUI
+__Hyprland:__
+sddm-git
+archlinux-themes-sddm
+alacritty
+osb
+btop
+mpv
+kdenlive
+rhythmbox (Podcast grabber)
+lollypop
+krita
+okular
+deluge
+blender
+cliphist
+qt5/6ct
+pavucontrol
+nemo
+polkit-gnome
+imv
+calcurse
+gamescope
+brightnessctl
+udiskie
+gammastep
+swayidle
+hyprland + desktop portal (duh)
+mako
+breeze icons & theme
+wlogout
+rofi + calc mode
+waybar
+hyprpicker
+swww
+nwg-look
+wlr-randr
+grimblast
+swaylock-effects
+psuinfo
 
-To summarise:
-This script was designed to support the "final installation process" of Arch and/or Artix Linux providing some hardening & personal dotfiles mainly for use in the Hyprland Window Compositor. 
+__Optional:__
+Steam/Wine
+gamemode
+Retroarch (Emulation: Includes cores for dolphin, pcsx2, citra, melonds & duckstation)
+Prismlauncher
+Waydroid
+Plymouth
+MakeMKV
+OpenRGB
+
+__AUR helper:__
+paru
+
+__KEEP IN MIND:__ 
+GPU driver detection and support is sketchy at best for NVIDIA cards (I guess you'd know that if you're using Linux, heh?), so maybe offer some suggestions or just fix the problems yourself.
+I am not familiar with init systems other than openrc & dinit so services for them may need fixing.
+
+# Summary
+This script was designed to support the "final installation process" of Arch and/or Artix Linux providing some hardening & personal dotfiles mainly for use in the Hyprland Window Compositor supporting optional installation of game & emulation support through the help of the paru AUR helper. 

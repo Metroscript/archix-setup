@@ -40,7 +40,6 @@ alias p='sudo pacman -S'
 alias r='sudo pacman -Rns'
 alias s='pacman -Ss'
 alias q='pacman -Qs'
-alias yay='paru'
 alias update='sudo pacman -Syu && yt-dlp -U'
 alias clean='sudo pacman -Sc'
 alias ukernel="sudo pacman -Syu --needed linux{,-{headers,firmware,lts{,-headers}}}"
