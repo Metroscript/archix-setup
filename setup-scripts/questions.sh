@@ -138,6 +138,14 @@ until [ $rgb == y ] || [ $rgb == n ];do
     printf "Install OpenRGB? (RGB management software) [y/n]: "
     read rgb
 done
+printf "Add installed kernels & firmware to IgnorePkg? [y/n]: "
+read kignore
+until [ $kignore == y ] || [ $kignore == n ];do
+    echo "Sorry, please try again."
+    printf "Add installed kernels & firmware to IgnorePkg? [y/n]: "
+    read kignore
+done
+
 if ! grep Size <<< $(swapon -s);then
     echo "Swapfile size. 2048Mib is usually a good choice. Put '0' for no swapfile."
     printf "Size of swapfile in Mib: "

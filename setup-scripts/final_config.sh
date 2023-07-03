@@ -113,21 +113,23 @@ sudo groupadd -r audit
 sudo gpasswd -a $usr audit
 sudo sed -i '/log_group/a log_group = audit/' /etc/audit/auditd.conf 
 
-sudo sed -i 's/#IgnorePkg   =/IgnorePkg   =linux-firmware/' /etc/pacman.conf
+if [ $kignore == y ];then
+    sudo sed -i 's/#IgnorePkg   =/IgnorePkg   =linux-firmware/' /etc/pacman.conf
 ######################################################################################################
 ############################### NEEDS WORKING ON!!! (bashrc editing) #################################
 ######################################################################################################
-if rg 'local/linux ' <<< $(pacman -Qs);then
-    sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux linux-headers /' /etc/pacman.conf
-fi
-if rg linux-lts <<< $(pacman -Q);then
-    sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-lts linux-lts-headers /' /etc/pacman.conf
-fi
-if rg linux-zen <<< $(pacman -Q);then
-    sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-zen linux-zen-headers /' /etc/pacman.conf
-fi
-if rg linux-hardened <<< $(pacman -Q);then
-    sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-hardened linux-hardened-headers /' /etc/pacman.conf
+    if rg 'local/linux ' <<< $(pacman -Qs);then
+        sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux linux-headers /' /etc/pacman.conf
+    fi
+    if rg linux-lts <<< $(pacman -Q);then
+        sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-lts linux-lts-headers /' /etc/pacman.conf
+    fi
+    if rg linux-zen <<< $(pacman -Q);then
+        sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-zen linux-zen-headers /' /etc/pacman.conf
+    fi
+    if rg linux-hardened <<< $(pacman -Q);then
+        sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-hardened linux-hardened-headers /' /etc/pacman.conf
+    fi
 fi
 ######################################################################################################
 ######################################## END OF PROBLEM AREA #########################################
