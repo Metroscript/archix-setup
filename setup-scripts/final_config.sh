@@ -161,6 +161,8 @@ fi
 sudo ufw limit 22/tcp
 sudo ufw allow 80/tcp
 sudo ufw allow 443/tcp
+sudo ufw allow 631/tcp
+sudo ufw allow 53/tcp
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
 sudo ufw enable
@@ -176,7 +178,6 @@ elif [ $init == dinit ]; then
     sudo dinitctl enable libvirtd
     sudo dinitctl enable apparmor
     sudo dinitctl enable auditd
-    sudo dinitctl enable haveged
     sudo ln -s /etc/dinit.d/$dm /etc/dinit.d/boot.d/
 elif [ $init == runit ]; then
     sudo ln -s /etc/runit/sv/ntpd /run/runit/service
@@ -186,13 +187,11 @@ elif [ $init == runit ]; then
     sudo ln -s /etc/runit/sv/apparmor /run/runit/service
     sudo ln -s /etc/runit/sv/auditd /run/runit/service
     sudo ln -s /etc/runit/sv/ufw /run/runit/service
-    sudo ln -s /etc/runit/sv/haveged /run/runit/service
 elif [ $init == openrc ]; then
     sudo rc-update add ntpd boot
     sudo rc-update add cupsd boot
     sudo rc-update add $dm boot
     sudo rc-update add ufw default
-    sudo rc-update add haveged default
     sudo rc-update add apparmor default
     sudo rc-update add auditd default
     sudo rc-update add cronie default
@@ -200,7 +199,6 @@ elif [ $init == openrc ]; then
 elif [ $init == s6 ];then
     sudo touch /etc/s6/adminsv/default/contents.d/ntpd
     sudo touch /etc/s6/adminsv/default/contents.d/ufw
-    sudo touch /etc/s6/adimsv/default/contents.d/haveged
     sudo touch /etc/s6/adminsv/default/contents.d/$dm
     sudo touch /etc/s6/adminsv/default/contents.d/cupsd
     sudo touch /etc/s6/adminsv/default/contents.d/cronie

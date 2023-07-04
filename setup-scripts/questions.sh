@@ -39,20 +39,20 @@ if grep Artix <<< $(cat /etc/issue);then
     artix=y
     sed -i -e 's/#exec-once/exec-once/' -i -e '/--systemd/d' -i -e '/systemctl/d' ${repo}dotfiles/hypr-rice/hypr/hyprland.conf
     sed -i -e 's/action" : "reboot/action" : "loginctl reboot/' -i -e 's/poweroff/loginctl poweroff/' -i -e 's/action" : "suspend/action" : "loginctl suspend/' ${repo}dotfiles/hypr-rice/wlogout/layout
-    if grep openrc <<< $(pacman -Q openrc);then
+    if grep openrc <<< $(pacman -Q);then
         init=openrc
-    elif grep runit <<< $(pacman -Q runit);then
+    elif grep runit <<< $(pacman -Q);then
         init=runit
-    elif grep s6-base <<< $(pacman -Q s6-base);then
+    elif grep s6-base <<< $(pacman -Q);then
         init=s6
-    elif grep dinit <<< $(pacman -Q dinit);then
+    elif grep dinit <<< $(pacman -Q);then
         init=dinit
     fi
 fi
 
 bootdir=/etc/default/grub
 
-if grep opendoas <<< $(pacman -Q opendoas);then
+if grep opendoas <<< $(pacman -Q);then
     suas=y
     alias sudo='doas'
     sed -i "/stuff/a alias sudo='doas'" ${repo}dotfiles/bashrc
@@ -138,6 +138,15 @@ until [ $rgb == y ] || [ $rgb == n ];do
     printf "Install OpenRGB? (RGB management software) [y/n]: "
     read rgb
 done
+if [ $img == mkinit ];then
+    printf "Install mkinitcpio-firmware (Removes missing firmware warnings when generating initramfs) [y/n]: "
+    read mkfirm
+    until [ $mkfirm == y ] || [ $mkfirm == n ];do
+        echo "Sorry, please try again."
+        printf "Install mkinitcpio-firmware (Removes missing firmware warnings when generating initramfs) [y/n]: "
+        read mkfirm
+    done
+fi
 printf "Add installed kernels & firmware to IgnorePkg? [y/n]: "
 read kignore
 until [ $kignore == y ] || [ $kignore == n ];do

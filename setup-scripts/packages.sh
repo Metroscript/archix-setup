@@ -11,19 +11,19 @@ sudo sed -i 's/quiet/efi=disable_early_pci_dma quiet/' $bootdir
     #######################################
     ##### NVIDIA DRIVERS MAY NOT WORK #####
     #######################################
-gpu=$(lspci)
-if lspci | grep 'VGA' | grep -E "Radeon|AMD";then
-   sudo pacman -S --noconfirm --needed xf86-video-amdgpu vulkan-{radeon,icd-loader} mesa lib{va-mesa-driver,32-{libva-mesa-driver,mesa,vulkan-{radeon,icd-loader}}}
-elif grep -E "NVIDIA|GeForce" <<< $gpu;then
-   sudo pacman -S --noconfirm --needed nvidia{,-utils} lib32-{nvidia-utils,vulkan-icd-loader} vulkan-icd-loader
-   nvidia-xconfig
-elif grep -E "Integrated Graphics Controller" <<< $gpu || grep -E "Intel Corporation UHD" <<< $gpu;then
-     sudo pacman -S --noconfirm --needed xf86-video-intel vulkan-{intel,icd-loader} mesa lib{va-{intel-driver,utils},vdpau-va-gl,32-{vulkan-{intel,icd-loader},mesa,libva-intel-driver}}
+gpu=$(lspci | grep VGA)
+if grep -E "Radeon|AMD|ATI" <<< $gpu;then
+   sudo pacman -S --noconfirm --needed vulkan-{radeon,icd-loader} mesa{,-vdpau} lib{va-mesa-driver,32-{libva-mesa-driver,mesa{,-vdpau},vulkan-{radeon,icd-loader}}}
+#elif grep -E "NVIDIA|GeForce" <<< $gpu;then
+#   sudo pacman -S --noconfirm --needed nvidia{,-utils} lib32-{nvidia-utils,vulkan-icd-loader} vulkan-icd-loader
+#   nvidia-xconfig
+elif grep -E "Intel Corporation|UHD" <<< $gpu;then
+     sudo pacman -S --noconfirm --needed vulkan-{intel,icd-loader} mesa lib{va-{intel-driver,utils},vdpau-va-gl,32-{vulkan-{intel,icd-loader},mesa,libva-intel-driver}} intel-media-driver
 fi
 sudo pacman -Syu --needed --noconfirm vkd3d lib32-vkd3d
 
 #Basic packages
-sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber cronie man-db wayland xorg-xwayland smartmontools v4l2loopback-dkms gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{jetbrains-mono-nerd,ubuntu-nerd,noto-nerd} cups{,-pk-helper,-pdf} gutenprint foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley ufw fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay libreoffice-fresh{,-en-gb} hunspell{,-en_{au,gb,us} hyphen-en mythes-en coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp lib{paper,wpg,pulse,mythes,32-{gnutls,libpulse,alsa-{lib,plugins},pipewire{,-jack,-v4l2}}} keepassxc gst-{libav,plugins-{base,good}} phonon-qt5-gstreamer imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq qemu-full edk2-ovmf virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat nvme-cli apparmor audit python-{notify2,psutil} noise-suppression-for-voice wl-clipboard haveged
+sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber cronie man-db wayland xorg-xwayland smartmontools v4l2loopback-dkms gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{jetbrains-mono-nerd,ubuntu-nerd,noto-nerd} cups{,-pk-helper,-pdf} gutenprint foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley ufw fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay libreoffice-fresh{,-en-gb} hunspell{,-en_{au,gb,us} hyphen-en mythes-en coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp lib{paper,wpg,pulse,mythes,32-{gnutls,libpulse,alsa-{lib,plugins},pipewire{,-jack,-v4l2}}} keepassxc gst-{libav,plugins-{base,good}} phonon-qt5-gstreamer imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq qemu-full edk2-ovmf virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat nvme-cli apparmor audit python-{notify2,psutil} noise-suppression-for-voice wl-clipboard
 if [ $ply == y ];then
     sudo pacman -S --noconfirm --needed plymouth
 fi
@@ -58,6 +58,9 @@ fi
 if [ $de == 1 ];then
     paru -S sddm-git archlinux-themes-sddm
 fi
+if [ $mkfirm == y ];then
+    paru -S mkinitcpio-firmware
+fi
 if [ "$rlx" == y ];then
     paru -S grapejuice-git
 fi
@@ -90,7 +93,7 @@ fi
 
 #Artix Init Services
 if [ "$artix" == y ]; then
-    sudo pacman -S --needed --noconfirm ${dm}-$init cups-$init openntpd-$init ufw-$init power-profiles-daemon-$init avahi-$init libvirt-$init ${init}-system apparmor-$init audit-$init haveged-$init
+    sudo pacman -S --needed --noconfirm ${dm}-$init cups-$init openntpd-$init ufw-$init power-profiles-daemon-$init avahi-$init libvirt-$init ${init}-system apparmor-$init audit-$init
 fi
 
 #Hyprland 
