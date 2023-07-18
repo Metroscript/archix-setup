@@ -15,11 +15,11 @@ country=$(curl https://ipapi.co/timezone | cut -d/ -f1)
 if [ "$artix" == y ];then
     sudo mv /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.pacnew
     sudo sh -c "rankmirrors /etc/pacman.d/mirrorlist.pacnew > /etc/pacman.d/mirrorlist"
-    sudo reflector --save /etc/pacman.d/mirrorlist-arch --sort rate -c $country -p https,rsync;else
-    sudo reflector --save /etc/pacman.d/mirrorlist --sort rate -c $country -p https,rsync
+    sudo reflector --save /etc/pacman.d/mirrorlist-arch --sort rate -c $country -p https;else
+    sudo reflector --save /etc/pacman.d/mirrorlist --sort rate -c $country -p https
 fi
 sudo pacman -Sy
-sudo pkgfile -u
+sudo pkgfile -uz "zstd -19 -T0"
 
 #Make Swapfile
 if [ $swap -gt 0 ];then
@@ -48,9 +48,12 @@ if [ $swap -gt 0 ];then
             #BOOSTER STUFF HERE
             #sudo booster build
         fi
-        sudo sed -i -e 's/#Allow/Allow/g' -i -e 's/#Suspend/Suspend/g' -i -e 's/#Hibernate/Hibernate/g' -i -e 's/AllowHybrid/#AllowHybrid/g' ${susdir}sleep.conf
+        if ! grep 'sleep.conf.d' <<< $(ls $sdir);then]
+            mkdir ${sdir}sleep.conf.d
+        fi
+        sudo sh -c "echo 'HibernateDelaySec=180min' > ${sdir}sleep.conf.d/99-Hibernate-Sec.conf"
         if [ $de == 1 ];then
-            sed -i 's/ctl suspend/ctl suspend-then-hibernate/' ${repo}dotfiles/hypr-rice/wlogout/layout
+            sed -i "s/ctl suspend/ctl suspend-then-hibernate \|\| $(if [ "$artix" == y ];then echo loginctl;else echo systemctl;fi) suspend/" ${repo}dotfiles/hypr-rice/wlogout/layout
         fi
     fi
 fi

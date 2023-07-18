@@ -11,7 +11,7 @@ It should be noted that in order for this script to work: you have the 'quiet' k
 
 # Hardening the system... how?
 
-The script sets multiple sysctl.d parameters, most of which are what you'd find built in to the linux-hardened kernel, activating apparmor & audit that, once rules are made; restricts an apps access what it needs & alerting you if apparmor stops an app from doing sometihing, along with enabling some other kernel parameters that manage memory, enabling ipv6 privacy extentions if networkmanager is installed, changing the machine-id so that it's generic, adding a delay when passwords fail, locking 'su' use to :wheel only, preventing root in ssh & setting up a basic firewall.
+The script sets multiple sysctl.d parameters, most of which are what you'd find built in to the linux-hardened kernel, activating apparmor & audit that, once rules are made; restricts an apps access what it needs & alerting you if apparmor stops an app from doing sometihing, along with enabling some other kernel parameters that manage memory, enabling ipv6 privacy extentions if networkmanager is installed, changing the machine-id so that it's generic, adding a delay when passwords fail, locking 'su' use to :wheel only, preventing root in ssh & installing the ufw firewall which you can configure to your liking later.
 
 
 # What does install specifically?
@@ -31,7 +31,7 @@ lsd,
 flatpak,
 apparmor + audit,
 wl-clipboard,
-haveged.
+rng-tools (TRNG entropy generation tool).
 
 __Other non-GUI related software:__
 yt-dlp,

@@ -29,8 +29,6 @@
         "cpu",
         "memory",
         "custom/temp",
-        //"disk",
-        //"disk#home",
         "pulseaudio",
         "network",
         "custom/updates",
@@ -107,7 +105,7 @@
     "cpu": {
         "interval": 1,
         "tooltip": true,
-        "format": "CPU:  {}%",
+        "format": "CPU: {}%",
         "max-length": 15,
         "on-click": "hyprctl dispatch exec '[workspace e;float 1;opacity 1.0 override 1.0 override] alacritty -e btop'"
     },
@@ -124,32 +122,11 @@
         "on-click": "pkill rofi || rofi -show drun",
     },
 
-    "custom/notification": {
-        "tooltip": false,
-        "format": "{icon}",
-        "format-icons": {
-            "notification": "<span foreground='red'><sup></sup></span>",
-            "none": "",
-            "dnd-notification": "<span foreground='red'><sup></sup></span>",
-            "dnd-none": "",
-            "inhibited-notification": "<span foreground='red'><sup></sup></span>",
-            "inhibited-none": "",
-            "dnd-inhibited-notification": ">span foreground='red'><sup></sup></span>",
-            "dnd-inhibited-none": ""
-        },
-        "return-type": "json",
-        "exec-if": "which swaync-client",
-        "exec": "swaync-client -swb",
-        "on-click": "swaync-client -t -sw",
-        "on-click-right": "swaync-client -d -sw",
-        "escape": true
-  },
-
     "custom/power": {
         "tooltip": false,
         "format": "",
         "on-click": "wlogout -p layer-shell"
-        },
+    },
 
     "custom/temp": {
         "interval": 1,
@@ -160,8 +137,8 @@
     "custom/updates": {
         "format": "󰇚 {}",
         "tooltip": true,
-        "interval": 60,                     // 3600=every hour
-        "exec": "(checkupdates;paru -Qua)|wc -l;(checkupdates;paru -Qua)|column -t|tr '\n' '\r'",       // # of updates and tooltip details
+        "interval": 3600,                     // 3600=every hour
+        "exec": "paru -Qu|wc -l;paru -Qu|column -t|tr '\n' '\r'",       // # of updates and tooltip details
         "on-click": "hyprctl dispatch exec '[workspace e;float 1;opacity 1.0 override 1.0 override] alacritty -e ./.config/waybar/scripts/upgrade'", // update system
         "on-click-right": "hyprctl dispatch exec '[workspace e;float 1;opacity 1.0 override 1.0 override] alacritty -e paru -Syua'",
     },
@@ -174,30 +151,13 @@
         "on-click": "librewolf https://wttr.in"
     },
 
-    "disk": {
-        "interval": 1,
-        "format": "Disk: {path} {percentage_used}%",
-        "path": ["/","/home"],
-        "tooltip": true,
-    },
-
-    "disk#home": {
-        "interval": 1,
-        "format": "{path} {percentage_used}%",
-        "path": "/home"
-    },
-
-    "hyprland/language": {
-        "format": "{}"
-    },
-
     "hyprland/window": {
         "format": "{}"
     },
 
     "memory": {
         "interval": 1,
-        "format": " RAM: 󰍛 {}%",
+        "format": " RAM: {}%",
         "max-length": 15,
         "on-click": "hyprctl dispatch exec '[workspace e;float 1;opacity 1.0 override 1.0 override] alacritty -e btop'",
         "tooltip": true,

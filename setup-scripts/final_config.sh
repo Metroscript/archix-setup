@@ -1,4 +1,26 @@
-#Plymouth check & conf
+#Final Configuration
+    #OpenRGB setup
+if [ $rgb == y ];then
+    #sudo sed -i 's/quiet/acpi_enforce_resources=lax quiet/' $bootdir
+    if [ $rgsmb == y ];then
+        if ! rg i2c-tools <<< $(pacman -Q);then
+            sudo pacman -Syu ic2-tools
+        fi
+        sudo modprobe i2c-dev
+        if ! rg i2c <<< $(cat /etc/group);then
+            sudo groupadd --system i2c
+        fi
+        sudo usermod $USER -aG i2c
+        sudo sh -c 'echo "i2c-dev" > /etc/modules-load.d/i2c.conf'
+        if rg amd <<< $(cat $bootdir);then
+            sudo modprobe i2c-piix4
+            sudo sh -c 'echo "i2c-piix4" > /etc/modules-load.d/i2c-piix4.conf';else
+            sudo modprobe i2c-i801
+            sudo sh -c 'echo "i2c-i801" > /etc/modules-load.d/i2c-i801.conf'
+        fi
+    fi
+fi
+    #Plymouth check & conf
 if [ $ply == y ];then
     if [ $img == mkinit ];then
         sudo sed -i 's/udev/udev plymouth/g' /etc/mkinitcpio.conf
@@ -9,16 +31,15 @@ if [ $ply == y ];then
     sudo sed -i 's/splash/splash plymouth.nolog/' $bootdir
     sudo sed -i -e 's/DialogVerticalAlignment=.382/DialogVerticalAlignment=.75/' -i -e 's/WatermarkVerticalAlignment=.96/WatermarkVerticalAlignment=.5/' /usr/share/plymouth/themes/spinner/spinner.plymouth
     if [ $img == mkinit ];then
-        if [ $de == 2 ];then
-            sudo plymouth-set-default-theme -R breeze;else
-            sudo plymouth-set-default-theme -R spinner
+        if [ "$plytheme" == breeze ] || [ "$plytheme" == breeze-text ];then
+            sudo pacman -Syu --needed --noconfirm breeze-plymouth
         fi
+        sudo plymouth-set-default-theme -R $plytheme
         ###########################################
         ###### OTHER INITRAMFS GEN SUPPORT ########
         ###########################################;else
         #if [ $de == 2 ];then
-        #    sudo sed -i 's/Theme=.*/Theme=breeze/' /etc/plymouth/plymouthd.conf;else
-        #    sudo sed -i 's/Theme=.*/Theme=spinner/' /etc/plymouth/plymouthd.conf
+        #    sudo sed -i "s/Theme=.*/Theme=$plytheme/" /etc/plymouth/plymouthd.conf;else
         #fi
         #if [ $img == dracut ];then
         #    sudo dracut-rebuild #;else
@@ -27,8 +48,6 @@ if [ $ply == y ];then
     fi
 fi
 
-#Final Configuration
-usr=$(whoami)
 if [ $de == 1 ];then
     if ! rg Desktop <<< $(ls);then
         mkdir Desktop
@@ -49,7 +68,7 @@ if [ $de == 1 ];then
         mkdir Downloads
     fi
     mv ${repo}dotfiles/hypr-rice/* .config/
-    bmpath=file:///home/$usr/
+    bmpath=file:///home/$USER/
     echo -e '${bmpath}Documents Documents\n${bmpath}Music Music\n${bmpath}Pictures Pictures\n${bmpath}Videos Videos\n${bmpath}Downloads Downloads' > .config/gtk-3.0/bookmarks
     mv ${repo}dotfiles/thumbnailers .local/share/
     mv ${repo}dotfiles/set-as-background.nemo_action .local/share/nemo/actions
@@ -80,10 +99,10 @@ fi
 if ! rg "sysctl.d" <<< $(ls /etc/);then
     sudo mkdir /etc/sysctl.d/
 fi
-sudo sh -c "echo -e 'kernel.kptr_restrict=2\nkernel.dmesg_restrict=1\nkernel.printk=3 3 3 3\nkernel.yama.ptrace_scope=2\nkernel.unpriviledged_bpf_disabled=1\nnet.core.bpf_jit_harden=2\ndev.tty.ldisc_autoload=0\nvm.unprivileged_userfaultfd=0\nkernel.kexec_load_disabled=1\nkernel.sysrq=4\nkernel.perf_event_paranoid=3\nvm.mmap_rnd_bits=32\nvm.mmap_rnd_compat_bits=16' > /etc/sysctl.d/99-kernel-hardening.conf"
+sudo sh -c "echo -e 'kernel.kptr_restrict=2\nkernel.dmesg_restrict=1\nkernel.printk=3 3 3 3\nkernel.yama.ptrace_scope=2\nkernel.unprivileged_bpf_disabled=1\nnet.core.bpf_jit_harden=2\ndev.tty.ldisc_autoload=0\nvm.unprivileged_userfaultfd=0\nkernel.kexec_load_disabled=1\nkernel.sysrq=4\nkernel.perf_event_paranoid=3\nvm.mmap_rnd_bits=32\nvm.mmap_rnd_compat_bits=16' > /etc/sysctl.d/99-kernel-hardening.conf"
 sudo sh -c "echo -e 'net.ipv4.tcp_syncookies=1\nnet.ipv4.tcp_rfc1337=1\nnet.ipv4.conf.all.rp_filter=1\nnet.ipv4.conf.default.rp_filter=1\nnet.ipv4.tcp_timestamps=0' > /etc/sysctl.d/99-network-security.conf"
 sudo sh -c "echo -e 'net.ipv6.conf.all.use_tempaddr = 2\nnet.ipv6.conf.default.use_tempaddr = 2' > /etc/sysctl.d/99-ipv6-privacy.conf"
-sudo sh -c "echo -e 'fs.protected_symlinks=1\nfs.protected_hardlinks=1\nfs.protected_fios=2\nfs.protected_regular=2' > /etc/sysctl.d/99-userspace.conf"
+sudo sh -c "echo -e 'fs.protected_symlinks=1\nfs.protected_hardlinks=1\nfs.protected_fifos=2\nfs.protected_regular=2' > /etc/sysctl.d/99-userspace.conf"
 sudo sh -c "echo -e 'vm.max_map_count=2147483642\nvm.swappiness=50' > /etc/sysctl.d/99-map-count-swappiness.conf"
 sudo sed -i "s/quiet/lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off quiet/" $bootdir
 if ! rg loglevel <<< $(cat $bootdir);then
@@ -93,7 +112,7 @@ fi
 sudo grub-mkconfig -o /boot/grub/grub.cfg
 #Enable NetworkManager ipv6 privacy features
 if rg networkmanager <<< $(pacman -Q) && ! rg 'ipv6.ip6-privacy=2' <<< $(cat /etc/NetworkManager/conf.d/*);then
-    sudo sh -c "echo -e '[connection]\nipv6.ip6-privacy=2' > /etc/NetworkManager/conf.d/99-ipv6-privacy.conf"
+    sudo sh -c "echo -e '[connection]\nipv6.ip6-privacy=2' > /etc/NetworkManager/conf.d/ipv6-privacy-features.conf"
 fi
 #set machine ID to generic whonix machine ID
 if ! rg b08dfa6083e7567a1921a715000001fb <<< $(cat /etc/machine-id);then
@@ -110,7 +129,7 @@ sudo sed -i 's/#PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
 #Apparmor audit settings
 sudo sed -i 's/#write-cache/write-cache/' /etc/apparmor/parser.conf
 sudo groupadd -r audit
-sudo gpasswd -a $usr audit
+sudo gpasswd -a $USER audit
 sudo sed -i '/log_group/a log_group = audit/' /etc/audit/auditd.conf 
 
 if [ $kignore == y ];then
@@ -152,56 +171,60 @@ fi
 mv ${repo}dotfiles/bashrc .bashrc
 mv ${repo}dotfiles/inputrc .inputrc
 sudo sed -i -e 's/#unix_sock_group = "libvirt"/unix_sock_group = "libvirt"/' -i -e 's/#unix_sock_ro_perms = "0777"/unix_sock_ro_perms = "0777"/' -i -e 's/#unix_sock_rw_perms = "0770"/unix_sock_rw_perms = "0770"/' /etc/libvirt/libvirtd.conf
-sudo usermod -aG libvirt $usr
+sudo usermod -aG libvirt $USER
 if ! rg localtime <<< $(ls /etc/);then
     sudo ln -sf /usr/share/zoneinfo/$tz /etc/localtime
     sudo hwclock --systohc
 fi
 #Enable Firewall settings
-sudo ufw limit 22/tcp
-sudo ufw allow 80/tcp
-sudo ufw allow 443/tcp
-sudo ufw allow 631/tcp
-sudo ufw allow 53/tcp
-sudo ufw default deny incoming
-sudo ufw default allow outgoing
-sudo ufw enable
+#sudo ufw limit 22/tcp
+#sudo ufw allow 80/tcp
+#sudo ufw allow 443/tcp
+#sudo ufw allow 631/tcp
+#sudo ufw allow 53/tcp
+#sudo ufw default deny incoming
+#sudo ufw default allow outgoing
+#sudo ufw enable
 
 #Enable init services
 if ! [ "$artix" == y ];then
-    sudo systemctl enable --now systemd-timesyncd cups ufw $dm cronie libvirtd apparmor auditd pkgfile-update.timer
+    sudo systemctl enable --now systemd-timesyncd cups ufw $dm $cron libvirtd apparmor auditd pkgfile-update.timer rngd
 elif [ $init == dinit ]; then
     sudo dinitctl enable ntpd
     sudo dinitctl enable ufw
     sudo dinitctl enable cupsd
-    sudo dinitctl enable cronie
+    sudo dinitctl enable $cron
     sudo dinitctl enable libvirtd
     sudo dinitctl enable apparmor
     sudo dinitctl enable auditd
+    sudo dinitctl enable rngd
     sudo ln -s /etc/dinit.d/$dm /etc/dinit.d/boot.d/
 elif [ $init == runit ]; then
     sudo ln -s /etc/runit/sv/ntpd /run/runit/service
     sudo ln -s /etc/runit/sv/cupsd /run/runit/service
     sudo ln -s /etc/runit/sv/$dm /run/runit/service
-    sudo ln -s /etc/runit/sv/cronie /run/runit/service
+    sudo ln -s /etc/runit/sv/$cron /run/runit/service
     sudo ln -s /etc/runit/sv/apparmor /run/runit/service
     sudo ln -s /etc/runit/sv/auditd /run/runit/service
     sudo ln -s /etc/runit/sv/ufw /run/runit/service
+    sudo ln -s /etc/runit/sv/rngd /run/runit/service
 elif [ $init == openrc ]; then
     sudo rc-update add ntpd boot
     sudo rc-update add cupsd boot
     sudo rc-update add $dm boot
+    sudo rc-update add rngd default
     sudo rc-update add ufw default
     sudo rc-update add apparmor default
     sudo rc-update add auditd default
-    sudo rc-update add cronie default
+    sudo rc-update add $cron default
     sudo rc-update add libvirtd default
 elif [ $init == s6 ];then
     sudo touch /etc/s6/adminsv/default/contents.d/ntpd
     sudo touch /etc/s6/adminsv/default/contents.d/ufw
     sudo touch /etc/s6/adminsv/default/contents.d/$dm
+    sudo touch /etc/s6/adminsv/default/contents.d/rngd
     sudo touch /etc/s6/adminsv/default/contents.d/cupsd
-    sudo touch /etc/s6/adminsv/default/contents.d/cronie
+    sudo touch /etc/s6/adminsv/default/contents.d/$cron
     sudo touch /etc/s6/adminsv/default/contents.d/apparmor
     sudo touch /etc/s6/adminsv/default/contents.d/auditd
     sudo s6-db-reload

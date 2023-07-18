@@ -37,6 +37,7 @@ fi
 
 if grep Artix <<< $(cat /etc/issue);then
     artix=y
+    sdir=/etc/elogind/
     sed -i -e 's/#exec-once/exec-once/' -i -e '/--systemd/d' -i -e '/systemctl/d' ${repo}dotfiles/hypr-rice/hypr/hyprland.conf
     sed -i -e 's/action" : "reboot/action" : "loginctl reboot/' -i -e 's/poweroff/loginctl poweroff/' -i -e 's/action" : "suspend/action" : "loginctl suspend/' ${repo}dotfiles/hypr-rice/wlogout/layout
     if grep openrc <<< $(pacman -Q);then
@@ -47,7 +48,8 @@ if grep Artix <<< $(cat /etc/issue);then
         init=s6
     elif grep dinit <<< $(pacman -Q);then
         init=dinit
-    fi
+    fi;else
+    sdir=/etc/systemd/
 fi
 
 bootdir=/etc/default/grub
@@ -120,12 +122,39 @@ if [ $gayms == y ];then
     done
     fi
 fi
+echo "What cron would you like? (If unsure, choose Cronie) 1.Cronie or 2.Fcron"
+printf "[1/2]: "
+read crock
+until [ $crock == 1 ] || [ $crock == 2 ];do
+    echo "What cron would you like? (If unsure, choose Cronie) 1.Cronie or 2.Fcron"
+    printf "[1/2]: "
+    read crock
+done
+if [ $crock == 1 ];then
+    cron=cronie;else
+    cron=fcron
+    if [ $artix == y ];then
+        echo "You will have to manually select all system scripts; excluding cronie to avoid conflicts. Just type '1-2,4-20' when asked."
+        sleep 5
+    fi
+fi
 printf "Install Plymouth? (Adds boot splash screen) [y/n]: "
 read ply
 until [ $ply == y ] || [ $ply == n ];do
     printf "Install Plymouth? (Adds boot splash screen) [y/n]: "
     read ply
 done
+if [ $ply == y ];then
+    echo 'Select Plymouth Theme: spinner, bgrt, breeze, breeze-text, fade-in, glow, solar, spininfinity, spinner, text, tribar, script, details.'
+    printf "Type desired theme name: "
+    read plytheme
+    until [ "$plytheme" == spinner] || [ "$plytheme" == bgrt ] || [ "$plytheme" == breeze ] || [ "$plytheme" == breeze-text ] || [ "$plytheme" == fade-in ] || [ "$plytheme" == glow ] || [ "$plytheme" == solar ] ||  [ "$plytheme" == spininfinity ] || [ "$plytheme" == text ] || [ "$plytheme" == tribar ] || [ "$plytheme" == script ] || [ "$plytheme" == details ];do
+        echo 'Sorry, please try again.'
+        echo 'Select Plymouth Theme: spinner, bgrt, breeze, breeze-text, fade-in, glow, solar, spininfinity, spinner, text, tribar, script, details.'
+        printf "Type desired theme name: "
+        read plytheme
+    done
+fi
 printf "Install MakeMKV? (A DVD/Bluray ripper) [y/n]: "
 read makemkv
 until [ $makemkv == y ] || [ $makemkv == n ];do
@@ -138,6 +167,14 @@ until [ $rgb == y ] || [ $rgb == n ];do
     printf "Install OpenRGB? (RGB management software) [y/n]: "
     read rgb
 done
+if [ $rgb == y ];then
+    printf "Are you planning to control motherboard or RAM LEDs? [y/n]: "
+    read rgsmb
+    until [ $rgsmb == y ] || [ $rgsmb == n ];do
+        printf "Are you planning to control motherboard or RAM LEDs? [y/n]: "
+        read rgsmb
+    done
+fi
 if [ $img == mkinit ];then
     printf "Install mkinitcpio-firmware (Removes missing firmware warnings when generating initramfs) [y/n]: "
     read mkfirm
@@ -156,12 +193,12 @@ until [ $kignore == y ] || [ $kignore == n ];do
 done
 
 if ! grep Size <<< $(swapon -s);then
-    echo "Swapfile size. 2048Mib is usually a good choice. Put '0' for no swapfile."
+    echo "Swapfile size. 8192/Eqal to RAM Mib is usually a good choice.  Put '0' for no swapfile."
     printf "Size of swapfile in Mib: "
     read swap
     until [ $swap -ge 0 ];do
         echo "Sorry, please try again."
-        echo "Swapfile size. 2048Mib is usually a good choice. Put '0' for no swapfile."
+        echo "Swapfile size. 8192/Equal to RAM Mib is usually a good choice. Put '0' for no swapfile."
         printf "Size of swapfile in Mib: "
         read swap
     done

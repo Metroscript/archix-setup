@@ -1,6 +1,7 @@
 #!/bin/bash
-if grep -E opendoas <<< $(pacman -Q);then
-    clear
-    alias sudo='doas'
+if rg doas <<< $(ls /usr/bin);then
+    su=doas;else
+    su=sudo
 fi
-sudo pacman -Syu
+clear
+$su pacman -Syu
