@@ -101,7 +101,7 @@ fi
 
 #Artix Init Services
 if [ "$artix" == y ]; then
-    sudo pacman -S --needed ${dm}-$init cups-$init openntpd-$init ufw-$init power-profiles-daemon-$init avahi-$init libvirt-$init ${cron}-${init} ${init}-system apparmor-$init audit-$init rng-tools-$init
+    sudo pacman -S --needed ${dm}-$init cups-$init openntpd-$init ufw-$init power-profiles-daemon-$init avahi-$init libvirt-$init ${cron}-${init} apparmor-$init audit-$init rng-tools-$init
 fi
 
 #Hyprland 
