@@ -110,7 +110,7 @@ sudo pacman -Syu --needed --noconfirm cliphist qt{5{ct,-wayland},6{ct,-wayland}}
 paru -S --needed wlogout rofi-lbonn-wayland-git waybar-hyprland-git hyprpicker-git swww nwg-look wlr-randr grimblast swaylock-effects-git psuinfo
 sudo pacman -Syu --needed --noconfirm rofi-calc
 elif [ $de == 2 ];then
-    sudo pacman -Syu --needed --noconfirm plasma{,-wayland-session} kde-applications
+    sudo pacman -Syu --needed --noconfirm plasma{-meta,-wayland-session} kde-applications-meta
 fi
 #Flatpak
 sudo pacman -Syu --needed --noconfirm flatpak
