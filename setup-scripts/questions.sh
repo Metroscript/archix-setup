@@ -144,7 +144,7 @@ if [ $ply == y ];then
     echo 'Select Plymouth Theme: spinner, bgrt, breeze, breeze-text, fade-in, glow, solar, spininfinity, spinner, text, tribar, script, details.'
     printf "Type desired theme name: "
     read plytheme
-    until [ "$plytheme" == spinner] || [ "$plytheme" == bgrt ] || [ "$plytheme" == breeze ] || [ "$plytheme" == breeze-text ] || [ "$plytheme" == fade-in ] || [ "$plytheme" == glow ] || [ "$plytheme" == solar ] ||  [ "$plytheme" == spininfinity ] || [ "$plytheme" == text ] || [ "$plytheme" == tribar ] || [ "$plytheme" == script ] || [ "$plytheme" == details ];do
+    until [ "$plytheme" == spinner ] || [ "$plytheme" == bgrt ] || [ "$plytheme" == breeze ] || [ "$plytheme" == breeze-text ] || [ "$plytheme" == fade-in ] || [ "$plytheme" == glow ] || [ "$plytheme" == solar ] ||  [ "$plytheme" == spininfinity ] || [ "$plytheme" == text ] || [ "$plytheme" == tribar ] || [ "$plytheme" == script ] || [ "$plytheme" == details ];do
         echo 'Sorry, please try again.'
         echo 'Select Plymouth Theme: spinner, bgrt, breeze, breeze-text, fade-in, glow, solar, spininfinity, spinner, text, tribar, script, details.'
         printf "Type desired theme name: "
