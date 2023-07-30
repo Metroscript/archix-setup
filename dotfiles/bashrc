@@ -46,9 +46,9 @@ alias ukernel="sudo pacman -Syu --needed linux{,-{headers,firmware,lts{,-headers
 alias aur='paru -Syua'
 
 #YT-DLP
-alias ytm='yt-dlp -x -f ba/b --audio-quality 0 --audio-format flac --add-metadata --embed-thumbnail -o ~/Music/%"(title)s.%(ext)"s'
+alias ytm='yt-dlp -x -f ba/b --audio-quality 0 --audio-format mp3 --add-metadata --embed-thumbnail -o ~/Music/%"(title)s.%(ext)"s'
 alias yt='yt-dlp -f bv+ba/b'
-alias yta='yt-dlp -x -f ba/b --audio-quality 0 --audio-format wav'
+alias yta='yt-dlp -x -f ba/b --audio-quality 0'
 
 #KEK
 alias speak='fortune | ponysay'
