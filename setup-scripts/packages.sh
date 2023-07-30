@@ -94,7 +94,7 @@ else
     fi
 fi
 
-if ! [ $cron == cronie ];then
+if ! [ $cron == fcron ];then
     if [ "$artix" == y ];then
         sudo pacman -S timeshift;else
         paru -S timeshift
