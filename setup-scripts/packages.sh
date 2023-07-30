@@ -46,7 +46,7 @@ if [ $bin == y ];then
 fi
 makepkg -sic --noconfirm
 cd
-if ! rg .config <<< $(ls -a);then
+if ! grep .config <<< $(ls -a);then
     mkdir -p .config/paru/;else
     mkdir .config/paru/
 fi
