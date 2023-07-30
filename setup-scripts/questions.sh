@@ -133,7 +133,7 @@ done
 if [ $crock == 1 ];then
     cron=cronie;else
     cron=fcron
-    if [ $artix == y ];then
+    if [ "$artix" == y ];then
         echo "You will have to manually select all system scripts; excluding cronie to avoid conflicts. Just type '1-2,4-20' when asked."
         sleep 5
     fi
