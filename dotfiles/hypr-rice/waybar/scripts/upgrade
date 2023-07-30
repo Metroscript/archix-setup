@@ -1,5 +1,5 @@
 #!/bin/bash
-if rg doas <<< $(ls /usr/bin);then
+if rg doas <<< $(pacman -Q);then
     su=doas;else
     su=sudo
 fi

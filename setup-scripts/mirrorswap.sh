@@ -48,7 +48,7 @@ if [ $swap -gt 0 ];then
             #BOOSTER STUFF HERE
             #sudo booster build
         fi
-        if ! grep 'sleep.conf.d' <<< $(ls $sdir);then]
+        if ! grep 'sleep.conf.d' <<< $(ls $sdir);then
             mkdir ${sdir}sleep.conf.d
         fi
         sudo sh -c "echo 'HibernateDelaySec=180min' > ${sdir}sleep.conf.d/99-Hibernate-Sec.conf"
