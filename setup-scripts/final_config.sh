@@ -184,11 +184,11 @@ fi
 #sudo ufw allow 53/tcp
 #sudo ufw default deny incoming
 #sudo ufw default allow outgoing
-#sudo ufw enable
+sudo ufw enable
 
 #Enable init services
 if ! [ "$artix" == y ];then
-    sudo systemctl enable --now systemd-timesyncd cups ufw $dm $cron libvirtd apparmor auditd pkgfile-update.timer rngd
+    sudo systemctl enable --now systemd-timesyncd cups ufw $dm $cron libvirtd apparmor auditd pkgfile-update.timer rngd power-profiles-daemon
 elif [ $init == dinit ]; then
     sudo dinitctl enable ntpd
     sudo dinitctl enable ufw
@@ -198,6 +198,7 @@ elif [ $init == dinit ]; then
     sudo dinitctl enable apparmor
     sudo dinitctl enable auditd
     sudo dinitctl enable rngd
+    sudo dinitctl enable power-profiles-daemon
     sudo ln -s /etc/dinit.d/$dm /etc/dinit.d/boot.d/
 elif [ $init == runit ]; then
     sudo ln -s /etc/runit/sv/ntpd /run/runit/service
@@ -208,12 +209,14 @@ elif [ $init == runit ]; then
     sudo ln -s /etc/runit/sv/auditd /run/runit/service
     sudo ln -s /etc/runit/sv/ufw /run/runit/service
     sudo ln -s /etc/runit/sv/rngd /run/runit/service
+    sudo ln -s /etc/runit/sv/power-profiles-daemon /run/runit/service
 elif [ $init == openrc ]; then
     sudo rc-update add ntpd boot
     sudo rc-update add cupsd boot
     sudo rc-update add $dm boot
     sudo rc-update add rngd default
     sudo rc-update add ufw default
+    sudo rc-update add power-profiles-daemon default
     sudo rc-update add apparmor default
     sudo rc-update add auditd default
     sudo rc-update add $cron default
@@ -227,6 +230,7 @@ elif [ $init == s6 ];then
     sudo touch /etc/s6/adminsv/default/contents.d/$cron
     sudo touch /etc/s6/adminsv/default/contents.d/apparmor
     sudo touch /etc/s6/adminsv/default/contents.d/auditd
+    sudo touch /etc/s6/adminsv/default/contents.d/power-profiles-daemon
     sudo s6-db-reload
 fi
 
