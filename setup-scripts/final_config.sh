@@ -3,16 +3,16 @@
 if [ $rgb == y ];then
     #sudo sed -i 's/quiet/acpi_enforce_resources=lax quiet/' $bootdir
     if [ $rgsmb == y ];then
-        if ! rg i2c-tools <<< $(pacman -Q);then
+        if ! grep i2c-tools <<< $(pacman -Q);then
             sudo pacman -Syu ic2-tools
         fi
         sudo modprobe i2c-dev
-        if ! rg i2c <<< $(cat /etc/group);then
+        if ! grep i2c <<< $(cat /etc/group);then
             sudo groupadd --system i2c
         fi
         sudo usermod $USER -aG i2c
         sudo sh -c 'echo "i2c-dev" > /etc/modules-load.d/i2c.conf'
-        if rg amd <<< $(cat $bootdir);then
+        if grep amd <<< $(cat $bootdir);then
             sudo modprobe i2c-piix4
             sudo sh -c 'echo "i2c-piix4" > /etc/modules-load.d/i2c-piix4.conf';else
             sudo modprobe i2c-i801
@@ -25,7 +25,7 @@ if [ $ply == y ];then
     if [ $img == mkinit ];then
         sudo sed -i 's/udev/udev plymouth/g' /etc/mkinitcpio.conf
     fi
-    if ! rg splash <<< $(cat $bootdir);then
+    if ! grep splash <<< $(cat $bootdir);then
         sudo sed -i 's/quiet/quiet splash/' $bootdir
     fi
     sudo sed -i 's/splash/splash plymouth.nolog/' $bootdir
@@ -49,22 +49,22 @@ if [ $ply == y ];then
 fi
 
 if [ $de == 1 ];then
-    if ! rg Desktop <<< $(ls);then
+    if ! grep Desktop <<< $(ls);then
         mkdir Desktop
     fi
-    if ! rg Documents <<< $(ls);then
+    if ! grep Documents <<< $(ls);then
         mkdir Documents
     fi
-    if ! rg Music <<< $(ls);then
+    if ! grep Music <<< $(ls);then
         mkdir Music
     fi
-    if ! rg Pictures <<< $(ls);then
+    if ! grep Pictures <<< $(ls);then
         mkdir Pictures
     fi
-    if ! rg Videos <<< $(ls);then
+    if ! grep Videos <<< $(ls);then
         mkdir Videos
     fi
-    if ! rg Downloads <<< $(ls);then
+    if ! grep Downloads <<< $(ls);then
         mkdir Downloads
     fi
     mv ${repo}dotfiles/hypr-rice/* .config/
@@ -81,7 +81,7 @@ if [ $de == 1 ];then
     gsettings set org.cinnamon.desktop.default-applications.terminal exec alacritty
 fi
 if [ "$artix" == y ] && ! [ $de == 1 ];then
-    if ! rg "autostart" <<< $(ls .config/);then
+    if ! grep "autostart" <<< $(ls .config/);then
         mkdir .config/autostart
     fi
     echo -e "[Desktop Entry]\nExec=/usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/wireplumber\nName=pipewire\nPath=\nType=Application\nX-KDE-AutostartScript=true" > .config/autostart/pipewire.desktop
@@ -96,7 +96,7 @@ fi
 ########################################
 ############# HARDENING ################
 ########################################
-if ! rg "sysctl.d" <<< $(ls /etc/);then
+if ! grep "sysctl.d" <<< $(ls /etc/);then
     sudo mkdir /etc/sysctl.d/
 fi
 sudo sh -c "echo -e 'kernel.kptr_restrict=2\nkernel.dmesg_restrict=1\nkernel.printk=3 3 3 3\nkernel.yama.ptrace_scope=2\nkernel.unprivileged_bpf_disabled=1\nnet.core.bpf_jit_harden=2\ndev.tty.ldisc_autoload=0\nvm.unprivileged_userfaultfd=0\nkernel.kexec_load_disabled=1\nkernel.sysrq=4\nkernel.perf_event_paranoid=3\nvm.mmap_rnd_bits=32\nvm.mmap_rnd_compat_bits=16' > /etc/sysctl.d/99-kernel-hardening.conf"
@@ -105,21 +105,21 @@ sudo sh -c "echo -e 'net.ipv6.conf.all.use_tempaddr = 2\nnet.ipv6.conf.default.u
 sudo sh -c "echo -e 'fs.protected_symlinks=1\nfs.protected_hardlinks=1\nfs.protected_fifos=2\nfs.protected_regular=2' > /etc/sysctl.d/99-userspace.conf"
 sudo sh -c "echo -e 'vm.max_map_count=2147483642\nvm.swappiness=50' > /etc/sysctl.d/99-map-count-swappiness.conf"
 sudo sed -i "s/quiet/lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off quiet/" $bootdir
-if ! rg loglevel <<< $(cat $bootdir);then
+if ! grep loglevel <<< $(cat $bootdir);then
     sudo sed -i 's/quiet/loglevel=0 quiet/' $bootdir;else
     sudo sed -i 's/loglevel=./loglevel=0/' $bootdir
 fi
 sudo grub-mkconfig -o /boot/grub/grub.cfg
 #Enable NetworkManager ipv6 privacy features
-if rg networkmanager <<< $(pacman -Q) && ! rg 'ipv6.ip6-privacy=2' <<< $(cat /etc/NetworkManager/conf.d/*);then
+if grep networkmanager <<< $(pacman -Q) && ! grep 'ipv6.ip6-privacy=2' <<< $(cat /etc/NetworkManager/conf.d/*);then
     sudo sh -c "echo -e '[connection]\nipv6.ip6-privacy=2' > /etc/NetworkManager/conf.d/ipv6-privacy-features.conf"
 fi
 #set machine ID to generic whonix machine ID
-if ! rg b08dfa6083e7567a1921a715000001fb <<< $(cat /etc/machine-id);then
+if ! grep b08dfa6083e7567a1921a715000001fb <<< $(cat /etc/machine-id);then
     sudo sh -c "echo b08dfa6083e7567a1921a715000001fb > /etc/machine-id ; echo b08dfa6083e7567a1921a715000001fb /var/lib/dbus/machine-id"
 fi
 #Add 5 second delay between failed password attempts
-if ! rg pam_faildelay <<< $(cat /etc/pam.d/system-login);then
+if ! grep pam_faildelay <<< $(cat /etc/pam.d/system-login);then
     sudo sh -c "echo 'auth       optional   pam_faildelay.so   delay=5000000' >> /etc/pam.d/system-login"
 fi
 #Restrict 'su' to :wheel
@@ -137,33 +137,33 @@ if [ $kignore == y ];then
 ######################################################################################################
 ############################### NEEDS WORKING ON!!! (bashrc editing) #################################
 ######################################################################################################
-    if rg 'local/linux ' <<< $(pacman -Qs);then
+    if grep 'local/linux ' <<< $(pacman -Qs);then
         sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux linux-headers /' /etc/pacman.conf
     fi
-    if rg linux-lts <<< $(pacman -Q);then
+    if grep linux-lts <<< $(pacman -Q);then
         sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-lts linux-lts-headers /' /etc/pacman.conf
     fi
-    if rg linux-zen <<< $(pacman -Q);then
+    if grep linux-zen <<< $(pacman -Q);then
         sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-zen linux-zen-headers /' /etc/pacman.conf
     fi
-    if rg linux-hardened <<< $(pacman -Q);then
+    if grep linux-hardened <<< $(pacman -Q);then
         sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-hardened linux-hardened-headers /' /etc/pacman.conf
     fi
 fi
 ######################################################################################################
 ######################################## END OF PROBLEM AREA #########################################
 ######################################################################################################
-if ! rg .config <<< $(sudo ls -a /root/);then
+if ! grep .config <<< $(sudo ls -a /root/);then
     sudo mkdir /root/.config/
 fi
 sudo cp -r ${repo}dotfiles/config/nvim /root/.config/
 sudo mv ${repo}dotfiles/root/* /root/.config/
 mv ${repo}dotfiles/config/* .config/
 if [ $gayms == y ];then
-    if ! rg Games <<< $(ls);then
+    if ! grep Games <<< $(ls);then
         mkdir Games
     fi
-    if ! rg "retroarch" <<< $(ls .config);then
+    if ! grep "retroarch" <<< $(ls .config);then
         mkdir .config/retroarch
     fi
     mv ${repo}dotfiles/retroarch.cfg .config/retroarch
@@ -172,7 +172,7 @@ mv ${repo}dotfiles/bashrc .bashrc
 mv ${repo}dotfiles/inputrc .inputrc
 sudo sed -i -e 's/#unix_sock_group = "libvirt"/unix_sock_group = "libvirt"/' -i -e 's/#unix_sock_ro_perms = "0777"/unix_sock_ro_perms = "0777"/' -i -e 's/#unix_sock_rw_perms = "0770"/unix_sock_rw_perms = "0770"/' /etc/libvirt/libvirtd.conf
 sudo usermod -aG libvirt $USER
-if ! rg localtime <<< $(ls /etc/);then
+if ! grep localtime <<< $(ls /etc/);then
     sudo ln -sf /usr/share/zoneinfo/$tz /etc/localtime
     sudo hwclock --systohc
 fi
