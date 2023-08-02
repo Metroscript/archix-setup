@@ -29,7 +29,9 @@ if [ $ply == y ];then
         sudo sed -i 's/quiet/quiet splash/' $bootdir
     fi
     sudo sed -i 's/splash/splash plymouth.nolog/' $bootdir
-    sudo sed -i -e 's/DialogVerticalAlignment=.382/DialogVerticalAlignment=.75/' -i -e 's/WatermarkVerticalAlignment=.96/WatermarkVerticalAlignment=.5/' /usr/share/plymouth/themes/spinner/spinner.plymouth
+    if ! [ $plytheme == bgrt ];then
+        sudo sed -i -e 's/DialogVerticalAlignment=.382/DialogVerticalAlignment=.75/' -i -e 's/WatermarkVerticalAlignment=.96/WatermarkVerticalAlignment=.5/' /usr/share/plymouth/themes/spinner/spinner.plymouth
+    fi
     if [ $img == mkinit ];then
         if [ "$plytheme" == breeze ] || [ "$plytheme" == breeze-text ];then
             sudo pacman -Syu --needed --noconfirm breeze-plymouth
