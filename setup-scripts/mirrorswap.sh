@@ -21,7 +21,7 @@ if [ "$artix" == y ];then
     sudo reflector --save /etc/pacman.d/mirrorlist --sort rate -c $country -p https
 fi
 sudo pacman -Sy
-sudo pkgfile -uz "zstd --ultra -22man  -T0"
+sudo pkgfile -uz "zstd --ultra -22 -T0"
 
 #Make Swapfile
 if [ $swap -gt 0 ];then
