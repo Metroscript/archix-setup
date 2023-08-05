@@ -6,8 +6,10 @@ if [ "$artix" == y ];then
     sudo pacman-key --populate
 fi
     sudo sed -i -e 's/#Color/Color/' -i -e '/Color/a ILoveCandy' -i -e 's/#Verbose/Verbose/' -i -e 's/#Parallel/Parallel/' -i -e "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
+sudo pacman -Syu --needed --noconfirm base-devel
 if [ "$suas" == y ];then
-    sudo pacman -Syu --needed --noconfirm autoconf automake bison debugedit fakeroot flex gcc groff libtool m4 make patch pkgconf texinfo which
+    sudo pacman -R --noconfirm base-devel
+    sudo pacman -Rns --noconfirm sudo
 fi
 sudo pacman -Syu --needed --noconfirm reflector rsync pacman-contrib pkgfile
 tz=$(curl https://ipapi.co/timezone)
@@ -19,7 +21,7 @@ if [ "$artix" == y ];then
     sudo reflector --save /etc/pacman.d/mirrorlist --sort rate -c $country -p https
 fi
 sudo pacman -Sy
-sudo pkgfile -uz "zstd -19 -T0"
+sudo pkgfile -uz "zstd --ultra -22man  -T0"
 
 #Make Swapfile
 if [ $swap -gt 0 ];then
