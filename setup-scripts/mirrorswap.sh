@@ -33,10 +33,6 @@ if [ $swap -gt 0 ];then
     sudo mount -a
     sudo swapon -a
     if [ $res == y ];then
-        if [ "$artix" == y ];then
-            susdir=/etc/elogind/;else
-            susdir=/etc/systemd/
-        fi
         sudo sed -i "s;quiet;resume=$(sudo lsblk -oUUID,MOUNTPOINT -P -M | grep \"/\" | cut -d\  -f1 | sed 's/\"//g') resume_offset=$(sudo filefrag -v /swapfile | awk '$1=="0:" {print substr($4, 1, length($4)-2)}') quiet;" $bootdir
         if [ $img == mkinit ];then
             sudo sed -i 's/filesystems/filesystems resume/' /etc/mkinitcpio.conf
@@ -51,7 +47,7 @@ if [ $swap -gt 0 ];then
             #sudo booster build
         fi
         if ! grep 'sleep.conf.d' <<< $(ls $sdir);then
-            mkdir ${sdir}sleep.conf.d
+            sudo mkdir ${sdir}sleep.conf.d
         fi
         sudo sh -c "echo 'HibernateDelaySec=180min' > ${sdir}sleep.conf.d/99-Hibernate-Sec.conf"
         sudo sh -c "echo -e '[Sleep]\nHibernateMode=shutdown' > ${sdir}sleep.conf.d/99-Hibernate-Mode.conf"
