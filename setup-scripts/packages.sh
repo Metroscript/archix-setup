@@ -26,8 +26,8 @@ sudo pacman -Syu --needed --noconfirm vkd3d lib32-vkd3d
 if [ "$artix" == y ];then
     sudo pacman -S --needed --noconfirm ${dm}-$init ${init}-system cups-$init openntpd-$init ufw-$init power-profiles-daemon-$init avahi-$init libvirt-$init apparmor-$init audit-$init rng-tools-$init
     if [ $cron == fcron ];then
-    sudo pacman -Rns cronie-$init
-    sudo pacman -S fcron-$init
+       sudo pacman -Rns cronie-$init
+       sudo pacman -S fcron-$init
     fi
 fi
 
