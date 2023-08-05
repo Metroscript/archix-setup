@@ -26,8 +26,8 @@ sudo pacman -Syu --needed --noconfirm vkd3d lib32-vkd3d
 if [ "$artix" == y ];then
     sudo pacman -S --needed --noconfirm ${dm}-$init ${init}-system cups-$init openntpd-$init ufw-$init power-profiles-daemon-$init avahi-$init libvirt-$init apparmor-$init audit-$init rng-tools-$init
     if [ $cron == fcron ];then
-       sudo pacman -Rns cronie-$init
-       sudo pacman -S fcron-$init
+       sudo pacman -Rns --noconfirm cronie-$init
+       sudo pacman -S --noconfirm fcron-$init
     fi
 fi
 
@@ -91,7 +91,7 @@ if [ $bin == y ];then
     fi
     if [ "$artix" == y ];then
         sudo pacman -S --needed --noconfirm librewolf;else
-        paru -S librewolf-bin
+        paru -S librewolf-bin psuinfo
     fi
 else
     if [ "$min" == y ];then
@@ -99,7 +99,7 @@ else
     fi
     if [ "$artix" == y ];then
         sudo pacman -S --needed --noconfirm librewolf;else
-        paru -S librewolf
+        paru -S librewolf psuinfo
     fi
 fi
 
@@ -113,7 +113,7 @@ fi
 #Hyprland 
 if [ $de == 1 ];then
 sudo pacman -Syu --needed --noconfirm cliphist qt{5{ct,-wayland},6{ct,-wayland}} pavucontrol nemo{,-{fileroller,share}} catdoc odt2txt poppler libgsf gvfs-{mtp,afc,nfs,smb} ffmpegthumbnailer polkit-gnome imv calcurse gamescope brightnessctl udiskie gammastep swayidle hyprland xdg-desktop-portal-hyprland breeze-{icons,gtk} mako simple-scan gnome-font-viewer okular
-paru -S --needed wlogout rofi-lbonn-wayland-git waybar-hyprland-git hyprpicker-git swww nwg-look wlr-randr grimblast swaylock-effects-git psuinfo
+paru -S --needed wlogout rofi-lbonn-wayland-git waybar-hyprland-git hyprpicker-git swww nwg-look wlr-randr grimblast swaylock-effects-git
 sudo pacman -Syu --needed --noconfirm rofi-calc
 elif [ $de == 2 ];then
     sudo pacman -Syu --needed --noconfirm plasma-{meta,wayland-session} cryfs flatpak-kcm plymouth-kcm fwupd packagekit-qt5 xdg-desktop-portal-{kde,gtk} gwenview kimageformats qt5-imageformats kamera dolphin{,-plugins} ffmpegthumbs kde{-{inotify-survey,cli-tools},graphics-thumbnailers,network-filesharing} kio-{admin,fuse,extras} purpose icoutils libappimage openexr perl taglib kmousetool kontrast colord-kde kcolorchooser kruler okular spectacle svgpart kcron ark filelight kate kbackup kcalc kcharselect kclock kdf kdialog keditbookmarks kgpg kweather markdownpart print-manager skanpager maliit-keyboard
