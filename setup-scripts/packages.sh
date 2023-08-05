@@ -115,7 +115,7 @@ sudo pacman -Syu --needed --noconfirm cliphist qt{5{ct,-wayland},6{ct,-wayland}}
 paru -S --needed wlogout rofi-lbonn-wayland-git waybar-hyprland-git hyprpicker-git swww nwg-look wlr-randr grimblast swaylock-effects-git
 sudo pacman -Syu --needed --noconfirm rofi-calc
 elif [ $de == 2 ];then
-    sudo pacman -Syu --needed --noconfirm plasma-{meta,wayland-session} cryfs flatpak-kcm plymouth-kcm fwupd packagekit-qt5 xdg-desktop-portal-{kde,gtk} gwenview kimageformats qt5-imageformats kamera dolphin{,-plugins} ffmpegthumbs kde{-{inotify-survey,cli-tools},graphics-thumbnailers,network-filesharing} kio-{admin,fuse,extras} purpose icoutils libappimage openexr perl taglib kmousetool kontrast colord-kde kcolorchooser kruler okular spectacle svgpart kcron ark filelight kate kbackup kcalc kcharselect kclock kdf kdialog keditbookmarks kgpg kweather markdownpart print-manager skanpage maliit-keyboard
+    sudo pacman -Syu --needed --noconfirm plasma-{meta,wayland-session} cryfs flatpak-kcm plymouth-kcm fwupd packagekit-qt5 xdg-desktop-portal-{kde,gtk} gwenview kimageformats qt5-imageformats kamera dolphin{,-plugins} ffmpegthumbs kde{-{inotify-survey,cli-tools},graphics-thumbnailers,network-filesharing} kio-{admin,fuse,extras} purpose icoutils libappimage openexr perl taglib kmousetool kontrast colord-kde kcolorchooser kruler okular spectacle svgpart kcron ark filelight kate kbackup kcalc kcharselect kclock kdialog keditbookmarks kgpg kweather markdownpart print-manager skanpage maliit-keyboard
 fi
 #Flatpak
 sudo pacman -Syu --needed --noconfirm flatpak
