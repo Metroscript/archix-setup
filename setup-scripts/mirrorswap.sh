@@ -49,8 +49,7 @@ if [ $swap -gt 0 ];then
         if ! grep 'sleep.conf.d' <<< $(ls $sdir);then
             sudo mkdir ${sdir}sleep.conf.d
         fi
-        sudo sh -c "echo '[Sleep]\nHibernateDelaySec=60min' > ${sdir}sleep.conf.d/99-Hibernate-Sec.conf"
-        sudo sh -c "echo -e '[Sleep]\nHibernateMode=shutdown' > ${sdir}sleep.conf.d/99-Hibernate-Mode.conf"
+        sudo sh -c "echo -e '[Sleep]\nHibernateDelaySec=60min\nHibernateMode=shutdown' > ${sdir}sleep.conf.d/99-Hibernate-Mode-and-Delay.conf"
         if [ $de == 1 ];then
             sed -i "s/ctl suspend/ctl suspend-then-hibernate \|\| $(if [ "$artix" == y ];then echo loginctl;else echo systemctl;fi) suspend/" ${repo}dotfiles/hypr-rice/wlogout/layout
         fi
