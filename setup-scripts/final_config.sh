@@ -183,6 +183,7 @@ sudo ufw limit ssh
 sudo ufw allow http
 sudo ufw allow https
 sudo ufw allow dns
+sudo ufw allow mdns
 sudo ufw allow 631
 sudo ufw allow qbittorrent
 sudo ufw default deny incoming
