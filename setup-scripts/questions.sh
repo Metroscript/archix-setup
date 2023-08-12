@@ -90,19 +90,19 @@ until [ $bin == y ] || [ $bin == n ];do
     read bin
 done
 
-printf "Enable compile optimisations such as multithreading & native binaries to makepkg.conf?"
+printf "Enable compile optimisations such as multithreading & native binaries to makepkg.conf? [y/n]: "
 read opt
 until [ $opt == y ] || [ $opt == n ];do
     echo "Sorry, please try again."
-    printf "Enable compile optimisations such as multithreading & native binaries to makepkg.conf?"
+    printf "Enable compile optimisations such as multithreading & native binaries to makepkg.conf? [y/n]: "
     read opt
 done
 
-printf "Install multithreaded drop-ins for gzip & bzip2?"
+printf "Install multithreaded drop-ins for gzip & bzip2? [y/n]: "
 read mtdi
 until [ $mtdi == y ] || [ $mtdi == n ];do
     echo "Sorry, please try again."
-    printf "Install multithreaded drop-ins for gzip & bzip2?"
+    printf "Install multithreaded drop-ins for gzip & bzip2? [y/n]: "
     read mtdi
 done
 
