@@ -166,6 +166,15 @@ if [ $ply == y ];then
         printf "Type desired theme name: "
         read plytheme
     done
+    if [ "$plytheme" == bgrt ];then
+        printf "Remove distro watermark to leave only BIOS vender logo? [y/n] "
+        read vr
+        until [ "$vr" == y ] || [ "$vr" == n ];do
+            echo "Sorry, please try again."
+            printf "Remove distro watermark to leave only BIOS vender logo? [y/n] "
+            read vr
+        done
+    fi
 fi
 printf "Install MakeMKV? (A DVD/Bluray ripper) [y/n]: "
 read makemkv

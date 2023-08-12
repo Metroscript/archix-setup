@@ -32,6 +32,9 @@ if [ $ply == y ];then
     if ! [ $plytheme == bgrt ];then
         sudo sed -i -e 's/DialogVerticalAlignment=.382/DialogVerticalAlignment=.75/' -i -e 's/WatermarkVerticalAlignment=.96/WatermarkVerticalAlignment=.5/' /usr/share/plymouth/themes/spinner/spinner.plymouth
     fi
+    if [ "$vr" == y ];then
+        sudo mv /usr/share/plymouth/themes/spinner/watermark.png /usr/share/plymouth
+    fi
     if [ $img == mkinit ];then
         if [ "$plytheme" == breeze ] || [ "$plytheme" == breeze-text ];then
             sudo pacman -Syu --needed --noconfirm breeze-plymouth
