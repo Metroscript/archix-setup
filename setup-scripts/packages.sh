@@ -88,7 +88,8 @@ if [ $bin == y ];then
         paru -S prismlauncher-bin jre{-openjdk,11-openjdk,8-openjdk}
     fi
     if [ "$artix" == y ];then
-        sudo pacman -S --needed --noconfirm librewolf;else
+        sudo pacman -S --needed --noconfirm librewolf
+        paru -S psuinfo;else
         paru -S librewolf-bin psuinfo
     fi
 else
@@ -96,7 +97,8 @@ else
         paru -S prismlauncher jre{-openjdk,17-openjdk,11-openjdk,8-openjdk}
     fi
     if [ "$artix" == y ];then
-        sudo pacman -S --needed --noconfirm librewolf;else
+        sudo pacman -S --needed --noconfirm librewolf
+        paru -S psuinfo;else
         paru -S librewolf psuinfo
     fi
 fi
