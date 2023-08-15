@@ -23,7 +23,7 @@ fi
 sudo pacman -Syu --needed --noconfirm vkd3d lib32-vkd3d
 
 #Basic packages
-sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber man-db wayland xorg-xwayland smartmontools strace v4l2loopback-dkms gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{jetbrains-mono-nerd,ubuntu-nerd,noto-nerd} cups{,-pk-helper,-pdf} gutenprint net-tools asp power-profiles-daemon gparted foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley ufw fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{archiver,rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay libreoffice-still{,-en-gb} hunspell{,-en_{au,gb,us}} hyphen-en mythes-en coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp lib{paper,wpg,pulse,mythes,32-{gnutls,libpulse,alsa-{lib,plugins},pipewire{,-jack,-v4l2}}} keepassxc gst-{libav,plugins-{base,good}} phonon-qt5-gstreamer imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq qemu-full edk2-ovmf virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat nvme-cli apparmor audit python-{notify2,psutil} noise-suppression-for-voice wl-clipboard rng-tools alacritty obs-studio btop mpv kdenlive bigsh0t dvgrab mediainfo open{cv,timelineio} recordmydesktop rhythmbox lollypop krita qbittorrent blender libdecor
+sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber man-db wayland xorg-xwayland smartmontools strace v4l2loopback-dkms gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{hack-nerd,ubuntu-font-family} cups{,-pk-helper,-pdf} gutenprint net-tools asp power-profiles-daemon gparted foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley ufw fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{archiver,rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay libreoffice-still{,-en-gb} hunspell{,-en_{au,gb,us}} hyphen-en mythes-en coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp lib{paper,wpg,pulse,mythes,32-{gnutls,libpulse,alsa-{lib,plugins},pipewire{,-jack,-v4l2}}} keepassxc gst-{libav,plugins-{base,good}} phonon-qt5-gstreamer imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq qemu-full edk2-ovmf virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat nvme-cli apparmor audit python-{notify2,psutil} noise-suppression-for-voice wl-clipboard rng-tools alacritty obs-studio btop mpv kdenlive bigsh0t dvgrab mediainfo open{cv,timelineio} recordmydesktop rhythmbox lollypop krita qbittorrent blender libdecor
 
 if [ $mtdi == y ];then
     sudo pacman -S --noconfirm --needed lbzip2 pigz
@@ -35,6 +35,13 @@ fi
 if [ $gayms == y ];then
     sudo pacman -Syu --needed --noconfirm wine{,-gecko,-mono} lutris steam retroarch{,-assets-{glui,ozone,xmb}} gamemode lib{32-gamemode,retro-{dolphin,pcsx2,citra,melonds,duckstation}}
 fi
+
+#Flatpak
+if grep "linux-hardened" <<< $(pacman -Q);then
+   sudo pacman -Syu --needed --noconfirm flatpak bubblewrap-suid;else
+   sudo pacman -Syu --needed --noconfirm flatpak bubblewrap
+fi
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
 #AUR
 if [ "$suas" == y ];then
@@ -122,15 +129,9 @@ fi
 
 #Hyprland 
 if [ $de == 1 ];then
-sudo pacman -Syu --needed --noconfirm cliphist qt{5{ct,-wayland},6{ct,-wayland}} pavucontrol nemo{,-{fileroller,share}} catdoc odt2txt poppler libgsf gvfs-{mtp,afc,nfs,smb} ffmpegthumbnailer polkit-gnome imv calcurse gamescope brightnessctl udiskie gammastep swayidle hyprland xdg-desktop-portal-hyprland breeze-{icons,gtk} mako simple-scan gnome-font-viewer okular
+sudo pacman -Syu --needed --noconfirm cliphist qt{5{ct,-wayland},6{ct,-wayland}} pavucontrol nemo{,-{fileroller,share}} catdoc odt2txt poppler libgsf gvfs-{mtp,afc,nfs,smb} ffmpegthumbnailer polkit-gnome imv calcurse gamescope brightnessctl udiskie gammastep swayidle hyprland xdg-desktop-portal-hyprland papirus-icon-theme breeze-{icons,gtk} mako simple-scan gnome-font-viewer okular ttf-noto-nerd
 paru -S --needed wlogout rofi-lbonn-wayland-git waybar-hyprland-git hyprpicker-git swww nwg-look wlr-randr grimblast swaylock-effects-git
 sudo pacman -Syu --needed --noconfirm rofi-calc
 elif [ $de == 2 ];then
     sudo pacman -Syu --needed --noconfirm plasma-{meta,wayland-session} cryfs flatpak-kcm plymouth-kcm fwupd packagekit-qt5 xdg-desktop-portal-{kde,gtk} gwenview kimageformats qt5-imageformats kamera dolphin{,-plugins} ffmpegthumbs kde{-{inotify-survey,cli-tools},graphics-thumbnailers,network-filesharing} kio-{admin,fuse,extras} purpose icoutils libappimage openexr perl taglib kmousetool kontrast colord-kde kcolorchooser kruler okular spectacle svgpart kcron ark filelight kate kbackup kcalc kcharselect kclock kdialog keditbookmarks kweather markdownpart print-manager skanpage maliit-keyboard
 fi
-#Flatpak
-if grep "linux-hardened" <<< $(pacman -Q);then
-   sudo pacman -Syu --needed --noconfirm flatpak bubblewrap-suid;else
-   sudo pacman -Syu --needed --noconfirm flatpak bubblewrap
-fi
-flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
