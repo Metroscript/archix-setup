@@ -16,18 +16,17 @@ alias mv='mv -iv'
 alias mkdir='mkdir -vp'
 alias rm='rm -Iv'
 alias cl='clear'
-alias v='vim'
 alias open='xdg-open'
 alias grep='grep --colour=auto'
 alias free='free -mht'
 alias tree='tree --dirsfirst -C'
-alias dmesg='dmesg --color=auto --reltime --human --nopager --decode'
+alias dmesg='dmesg -HePxL=auto'
 export VISUAL=
 export EDITOR="$VISUAL"
 source /usr/share/doc/pkgfile/command-not-found.bash
 HISTCONTROL=ignoreboth
-HISTSIZE=1000
-HISTFILESIZE=2000
+HISTSIZE=10000
+HISTFILESIZE=5000
 shopt -s cmdhist
 shopt -s lithist
 shopt -s histappend
@@ -40,9 +39,7 @@ alias p='sudo pacman -S'
 alias r='sudo pacman -Rns'
 alias s='pacman -Ss'
 alias q='pacman -Qs'
-alias update='sudo pacman -Syu && yt-dlp -U'
-alias clean='sudo pacman -Sc'
-alias ukernel="sudo pacman -Syu --needed linux{,-{headers,firmware,lts{,-headers}}}"
+alias kernel-update="pacman -Qu|rg linux|cut -d\  -f1|sudo pacman -Syu -"
 alias aur='paru -Syua'
 
 #YT-DLP
@@ -51,14 +48,13 @@ alias yt='yt-dlp -f bv+ba/b'
 alias yta='yt-dlp -x -f ba/b --audio-quality 0'
 
 #KEK
-alias speak='fortune | ponysay'
+alias speak='fortune|ponysay'
 
 #Other/Help
-alias tips='echo Write ISO to USB: sudo dd if=/path/to/iso/file.iso of=/dev/sdX status=progress'
 PS1='[\u@\h \W]\$ '
 
 ##-----------------------------------------------------
 ## synth-shell-prompt.sh
-if [ -f ~/.config/synth-shell/synth-shell-prompt.sh ] && [ -n "$( echo $- | grep i )" ]; then
+if [ -f ~/.config/synth-shell/synth-shell-prompt.sh ] && [ -n "$( echo $- | grep i )" ];then
 	source ~/.config/synth-shell/synth-shell-prompt.sh
 fi
