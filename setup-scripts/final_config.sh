@@ -158,11 +158,13 @@ fi
 ######################################################################################################
 ######################################## END OF PROBLEM AREA #########################################
 ######################################################################################################
-if ! grep .config <<< $(sudo ls -a /root/);then
-    sudo mkdir /root/.config/
+if [ $de == 1 ];then
+    if ! grep .config <<< $(sudo ls -a /root/);then
+        sudo mkdir /root/.config/
+    fi
+    sudo cp -r ${repo}dotfiles/config/nvim /root/.config/
+    sudo mv ${repo}dotfiles/root/* /root/.config/
 fi
-sudo cp -r ${repo}dotfiles/config/nvim /root/.config/
-sudo mv ${repo}dotfiles/root/* /root/.config/
 mv ${repo}dotfiles/config/* .config/
 if [ $gayms == y ];then
     if ! grep Games <<< $(ls);then
@@ -176,7 +178,7 @@ fi
 mv ${repo}dotfiles/bashrc .bashrc
 mv ${repo}dotfiles/inputrc .inputrc
 sudo sed -i -e 's/#unix_sock_group = "libvirt"/unix_sock_group = "libvirt"/' -i -e 's/#unix_sock_ro_perms = "0777"/unix_sock_ro_perms = "0777"/' -i -e 's/#unix_sock_rw_perms = "0770"/unix_sock_rw_perms = "0770"/' /etc/libvirt/libvirtd.conf
-sudo usermod -aG libvirt $USER
+sudo gpasswd -a $USER libvirt
 if ! grep localtime <<< $(ls /etc/);then
     sudo ln -sf /usr/share/zoneinfo/$tz /etc/localtime
     sudo hwclock --systohc
@@ -195,7 +197,8 @@ sudo ufw enable
 
 #Enable init services
 if ! [ "$artix" == y ];then
-    sudo systemctl enable --now systemd-timesyncd cups ufw $dm $cron libvirtd apparmor auditd pkgfile-update.timer rngd power-profiles-daemon
+    sudo timedatectl set-ntp y
+    sudo systemctl enable --now systemd-timesyncd cups ufw $dm $cron libvirtd apparmor auditd rngd power-profiles-daemon
 elif [ $init == dinit ]; then
     sudo dinitctl enable ntpd
     sudo dinitctl enable ufw
