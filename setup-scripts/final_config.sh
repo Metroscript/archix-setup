@@ -184,6 +184,8 @@ if ! grep localtime <<< $(ls /etc/);then
     sudo hwclock --systohc
 fi
 #Enable Firewall settings
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
 sudo ufw limit ssh
 sudo ufw allow http
 sudo ufw allow https
@@ -191,8 +193,6 @@ sudo ufw allow dns
 sudo ufw allow mdns
 sudo ufw allow 631
 sudo ufw allow qbittorrent
-sudo ufw default deny incoming
-sudo ufw default allow outgoing
 sudo ufw enable
 
 #Enable init services
