@@ -114,11 +114,11 @@ until [ $gayms == y ] || [ $gayms == n ];do
     read gayms
 done
 if [ $gayms == y ];then
-    printf "Install Grapejuice? (A WINE wrapper for Roblox) [y/n]: "
+    printf "Install Vinegar? (A WINE wrapper for Roblox) [y/n]: "
     read rlx
     until [ $rlx == y ] || [ $rlx == n ];do
         echo "Sorry, please try again"
-        printf "Install Grapejuice? (A WINE wrapper for Roblox) [y/n]: "
+        printf "Install Vinegar? (A WINE wrapper for Roblox) [y/n]: "
         read rlx
     done
     printf "Install Prismlauncher? (A custom Minecraft launcher with mod support) [y/n]: "
