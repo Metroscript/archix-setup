@@ -79,7 +79,7 @@ if [ $mkfirm == y ];then
     paru -S mkinitcpio-firmware
 fi
 if [ "$rlx" == y ];then
-    paru -S grapejuice-git
+    paru -S vinegar
 fi
 if [ "$waydroid" == y ];then
     paru -S waydroid
