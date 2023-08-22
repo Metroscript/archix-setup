@@ -1,1 +1,28 @@
+launcher = "gamemoderun"
 
+[env]
+WINEARCH = "win64"
+WINEDEBUG = "-all"
+WINEESYNC = "1"
+WINEDLLOVERRIDES = "dxdiagn=d;winemenubuilder.exe=d"
+
+DXVK_LOG_LEVEL = "warn"
+DXVK_LOG_PATH = "none"
+
+MESA_GL_VERSION_OVERRIDE = "4.4"
+__GL_THREADED_OPTIMIZATIONS = "1"
+
+[player]
+renderer = "Vulkan"
+dxvk = false
+auto_kill_prefix = true
+
+[player.env]
+DXVK_HUD = "0"
+
+[player.fflags]
+DFIntTaskSchedulerTargetFps = 640
+
+[studio]
+renderer = "Vulkan"
+auto_kill_prefix = true
