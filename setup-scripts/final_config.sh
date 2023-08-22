@@ -198,8 +198,7 @@ sudo ufw enable
 #Enable init services
 if ! [ "$artix" == y ];then
     sudo timedatectl set-ntp y
-    sudo systemctl enable --now systemd-timesyncd cups ufw $cron libvirtd apparmor auditd rngd power-profiles-daemon
-    sudo ln -s /usr/lib/systemd/system/${dm}.service /etc/systemd/system/display-manager.service
+    sudo systemctl enable systemd-timesyncd cups ufw $dm $cron libvirtd apparmor auditd rngd power-profiles-daemon
 elif [ $init == dinit ]; then
     sudo dinitctl enable ntpd
     sudo dinitctl enable ufw
