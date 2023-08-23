@@ -16,6 +16,7 @@ __GL_THREADED_OPTIMIZATIONS = "1"
 renderer = "Vulkan"
 dxvk = false
 auto_kill_prefix = true
+channel = "zcanary"
 
 [player.env]
 DXVK_HUD = "0"
