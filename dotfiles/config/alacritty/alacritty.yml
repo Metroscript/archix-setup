@@ -23,9 +23,6 @@ cursor:
 env:
   TERM: alacritty
   
-shell:
-  program: /usr/bin/bash
-
 scrolling:
   history: 100000
   multiplier: 10

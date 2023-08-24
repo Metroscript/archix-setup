@@ -19,9 +19,6 @@ y = 2
 [env]
 TERM = "alacritty"
 
-[shell]
-program = "/usr/bin/bash"
-
 #[enabled]
 #command = "xdg-open"
 #hyperlinks = true
