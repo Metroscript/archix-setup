@@ -118,7 +118,6 @@ if [ $gayms == y ];then
         printf "Install Prismlauncher? (A custom Minecraft launcher with mod support) [y/n]: "
         read min
     done
-    fi
 fi
 echo "What shell would you like to use? (Use BASH if unsure) 1.BASH 2.FISH"
 printf "[1/2]: "
