@@ -20,6 +20,7 @@ if [ "$artix" == y ];then
     sudo reflector --save /etc/pacman.d/mirrorlist-arch --sort rate -c $country -p https;else
     sudo reflector --save /etc/pacman.d/mirrorlist --sort rate -c $country -p https
 fi
+sudo sh -c "echo 'Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch' >> /etc/pacman.d/mirrorlist"
 sudo pacman -Sy
 sudo pkgfile -uz "zstd --ultra -22 -T0"
 
