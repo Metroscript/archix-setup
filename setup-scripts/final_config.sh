@@ -85,10 +85,10 @@ if [ $de == 1 ];then
     gsettings set org.cinnamon.desktop.privacy remember-recent-files false
     gsettings set org.cinnamon.desktop.default-applications.terminal exec alacritty
 fi
+if ! grep "autostart" <<< $(ls .config/);then
+    mkdir .config/autostart
+fi
 if [ "$artix" == y ] && ! [ $de == 1 ];then
-    if ! grep "autostart" <<< $(ls .config/);then
-        mkdir .config/autostart
-    fi
     echo -e "[Desktop Entry]\nExec=/usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/wireplumber\nName=pipewire\nPath=\nType=Application\nX-KDE-AutostartScript=true" > .config/autostart/pipewire.desktop
 fi
 echo -e "[Desktop Entry]\nType=Application\nName=Apparmor Notify\nComment=Notify User of Apparmor Denials\nTryExec=aa-notify\nExec=aa-notify -p -s 1 -w 60 -f /var/log/audit/audit.log\nStartupNotify=false\nNoDisplay=true" > .config/autostart/apparmor-notify.desktop
@@ -185,7 +185,7 @@ if ! [ $shell == bash ];then
     chsh -s /bin/$shell
     if [ $shell == fish ];then
         cp ${repo}dotfiles/config.fish .config/fish/
-        fish -c 'set -U fish_greeting';else
+        fish -c 'set -U fish_greeting'
     fi
 fi
 sudo sed -i -e 's/#unix_sock_group = "libvirt"/unix_sock_group = "libvirt"/' -i -e 's/#unix_sock_ro_perms = "0777"/unix_sock_ro_perms = "0777"/' -i -e 's/#unix_sock_rw_perms = "0770"/unix_sock_rw_perms = "0770"/' /etc/libvirt/libvirtd.conf
