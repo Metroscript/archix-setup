@@ -1,13 +1,3 @@
-#SET EDITOR#
-if grep -E neovim <<< $(pacman -Q);then
-    sed -i -e 's,VISUAL=,VISUAL="/usr/bin/nvim",' -i -e "/cl=/a alias vim='nvim'" ${repo}dotfiles/bashrc
-elif grep -E emacs <<< $(pacman -Q);then
-    sed -i 's,VISUAL=,VISUAL="/usr/bin/emacs -nw",' ${repo}dotfiles/bashrc
-elif grep -E nano <<< $(pacman -Q);then
-    sed -i 's,VISUAL=,VISUAL="/usr/bin/nano",' ${repo}dotfiles/bashrc;else
-    sed -i 's,VISUAL=,VISUAL="/usr/bin/vim",' ${repo}dotfiles/bashrc
-fi
-
 if grep mkinitcpio <<< $(pacman -Q);then
     img=mkinit
 elif grep dracut <<< $(pacman -Q);then
@@ -59,7 +49,7 @@ if grep opendoas <<< $(pacman -Q);then
     alias sudo='doas'
     sed -i "/stuff/a alias sudo='doas'" ${repo}dotfiles/bashrc
     echo "-----------------------------------------------------------------------------------------"
-    echo -e "SudoLoop is enabled on paru, when tweaking doas.conf, put 'permit persist :wheel as root cmd true' so SudoLoop works\nYou should make any changes & run 'chmod 0400 /etc/doas.conf' as root after install"
+    echo -e "SudoLoop is enabled on paru, when tweaking doas.conf, put 'permit persist :wheel cmd true' so SudoLoop works\nYou should make any changes & run 'chmod 0400 /etc/doas.conf' as root after install"
     echo "-----------------------------------------------------------------------------------------"
     sleep 5
 fi
@@ -128,15 +118,19 @@ if [ $gayms == y ];then
         printf "Install Prismlauncher? (A custom Minecraft launcher with mod support) [y/n]: "
         read min
     done
-    if [ $de == 1 ] || [ $de == 2 ] || [ $de == 3 ];then
-        printf "Install WayDroid? (An Android emulator that exclusively runs on Wayland) [y/n]: "
-        read waydroid
-        until [ $waydroid == y ] || [ $waydroid == n ];do
-            echo "Sorry, please try again."
-            printf "Install WayDroid? (An Android emulator that exclusively runs on Wayland) [y/n]: "
-            read waydroid
-    done
     fi
+fi
+echo "What shell would you like to use? (Use BASH if unsure) 1.BASH 2.FISH"
+printf "[1/2]: "
+read shel
+until [ $shel == 1 ] || [ $shel == 2 ];do
+    echo "What shell would you like to use? (Use BASH if unsure) 1.BASH 2.FISH"
+    printf "[1/2]: "
+    read shel
+done
+if [ $shel == 1 ];then
+    shell=bash;else
+    shell=fish
 fi
 echo "What cron would you like? (If unsure, choose Cronie) 1.Cronie or 2.Fcron"
 printf "[1/2]: "
@@ -214,7 +208,7 @@ until [ $kignore == y ] || [ $kignore == n ];do
 done
 
 if ! grep Size <<< $(swapon -s);then
-    echo "Swapfile size. 8192/Eqal to RAM Mib is usually a good choice.  Put '0' for no swapfile."
+    echo "Swapfile size. 8192/Equal to RAM Mib is usually a good choice for hibernation. Put '0' for no swapfile."
     printf "Size of swapfile in Mib: "
     read swap
     until [ $swap -ge 0 ];do

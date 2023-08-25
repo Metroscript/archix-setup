@@ -21,7 +21,7 @@ alias grep='grep --colour=auto'
 alias free='free -mht'
 alias tree='tree --dirsfirst -C'
 alias dmesg='dmesg -HePxL=auto'
-export VISUAL=
+export VISUAL=/usr/bin/nvim
 export EDITOR="$VISUAL"
 source /usr/share/doc/pkgfile/command-not-found.bash
 HISTCONTROL=ignoreboth
@@ -48,7 +48,7 @@ alias yt='yt-dlp -f bv+ba/b'
 alias yta='yt-dlp -x -f ba/b --audio-quality 0'
 
 #KEK
-alias speak='fortune|ponysay'
+alias pony='fortune|ponysay'
 
 #Other/Help
 PS1='[\u@\h \W]\$ '
