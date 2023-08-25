@@ -184,8 +184,8 @@ mv ${repo}dotfiles/inputrc .inputrc
 if ! [ $shell == bash ];then
     chsh -s /bin/$shell
     if [ $shell == fish ];then
-        cp ${repo}dotfiles/config.fish .config/fish/
         fish -c 'set -U fish_greeting'
+        cp ${repo}dotfiles/config.fish .config/fish/
     fi
 fi
 sudo sed -i -e 's/#unix_sock_group = "libvirt"/unix_sock_group = "libvirt"/' -i -e 's/#unix_sock_ro_perms = "0777"/unix_sock_ro_perms = "0777"/' -i -e 's/#unix_sock_rw_perms = "0770"/unix_sock_rw_perms = "0770"/' /etc/libvirt/libvirtd.conf
