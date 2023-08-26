@@ -11,7 +11,7 @@ if [ "$suas" == y ];then
     sudo pacman -R --noconfirm base-devel
     sudo pacman -Rns --noconfirm sudo
 fi
-sudo pacman -Syu --needed --noconfirm reflector rsync pacman-contrib pkgfile
+sudo pacman -Syu --needed --noconfirm reflector rsync pacman-contrib pkgfile neovim
 tz=$(curl https://ipapi.co/timezone)
 country=$(curl https://ipapi.co/timezone | cut -d/ -f1)
 if [ "$artix" == y ];then
@@ -21,6 +21,7 @@ if [ "$artix" == y ];then
     sudo reflector --save /etc/pacman.d/mirrorlist --sort rate -c $country -p https
 fi
 sudo sh -c "echo 'Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch' >> /etc/pacman.d/mirrorlist"
+sudo nvim /etc/pacman.d/mirrorlist
 sudo pacman -Sy
 sudo pkgfile -uz "zstd --ultra -22 -T0"
 
