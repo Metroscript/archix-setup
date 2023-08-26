@@ -83,6 +83,7 @@ if [ "$rlx" == y ];then
 fi
 if [ $makemkv == y ];then
     paru -S makemkv
+    sudo sh -c "echo sg > /etc/modules-load.d/sg.conf"
 fi
 if [ $rgb == y ];then
     paru -S openrgb
