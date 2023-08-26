@@ -185,9 +185,7 @@ if ! [ $shell == bash ];then
     chsh -s /bin/$shell
     if [ $shell == fish ];then
         fish -c 'set -U fish_greeting'
-        cp ${repo}dotfiles/config.fish ~/
-        echo -e "-------------------------------------------------------\n manually copy config.fish to .config/fish after install\n------------------------------------------"
-        sleep 5
+        cp ${repo}dotfiles/config.fish ~/.config/fish/
     fi
 fi
 sudo sed -i -e 's/#unix_sock_group = "libvirt"/unix_sock_group = "libvirt"/' -i -e 's/#unix_sock_ro_perms = "0777"/unix_sock_ro_perms = "0777"/' -i -e 's/#unix_sock_rw_perms = "0770"/unix_sock_rw_perms = "0770"/' /etc/libvirt/libvirtd.conf
