@@ -211,13 +211,13 @@ until [ $kignore == y ] || [ $kignore == n ];do
 done
 
 if ! grep Size <<< $(swapon -s);then
-    echo "Swapfile size. 8192/Equal to RAM Mib is usually a good choice for hibernation. Put '0' for no swapfile."
-    printf "Size of swapfile in Mib: "
+    echo "Swapfile size in GiB. Matching RAM size OR RAM x 1.5 sized swap is usually a good choice for hibernation. Put '0' for no swapfile."
+    printf "Size of swapfile in GiB: "
     read swap
     until [ $swap -ge 0 ];do
         echo "Sorry, please try again."
-        echo "Swapfile size. 8192/Equal to RAM Mib is usually a good choice. Put '0' for no swapfile."
-        printf "Size of swapfile in Mib: "
+        echo "Swapfile size in GiB. Matching RAM size OR RAM x 1.5 sized swap is usually a good choice for hibernation. Put '0' for no swapfile."
+        printf "Size of swapfile in GiB: "
         read swap
     done
     if [ $swap -gt 0 ];then
