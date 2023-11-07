@@ -13,10 +13,10 @@ sudo sed -i 's/quiet/efi=disable_early_pci_dma quiet/' $bootdir
     #######################################
 gpu=$(lspci|grep VGA)
 if grep -E "Radeon|AMD|ATI" <<< $gpu && grep -E "Intel Corporation|UHD" <<< $gpu;then
-    sudo pacman -Syu --noconfirm --needed vulkan-{radeon,intel,icd-loader} mesa{,-vdpau} opencl-rusticl-mesa lib{va-mesa-driver} intel-media-driver
+    sudo pacman -Syu --noconfirm --needed vulkan-{radeon,intel,icd-loader} mesa{,-vdpau} opencl-rusticl-mesa libva-mesa-driver intel-media-driver
     sudo sh -c "echo 'RUSTICL_ENABLE=radeonsi,iris' >> /etc/environment"
 elif grep -E "Radeon|AMD|ATI" <<< $gpu;then
-   sudo pacman -Syu --noconfirm --needed vulkan-{radeon,icd-loader} mesa{,-vdpau} opencl-rusticl-mesa lib{va-mesa-driver,}
+   sudo pacman -Syu --noconfirm --needed vulkan-{radeon,icd-loader} mesa{,-vdpau} opencl-rusticl-mesa libva-mesa-driver
    sudo sh -c "echo 'RUSTICL_ENABLE=radeonsi' >> /etc/environment"
 #elif grep -E "NVIDIA|GeForce" <<< $gpu;then
 #   sudo pacman -S --noconfirm --needed nvidia{,-utils} lib32-{nvidia-utils,vulkan-icd-loader} vulkan-icd-loader
@@ -26,6 +26,13 @@ elif grep -E "Intel Corporation|UHD" <<< $gpu;then
      sudo sh -c "echo 'RUSTICL_ENABLE=iris' >> /etc/environment"
 fi
 sudo pacman -Syu --needed --noconfirm vkd3d
+
+#Flatpak
+if grep "linux-hardened" <<< $(pacman -Q);then
+   sudo pacman -Syu --needed --noconfirm flatpak bubblewrap-suid;else
+   sudo pacman -Syu --needed --noconfirm flatpak bubblewrap
+fi
+flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
 
 #Basic packages
 sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber man-db wayland xorg-xwayland smartmontools strace v4l2loopback-dkms gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{dejavu,liberation,hack-nerd,ubuntu-font-family} bash-language-server cups{,-pk-helper,-pdf} gutenprint net-tools asp power-profiles-daemon gparted foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley ufw fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{archiver,rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay libreoffice-still{,-en-gb} hunspell{,-en_{au,gb,us}} hyphen-en mythes-en coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp lib{paper,wpg,pulse,mythes} keepassxc gst-{libav,plugins-{base,good}} phonon-qt5-gstreamer imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq qemu-full edk2-ovmf virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat nvme-cli apparmor audit python-{notify2,psutil} noise-suppression-for-voice wl-clipboard rng-tools alacritty obs-studio btop mpv kdenlive movit bigsh0t dvgrab mediainfo open{cv,timelineio} recordmydesktop rhythmbox lollypop krita qbittorrent blender libdecor nvtop exfatprogs $shell
@@ -39,18 +46,7 @@ fi
     #Games, etc
 if [ $gayms == y ];then
     sudo pacman -Syu --needed --noconfirm wine{,-gecko,-mono} lutris steam gamescope gamemode lib32-gst-plugins-base
-    ## EMULATION STUFF
-    ## sudo pacman -Syu --needed --noconfirm retroarch{,-assets-{glui,ozone,xmb}} libretro-{dolphin,pcsx2,citra,melonds,duckstation}
-fi
-
-#Flatpak
-if grep "linux-hardened" <<< $(pacman -Q);then
-   sudo pacman -Syu --needed --noconfirm flatpak bubblewrap-suid;else
-   sudo pacman -Syu --needed --noconfirm flatpak bubblewrap
-fi
-flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
-if [ "$gayms" == y ];then
-flatpak install -y --user pcsx2 cemu citra
+    flatpak install -y --user pcsx2 cemu citra
 fi
 
 #AUR
