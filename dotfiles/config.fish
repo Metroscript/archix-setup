@@ -19,6 +19,8 @@ if status is-interactive
     alias dmesg 'dmesg -HePxL=auto'
     set -x VISUAL /usr/bin/nvim
     set -x EDITOR $VISUAL
+    set -x GOPATH "$HOME/.go"
+    set -x PATH "$PATH:$GOPATH/bin"
     set HISTCONTROL ignoreboth
     set HISTSIZE 10000
     set HISTFILESIZE 5000
@@ -26,15 +28,13 @@ if status is-interactive
     #Pacman
     alias p 'sudo pacman -S'
     alias r 'sudo pacman -Rns'
+    alias u 'paru -Syu;flatpak update;exit'
     alias s 'pacman -Ss'
     alias q 'pacman -Qs'
-    alias kernel-update "pacman -Qu|rg linux|cut -d\  -f1|sudo pacman -Syu -"
-    alias aur 'paru -Syua'
 
     #YT-DLP
-    alias ytm 'yt-dlp -x -f ba/b --audio-quality 0 --audio-format mp3 --add-metadata --embed-thumbnail -o ~/Music/%"(title)s.%(ext)"s'
+    alias ytm 'yt-dlp -x -f ba/b --audio-quality 0 --add-metadata --embed-thumbnail'
     alias yt 'yt-dlp -f bv+ba/b'
-    alias yta 'yt-dlp -x -f ba/b --audio-quality 0'
 
     #KEK
     alias pony 'fortune|ponysay'

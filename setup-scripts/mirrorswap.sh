@@ -26,7 +26,7 @@ sudo pacman -Sy
 sudo pkgfile -uz "zstd --ultra -22 -T0"
 
 #Make Swapfile
-if [ $swap -gt 0 ];then
+if [ "$swap" -gt 0 ];then
     sudo dd if=/dev/zero of=/swapfile bs=1M count=$swap status=progress
     sudo chmod 600 /swapfile
     sudo mkswap -U clear /swapfile
@@ -56,6 +56,13 @@ if [ $swap -gt 0 ];then
             sed -i "s/ctl suspend/ctl suspend-then-hibernate \|\| $(if [ "$artix" == y ];then echo loginctl;else echo systemctl;fi) suspend/" ${repo}dotfiles/hypr-rice/wlogout/layout
         fi
     fi
+fi
+
+if [ "$zram" -gt 0 ];then
+    sudo sh -c "echo 'zram' > /etc/modules-load.d/zram.conf"
+    sudo touch /etc/udev/rules.d/99-zram.rules; echo ACTION==\"add\", KERNEL==\"zram0\", ATTR{comp_algorithm}=\"${zramcomp}\", ATTR{disksize}=\"${zram}G\", RUN=\"/usr/bin/mkswap -U clear /dev/%k\" | sudo tee /etc/udev/rules.d/99-zram.rules
+    sudo sed -i 's;quiet;zswap.enabled=0 quiet;' /etc/default/grub
+    sudo sh -c "echo '/dev/zram0 none swap defaults,pri=100 0 0' >> /etc/fstab"
 fi
 if grep nvme <<< $(lsblk) && ! grep nvme_load <<< $(cat $bootdir);then
     sudo sed -i 's/quiet/nvme_load=YES quiet/' $bootdir

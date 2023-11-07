@@ -7,7 +7,7 @@ A setup script with some personal dotfiles to aid you in installing Arch and/or 
 The script is designed to install Arch/Artix Linux with my custom Hyprland rice, though it also supports KDE-Plasma for testing purposes.
 Along with installing software, it includes support for installing a swapfile if you lack swap & adding resume-from-disk/hibernate support, Plus some - to my knowledge; unintrusive security features which should have minimum compatability issues, aside from possible issues with slow hardware as vm.max_map_count is set to the 64 bit integer limit - same a Fedora.
 
-It should be noted that in order for this script to work: you have the 'quiet' kernel parameter enabled, are not using Systemd-Boot (If using Arch), are using mkinitcpio for initramfs generation (Support for others may come later) and have, until you boot into your GUI: Unrestricted sudo/doas privileges (Mainly used for pacman, sed, echoing settings to files, and obtaining disk UUIDs).
+It should be noted that in order for this script to work: you have the 'quiet' kernel parameter enabled (May change later. I may add quiet with the script if it's not detected), are not using Systemd-Boot (If using Arch), are using mkinitcpio for initramfs generation (Support for others may come later) and have, until you boot into your GUI: Unrestricted sudo/doas privileges (Mainly used for pacman, sed, echoing settings to files, and obtaining disk UUIDs).
 
 # Hardening the system... how?
 
@@ -83,7 +83,12 @@ psuinfo.
 __Optional:__
 Steam/WINE,
 gamemode,
-retroarch (Emulation: Includes cores for dolphin, pcsx2, citra, melonds & duckstation),
+Emulation:
+    Dolphin,
+    PCSX2
+    CEMU
+    Citra,
+    (Some of these will be installed with flatpak)
 prismlauncher,
 waydroid, 
 plymouth,
@@ -93,8 +98,8 @@ openRGB.
 __AUR helper:__
 paru
 
-__KEEP IN MIND:__ 
-GPU driver detection and support is sketchy at best for NVIDIA cards (I guess you'd know that if you're using Linux, heh?), so maybe offer some suggestions or just fix the problems yourself.  
+__KEEP IN MIND:__
+I do not offer checking and driver installation for Nvidia cards. You'll have to do that manually before or after using this script.
 I am not familiar with init systems other than openrc & dinit so services for s6 or runit may need some changing in their runlevels.
 
 # Summary

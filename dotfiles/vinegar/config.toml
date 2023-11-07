@@ -1,29 +1,19 @@
-launcher = "gamemoderun"
+[global]
+channel = "live" #live zcanary zintegration
+auto_kill_prefix = true
 
 [env]
-WINEARCH = "win64"
 WINEDEBUG = "-all"
-WINEESYNC = "1"
-WINEDLLOVERRIDES = "dxdiagn=d;winemenubuilder.exe=d"
-
-DXVK_LOG_LEVEL = "warn"
-DXVK_LOG_PATH = "none"
-
-MESA_GL_VERSION_OVERRIDE = "4.4"
-__GL_THREADED_OPTIMIZATIONS = "1"
-
-[player]
-renderer = "Vulkan"
-dxvk = false
-auto_kill_prefix = true
-channel = "zcanary"
+WINEFSYNC = "1"
 
 [player.env]
 DXVK_HUD = "0"
 
-[player.fflags]
-DFIntTaskSchedulerTargetFps = 640
+[player]
+renderer = "D3D11" #D3D11 D3D11FL10 Vulkan OpenGL
+dxvk = true
+launcher = "gamemoderun gamescope -f -W WIDTH -H HEIGHT --force-grab-cursor --" 
 
 [studio]
 renderer = "Vulkan"
-auto_kill_prefix = true
+launcher = "gamemoderun"

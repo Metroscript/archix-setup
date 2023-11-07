@@ -11,19 +11,24 @@ sudo sed -i 's/quiet/efi=disable_early_pci_dma quiet/' $bootdir
     #######################################
     ##### NVIDIA DRIVERS MAY NOT WORK #####
     #######################################
-gpu=$(lspci | grep VGA)
-if grep -E "Radeon|AMD|ATI" <<< $gpu;then
-   sudo pacman -Syu --noconfirm --needed vulkan-{radeon,icd-loader} mesa{,-vdpau} lib{va-mesa-driver,32-{libva-mesa-driver,mesa{,-vdpau},vulkan-{radeon,icd-loader}}}
+gpu=$(lspci|grep VGA)
+if grep -E "Radeon|AMD|ATI" <<< $gpu && grep -E "Intel Corporation|UHD" <<< $gpu;then
+    sudo pacman -Syu --noconfirm --needed vulkan-{radeon,intel,icd-loader} mesa{,-vdpau} opencl-rusticl-mesa lib{va-mesa-driver} intel-media-driver
+    sudo sh -c "echo 'RUSTICL_ENABLE=radeonsi,iris' >> /etc/environment"
+elif grep -E "Radeon|AMD|ATI" <<< $gpu;then
+   sudo pacman -Syu --noconfirm --needed vulkan-{radeon,icd-loader} mesa{,-vdpau} opencl-rusticl-mesa lib{va-mesa-driver,}
+   sudo sh -c "echo 'RUSTICL_ENABLE=radeonsi' >> /etc/environment"
 #elif grep -E "NVIDIA|GeForce" <<< $gpu;then
 #   sudo pacman -S --noconfirm --needed nvidia{,-utils} lib32-{nvidia-utils,vulkan-icd-loader} vulkan-icd-loader
 #   nvidia-xconfig
 elif grep -E "Intel Corporation|UHD" <<< $gpu;then
-     sudo pacman -Syu --noconfirm --needed vulkan-{intel,icd-loader} mesa lib{va-{intel-driver,utils},vdpau-va-gl,32-{vulkan-{intel,icd-loader},mesa,libva-intel-driver}} intel-media-driver
+     sudo pacman -Syu --noconfirm --needed vulkan-{intel,icd-loader} mesa opencl-rusticl-mesa lib{va-{intel-driver,utils},vdpau-va-gl} intel-media-driver
+     sudo sh -c "echo 'RUSTICL_ENABLE=iris' >> /etc/environment"
 fi
-sudo pacman -Syu --needed --noconfirm vkd3d lib32-vkd3d
+sudo pacman -Syu --needed --noconfirm vkd3d
 
 #Basic packages
-sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber man-db wayland xorg-xwayland smartmontools strace v4l2loopback-dkms gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{dejavu,liberation,hack-nerd,ubuntu-font-family} bash-language-server cups{,-pk-helper,-pdf} gutenprint net-tools asp power-profiles-daemon gparted foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley ufw fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{archiver,rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay libreoffice-still{,-en-gb} hunspell{,-en_{au,gb,us}} hyphen-en mythes-en coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp lib{paper,wpg,pulse,mythes,32-{gnutls,libpulse,alsa-{lib,plugins},pipewire{,-jack,-v4l2}}} keepassxc gst-{libav,plugins-{base,good}} phonon-qt5-gstreamer imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq qemu-full edk2-ovmf virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat nvme-cli apparmor audit python-{notify2,psutil} noise-suppression-for-voice wl-clipboard rng-tools alacritty obs-studio btop mpv kdenlive bigsh0t dvgrab mediainfo open{cv,timelineio} recordmydesktop rhythmbox lollypop krita qbittorrent blender libdecor $shell
+sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber man-db wayland xorg-xwayland smartmontools strace v4l2loopback-dkms gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{dejavu,liberation,hack-nerd,ubuntu-font-family} bash-language-server cups{,-pk-helper,-pdf} gutenprint net-tools asp power-profiles-daemon gparted foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley ufw fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{archiver,rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay libreoffice-still{,-en-gb} hunspell{,-en_{au,gb,us}} hyphen-en mythes-en coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp lib{paper,wpg,pulse,mythes} keepassxc gst-{libav,plugins-{base,good}} phonon-qt5-gstreamer imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq qemu-full edk2-ovmf virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat nvme-cli apparmor audit python-{notify2,psutil} noise-suppression-for-voice wl-clipboard rng-tools alacritty obs-studio btop mpv kdenlive movit bigsh0t dvgrab mediainfo open{cv,timelineio} recordmydesktop rhythmbox lollypop krita qbittorrent blender libdecor nvtop exfatprogs $shell
 
 if [ $mtdi == y ];then
     sudo pacman -S --noconfirm --needed lbzip2 pigz
@@ -33,7 +38,9 @@ if [ $ply == y ];then
 fi
     #Games, etc
 if [ $gayms == y ];then
-    sudo pacman -Syu --needed --noconfirm wine{,-gecko,-mono} lutris steam retroarch{,-assets-{glui,ozone,xmb}} gamemode lib{32-gamemode,retro-{dolphin,pcsx2,citra,melonds,duckstation}}
+    sudo pacman -Syu --needed --noconfirm wine{,-gecko,-mono} lutris steam gamescope gamemode lib32-gst-plugins-base
+    ## EMULATION STUFF
+    ## sudo pacman -Syu --needed --noconfirm retroarch{,-assets-{glui,ozone,xmb}} libretro-{dolphin,pcsx2,citra,melonds,duckstation}
 fi
 
 #Flatpak
@@ -41,7 +48,10 @@ if grep "linux-hardened" <<< $(pacman -Q);then
    sudo pacman -Syu --needed --noconfirm flatpak bubblewrap-suid;else
    sudo pacman -Syu --needed --noconfirm flatpak bubblewrap
 fi
-flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
+if [ "$gayms" == y ];then
+flatpak install -y --user pcsx2 cemu citra
+fi
 
 #AUR
 if [ "$suas" == y ];then
@@ -79,32 +89,30 @@ if [ $mkfirm == y ];then
     paru -S mkinitcpio-firmware
 fi
 if [ "$rlx" == y ];then
-    paru -S vinegar-git
+    paru -S vinegar
 fi
 if [ $makemkv == y ];then
     paru -S makemkv
-    sudo sh -c "echo sg > /etc/modules-load.d/sg.conf"
+    #sudo sh -c "echo sg > /etc/modules-load.d/sg.conf"
 fi
 if [ $rgb == y ];then
     paru -S openrgb
 fi
 if [ $bin == y ];then
     if [ "$min" == y ];then
-        paru -S prismlauncher-bin jre{-openjdk,11-openjdk,8-openjdk}
+        paru -S prismlauncher-bin jre{-openjdk,17-openjdk,11-openjdk,8-openjdk}
     fi
     if [ "$artix" == y ];then
-        sudo pacman -S --needed --noconfirm librewolf
-        paru -S psuinfo;else
-        paru -S librewolf-bin psuinfo
+        sudo pacman -S --needed --noconfirm librewolf;else
+        paru -S librewolf-bin
     fi
 else
     if [ "$min" == y ];then
-        paru -S prismlauncher jre{-openjdk,17-openjdk,11-openjdk,8-openjdk}
+        export JAVA_HOME=/usr/lib/jvm/java-17-openjdk;paru -S prismlauncher jre{-openjdk,17-openjdk,11-openjdk,8-openjdk}
     fi
     if [ "$artix" == y ];then
-        sudo pacman -S --needed --noconfirm librewolf
-        paru -S psuinfo;else
-        paru -S librewolf psuinfo
+        sudo pacman -S --needed --noconfirm librewolf;else
+        paru -S librewolf-bin
     fi
 fi
 
@@ -124,13 +132,13 @@ if [ "$artix" == y ];then
     sudo pacman -S --needed --noconfirm $cron
 fi
 
-if grep btrfs <<< $(lsblk -oFSTYPE);then
+if [ "$btrfs" == y ];then
    sudo pacman -Syu --needed --noconfirm grub-btrfs btrfs-progs
 fi
 
 #Hyprland 
 if [ $de == 1 ];then
-sudo pacman -Syu --needed --noconfirm cliphist qt{5{ct,-wayland},6{ct,-wayland}} pavucontrol nemo{,-{fileroller,share}} catdoc odt2txt poppler libgsf gvfs-{mtp,afc,nfs,smb} ffmpegthumbnailer polkit-gnome imv calcurse gamescope brightnessctl udiskie gammastep swayidle hyprland xdg-desktop-portal-hyprland papirus-icon-theme breeze-{icons,gtk} mako simple-scan gnome-font-viewer okular ttf-noto-nerd
+sudo pacman -Syu --needed --noconfirm cliphist qt{5{ct,-wayland},6{ct,-wayland}} pavucontrol nemo{,-{fileroller,share}} catdoc odt2txt poppler libgsf gvfs-{mtp,afc,nfs,smb} ffmpegthumbnailer polkit-gnome imv calcurse brightnessctl udiskie gammastep swayidle hyprland xdg-desktop-portal-hyprland papirus-icon-theme breeze-{icons,gtk} mako simple-scan gnome-font-viewer okular ttf-noto-nerd
 paru -S --needed wlogout rofi-lbonn-wayland-git waybar-hyprland-git hyprpicker-git swww nwg-look wlr-randr grimblast swaylock-effects-git
 sudo pacman -Syu --needed --noconfirm rofi-calc
 elif [ $de == 2 ];then

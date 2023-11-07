@@ -131,7 +131,7 @@
     "custom/temp": {
         "interval": 1,
         "tooltip": false,
-        "exec": "t=$(psuinfo -Ct | sed 's/℃//'); if [ \"$t\" -ge \"80\" ];then echo \" $t℃ \";else echo \"$t℃\";fi"
+        "exec": "t=$(sensors|rg ccd1|cut -d+ -f2|sed 's/℃//'|cut -d. -f1);if [ \$t -ge '80' ];then echo ⚠\$t℃⚠;else echo \$t℃;fi"
     },
 
     "custom/updates": {

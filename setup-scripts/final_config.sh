@@ -20,6 +20,10 @@ if [ $rgb == y ];then
         fi
     fi
 fi
+#Load sg if optical drive is detected
+if grep sr0 <<< $(lsblk);then
+    sudo sh -c "echo 'sg' > /etc/modules-load.d/sg.conf"
+fi
     #Plymouth check & conf
 if [ $ply == y ];then
     if [ $img == mkinit ];then
@@ -108,7 +112,14 @@ sudo sh -c "echo -e 'kernel.kptr_restrict=2\nkernel.dmesg_restrict=1\nkernel.pri
 sudo sh -c "echo -e 'net.ipv4.tcp_syncookies=1\nnet.ipv4.tcp_rfc1337=1\nnet.ipv4.conf.all.rp_filter=1\nnet.ipv4.conf.default.rp_filter=1\nnet.ipv4.tcp_timestamps=0' > /etc/sysctl.d/99-network-security.conf"
 sudo sh -c "echo -e 'net.ipv6.conf.all.use_tempaddr = 2\nnet.ipv6.conf.default.use_tempaddr = 2' > /etc/sysctl.d/99-ipv6-privacy.conf"
 sudo sh -c "echo -e 'fs.protected_symlinks=1\nfs.protected_hardlinks=1\nfs.protected_fifos=2\nfs.protected_regular=2' > /etc/sysctl.d/99-userspace.conf"
-sudo sh -c "echo -e 'vm.max_map_count=2147483642\nvm.swappiness=50' > /etc/sysctl.d/99-map-count-swappiness.conf"
+sudo sh -c "echo -e 'vm.max_map_count=2147483642\nvm.swappiness=50' > /etc/sysctl.d/99-ram.conf"
+if [ "$zram" -gt 0 ];then
+    sudo sed -i '/vm.swappiness/d' /etc/sysctl.d/99-ram.conf
+    sudo sh -c "echo -e 'vm.watermark_boost_factor = 0\nvm.watermark_scale_factor = 125\nvm.page-cluster = 0' >> /etc/sysctl.d/99-ram.conf"
+    if [ "$zramcomp" == lz4 ];then
+        sudo sed -i 's/vm.page-cluster = 0/vm.page-cluster = 1' /etc/sysctl.d/99-ram.conf
+    fi
+fi
 sudo sed -i "s/quiet/lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off quiet/" $bootdir
 if ! grep loglevel <<< $(cat $bootdir);then
     sudo sed -i 's/quiet/loglevel=0 quiet/' $bootdir;else
@@ -177,6 +188,11 @@ if [ $gayms == y ];then
 fi
 if [ "$rlx" == y ];then
     mv ${repo}dotfiles/vinegar .config/
+    sed -i -e "s,WIDTH,$(xdpyinfo | awk -F'[ x]+' '/dimensions:/{print $3}') ," -i -e "s,HEIGHT,$(xdpyinfo | awk -F'[ x]+' '/dimensions:/{print $4}') ," .config/vinegar/config.toml
+fi
+if [ "$min" == y ];then
+    sed -i 's,paru,set -x JAVA_HOME /usr/lib/jvm/java-17-openjdk;paru,' ${repo}dotfiles/config.fish
+    sed -i 's,paru,JAVA_HOME=/usr/lib/jvm/java-17-openjdk paru,' ${repo}dotfiles/bashrc
 fi
 mv ${repo}dotfiles/bashrc .bashrc
 mv ${repo}dotfiles/inputrc .inputrc
@@ -189,6 +205,7 @@ if ! [ $shell == bash ];then
     fi
 fi
 sudo sed -i -e 's/#unix_sock_group = "libvirt"/unix_sock_group = "libvirt"/' -i -e 's/#unix_sock_ro_perms = "0777"/unix_sock_ro_perms = "0777"/' -i -e 's/#unix_sock_rw_perms = "0770"/unix_sock_rw_perms = "0770"/' /etc/libvirt/libvirtd.conf
+sudo sed -i 's/#group.*/group = "libvirt"/' /etc/libvirt/qemu.conf
 sudo gpasswd -a $USER libvirt
 if ! grep localtime <<< $(ls /etc/);then
     sudo ln -sf /usr/share/zoneinfo/$tz /etc/localtime
