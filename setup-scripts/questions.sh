@@ -233,13 +233,13 @@ if ! grep zram <<< $(lsblk);then
     echo "Would you like to use zram? (Compressed RAM; faster than standard swap) Please input the size in GiB of uncompressed data zram should have. Half of RAM is usually good. Put 0 for no zram"
     printf "Size of zram in GiB: "
     read zram
-    until [ $zram -ge 0 ];do
+    until [ "$zram" -ge 0 ];do
         echo "Sorry, please try again."
         echo "Would you like to use zram? (Compressed RAM; faster than standard swap) Please input the size in GiB of uncompressed data zram should have. Half of RAM is usually good. Put 0 for no zram"
         printf "Size of zram in GiB: "
         read zram
     done
-    if [ "zram" -gt 0 ];then
+    if [ "$zram" -gt 0 ];then
         echo -e "Please select the compression algorithm for zram. 1. LZ4, 2. ZSTD.\nLZ4 is faster, but less effective. ZSTD is slower, but more effective at compression"
         printf "1 OR 2: "
         read zramc
