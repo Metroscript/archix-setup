@@ -27,15 +27,25 @@ sudo pkgfile -uz "zstd --ultra -22 -T0"
 
 #Make Swapfile
 if [ "$swap" -gt 0 ];then
-    sudo dd if=/dev/zero of=/swapfile bs=1M count=$swap status=progress
-    sudo chmod 600 /swapfile
-    sudo mkswap -U clear /swapfile
-    sudo cp /etc/fstab /etc/fstab.bak
-    sudo echo '/swapfile none swap defaults 0 0' | sudo tee -a /etc/fstab
-    sudo mount -a
-    sudo swapon -a
+    if [ "$btrfs" == y ];then
+        btrfs subvolume create /swap
+        btrfs filesystem mkswapfile --size ${swap}g --uuid clear /swap/swapfile
+        swapon /swap/swapfile
+        sudo cp /etc/fstab /etc/fstab.bak
+        sudo sh -c "echo '/swap/swapfile none swap defaults 0 0' >> /etc/fstab";else
+        sudo dd if=/dev/zero of=/swapfile bs=1G count=$swap status=progress
+        sudo chmod 600 /swapfile
+        sudo mkswap -U clear /swapfile
+        sudo cp /etc/fstab /etc/fstab.bak
+        sudo sh -c "echo '/swapfile none swap defaults 0 0' >> /etc/fstab"
+        sudo mount -a
+        sudo swapon -a
+    fi
     if [ $res == y ];then
-        sudo sed -i "s;quiet;resume=$(sudo lsblk -oUUID,MOUNTPOINT -P -M | grep \"/\" | cut -d\  -f1 | sed 's/\"//g') resume_offset=$(sudo filefrag -v /swapfile | awk '$1=="0:" {print substr($4, 1, length($4)-2)}') quiet;" $bootdir
+        if [ "$btrfs" == y ];then
+            sudo sed -i "s;quiet;resume=$(sudo lsblk -oUUID,MOUNTPOINT -P -M | grep \"/\" | cut -d\  -f1 | sed 's/\"//g') resume_offset=$(btrfs inspect-internal map-swapfile -r /swap/swapfile) quiet;" $bootdir;else
+            sudo sed -i "s;quiet;resume=$(sudo lsblk -oUUID,MOUNTPOINT -P -M | grep \"/\" | cut -d\  -f1 | sed 's/\"//g') resume_offset=$(sudo filefrag -v /swapfile | awk '$1=="0:" {print substr($4, 1, length($4)-2)}') quiet;" $bootdir
+    fi
         if [ $img == mkinit ];then
             sudo sed -i 's/filesystems/filesystems resume/' /etc/mkinitcpio.conf
             sudo mkinitcpio -P
