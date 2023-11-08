@@ -33,7 +33,7 @@ if [ "$swap" -gt 0 ];then
         swapon /swap/swapfile
         sudo cp /etc/fstab /etc/fstab.bak
         sudo sh -c "echo '/swap/swapfile none swap defaults 0 0' >> /etc/fstab";else
-        sudo dd if=/dev/zero of=/swapfile bs=1G count=$swap status=progress
+        sudo dd if=/dev/zero of=/swapfile bs=1M count=$((${swap}*1024)) status=progress
         sudo chmod 600 /swapfile
         sudo mkswap -U clear /swapfile
         sudo cp /etc/fstab /etc/fstab.bak
