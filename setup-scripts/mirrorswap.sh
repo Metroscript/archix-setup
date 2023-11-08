@@ -29,7 +29,7 @@ sudo pkgfile -uz "zstd --ultra -22 -T0"
 if [ "$swap" -gt 0 ];then
     if [ "$btrfs" == y ];then
         btrfs subvolume create /swap
-        btrfs filesystem mkswapfile --size ${swap}g --uuid clear /swap/swapfile
+        btrfs filesystem mkswapfile --size ${swap}G --uuid clear /swap/swapfile
         swapon /swap/swapfile
         sudo cp /etc/fstab /etc/fstab.bak
         sudo sh -c "echo '/swap/swapfile none swap defaults 0 0' >> /etc/fstab";else
