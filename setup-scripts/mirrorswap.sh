@@ -45,6 +45,7 @@ if [ "$swap" -gt 0 ];then
         if [ "$btrfs" == y ];then
             sudo sed -i "s;quiet;resume=$(sudo lsblk -oUUID,MOUNTPOINT -P -M | grep \"/\" | cut -d\  -f1 | sed 's/\"//g') resume_offset=$(btrfs inspect-internal map-swapfile -r /swap/swapfile) quiet;" $bootdir;else
             sudo sed -i "s;quiet;resume=$(sudo lsblk -oUUID,MOUNTPOINT -P -M | grep \"/\" | cut -d\  -f1 | sed 's/\"//g') resume_offset=$(sudo filefrag -v /swapfile | awk '$1=="0:" {print substr($4, 1, length($4)-2)}') quiet;" $bootdir
+        fi
     fi
         if [ $img == mkinit ];then
             sudo sed -i 's/filesystems/filesystems resume/' /etc/mkinitcpio.conf
