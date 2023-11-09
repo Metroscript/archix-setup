@@ -25,6 +25,10 @@ sudo nvim /etc/pacman.d/mirrorlist
 sudo pacman -Sy
 sudo pkgfile -uz "zstd --ultra -22 -T0"
 
+if [ "$btrfs" == y ];then
+   sudo pacman -Syu --needed --noconfirm grub-btrfs btrfs-progs
+fi
+
 #Make Swapfile
 if [ "$swap" -gt 0 ];then
     if [ "$btrfs" == y ];then
