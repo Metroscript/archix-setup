@@ -128,10 +128,6 @@ if [ "$artix" == y ];then
     sudo pacman -S --needed --noconfirm $cron
 fi
 
-if [ "$btrfs" == y ];then
-   sudo pacman -Syu --needed --noconfirm grub-btrfs btrfs-progs
-fi
-
 #Hyprland 
 if [ $de == 1 ];then
 sudo pacman -Syu --needed --noconfirm cliphist qt{5{ct,-wayland},6{ct,-wayland}} pavucontrol nemo{,-{fileroller,share}} catdoc odt2txt poppler libgsf gvfs-{mtp,afc,nfs,smb} ffmpegthumbnailer polkit-gnome imv calcurse brightnessctl udiskie gammastep swayidle hyprland xdg-desktop-portal-hyprland papirus-icon-theme breeze-{icons,gtk} mako simple-scan gnome-font-viewer okular ttf-noto-nerd
