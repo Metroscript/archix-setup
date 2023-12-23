@@ -50,7 +50,7 @@ if [ "$swap" -gt 0 ];then
         sudo swapon -a
     fi
     if [ $res == y ];then
-        sudo sed -i "s,quiet,resume=$(cat /etc/fstab | grep '/ ' | cut -d/ -f1 | awk '{$1=$1};1') resume_offset=$(if [ "$btrfs" == y ];then sudo btrfs inspect-internal map-swapfile -r /${swapvol}/swapfile;else sudo filefrag -v /swapfile | awk '$1=="0:" {print substr($4, 1, length($4)-2)}';fi) quiet;" $bootdir
+        sudo sed -i "s.quiet.resume=$(cat /etc/fstab | grep '/ ' | cut -d/ -f1 | awk '{$1=$1};1') resume_offset=$(if [ "$btrfs" == y ];then sudo btrfs inspect-internal map-swapfile -r /${swapvol}/swapfile;else sudo filefrag -v /swapfile | awk '$1=="0:" {print substr($4, 1, length($4)-2)}';fi) quiet." $bootdir
     fi
         if [ $img == mkinit ];then
             sudo sed -i 's/filesystems/filesystems resume/' /etc/mkinitcpio.conf
