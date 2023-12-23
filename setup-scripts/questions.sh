@@ -147,6 +147,12 @@ if [ $crock == 1 ];then
     cron=cronie;else
     cron=fcron
 fi
+printf "Install reflector to find closer package mirrors? [y/n]: "
+read reflect
+until [ $reflect == y ] || [ $reflect == n ];do
+    printf "Install reflector to find close package mirrors? [y/n]: "
+    read reflect
+done
 printf "Install Plymouth? (Adds boot splash screen) [y/n]: "
 read ply
 until [ $ply == y ] || [ $ply == n ];do

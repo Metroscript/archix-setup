@@ -190,10 +190,10 @@ if [ "$rlx" == y ];then
     mv ${repo}dotfiles/vinegar .config/
     sed -i -e "s,WIDTH,$(xdpyinfo | awk -F'[ x]+' '/dimensions:/{print $3}') ," -i -e "s,HEIGHT,$(xdpyinfo | awk -F'[ x]+' '/dimensions:/{print $4}') ," .config/vinegar/config.toml
 fi
-if [ "$min" == y ];then
-    sed -i 's,paru,set -x JAVA_HOME /usr/lib/jvm/java-17-openjdk;paru,' ${repo}dotfiles/config.fish
-    sed -i 's,paru,JAVA_HOME=/usr/lib/jvm/java-17-openjdk paru,' ${repo}dotfiles/bashrc
-fi
+#if [ "$min" == y ];then
+#    sed -i 's,paru,set -x JAVA_HOME /usr/lib/jvm/java-17-openjdk;paru,' ${repo}dotfiles/config.fish
+#    sed -i 's,paru,JAVA_HOME=/usr/lib/jvm/java-17-openjdk paru,' ${repo}dotfiles/bashrc
+#fi
 mv ${repo}dotfiles/bashrc .bashrc
 mv ${repo}dotfiles/inputrc .inputrc
 #Set Shell

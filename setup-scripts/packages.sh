@@ -58,7 +58,7 @@ if [ "$suas" == y ];then
     sudo sed -i 's,#PACMAN_AUTH=(),PACMAN_AUTH=(/bin/doas),' /etc/makepkg.conf
 fi
 if [ $opt == y ];then
-    sudo sed -i -e 's/#MAKEFLAGS.*/MAKEFLAGS="-j\$(nproc)"/' -i -e 's/(xz/(xz --threads=0/' -i -e 's/(zstd/(zstd --threads=0/' -i -e 's/-march=x86-64 -mtune=generic/-march=native/' -i -e 's/#RUSTFLAGS.*/RUSTFLAGS="-C opt-level=3 -C target-cpu=native"/' /etc/makepkg.conf
+    sudo sed -i -e 's/#MAKEFLAGS.*/MAKEFLAGS="-j\$(nproc)"/' -i -e 's/(xz/(xz --threads=0/' -i -e 's/(zstd/(zstd --threads=0/' -i -e 's/-march=x86-64 -mtune=generic/-march=native/' -i -e 's/#RUSTFLAGS.*/RUSTFLAGS="-C opt-level=3 -C target-cpu=native --release"/' /etc/makepkg.conf
     if [ $mtdi == y ];then
         sudo sed -i -e 's/(bzip2/(lbzip2/' -i -e 's/(gzip/(pigz/' /etc/makepkg.conf
     fi
@@ -108,7 +108,8 @@ if [ $bin == y ];then
     fi
 else
     if [ "$min" == y ];then
-        export JAVA_HOME=/usr/lib/jvm/java-17-openjdk;paru -S prismlauncher jre{-openjdk,17-openjdk,11-openjdk,8-openjdk}
+        #export JAVA_HOME=/usr/lib/jvm/java-17-openjdk;
+        paru -S prismlauncher jre{-openjdk,17-openjdk,11-openjdk,8-openjdk}
     fi
     if [ "$artix" == y ];then
         sudo pacman -S --needed --noconfirm librewolf;else

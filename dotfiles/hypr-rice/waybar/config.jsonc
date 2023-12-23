@@ -131,7 +131,7 @@
     "custom/temp": {
         "interval": 1,
         "tooltip": false,
-        "exec": "t=$(sensors|rg ccd1|cut -d+ -f2|sed 's/℃//'|cut -d. -f1);if [ \$t -ge '80' ];then echo ⚠\$t℃⚠;else echo \$t℃;fi"
+        "exec": "t=$(sensors|rg ccd1|cut -d+ -f2|sed 's/℃//');if [ \$(echo \$t|cut -d. -f1) -ge '80' ];then echo ⚠\$t⚠;else echo \$t;fi" // sh -c
     },
 
     "custom/updates": {
