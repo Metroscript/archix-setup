@@ -27,17 +27,32 @@ fi
 sudo pacman -Syu pacman-contrib pkgfile
 sudo pkgfile -uz "zstd --ultra -22 -T0"
 
+if [ "$btrfs" == y ];then
+   sudo pacman -Syu --needed --noconfirm grub-btrfs btrfs-progs
+fi
+
 #Make Swapfile
 if [ "$swap" -gt 0 ];then
-    sudo dd if=/dev/zero of=/swapfile bs=1M count=$swap status=progress
-    sudo chmod 600 /swapfile
-    sudo mkswap -U clear /swapfile
-    sudo cp /etc/fstab /etc/fstab.bak
-    sudo echo '/swapfile none swap defaults 0 0' | sudo tee -a /etc/fstab
-    sudo mount -a
-    sudo swapon -a
+    if [ "$btrfs" == y ];then
+        btrfs subvolume create /swap
+        btrfs filesystem mkswapfile --size ${swap}G --uuid clear /swap/swapfile
+        swapon /swap/swapfile
+        sudo cp /etc/fstab /etc/fstab.bak
+        sudo sh -c "echo '/swap/swapfile none swap defaults 0 0' >> /etc/fstab";else
+        sudo dd if=/dev/zero of=/swapfile bs=1M count=$((${swap}*1024)) status=progress
+        sudo chmod 600 /swapfile
+        sudo mkswap -U clear /swapfile
+        sudo cp /etc/fstab /etc/fstab.bak
+        sudo sh -c "echo '/swapfile none swap defaults 0 0' >> /etc/fstab"
+        sudo mount -a
+        sudo swapon -a
+    fi
     if [ $res == y ];then
-        sudo sed -i "s;quiet;resume=$(sudo lsblk -oUUID,MOUNTPOINT -P -M | grep \"/\" | cut -d\  -f1 | sed 's/\"//g') resume_offset=$(sudo filefrag -v /swapfile | awk '$1=="0:" {print substr($4, 1, length($4)-2)}') quiet;" $bootdir
+        if [ "$btrfs" == y ];then
+            sudo sed -i "s;quiet;resume=$(sudo lsblk -oUUID,MOUNTPOINT -P -M | grep \"/\" | cut -d\  -f1 | sed 's/\"//g') resume_offset=$(btrfs inspect-internal map-swapfile -r /swap/swapfile) quiet;" $bootdir;else
+            sudo sed -i "s;quiet;resume=$(sudo lsblk -oUUID,MOUNTPOINT -P -M | grep \"/\" | cut -d\  -f1 | sed 's/\"//g') resume_offset=$(sudo filefrag -v /swapfile | awk '$1=="0:" {print substr($4, 1, length($4)-2)}') quiet;" $bootdir
+        fi
+    fi
         if [ $img == mkinit ];then
             sudo sed -i 's/filesystems/filesystems resume/' /etc/mkinitcpio.conf
             sudo mkinitcpio -P
@@ -62,7 +77,8 @@ fi
 
 if [ "$zram" -gt 0 ];then
     sudo sh -c "echo 'zram' > /etc/modules-load.d/zram.conf"
-    sudo touch /etc/udev/rules.d/99-zram.rules; echo ACTION==\"add\", KERNEL==\"zram0\", ATTR{comp_algorithm}=\"${zramcomp}\", ATTR{disksize}=\"${zram}G\", RUN=\"/usr/bin/mkswap -U clear /dev/%k\" | sudo tee /etc/udev/rules.d/99-zram.rules
+    sudo sh -c "echo 'options zram num_devices=1' > /etc/modprobe.d/zram.conf"
+    echo ACTION==\"add\", KERNEL==\"zram0\", ATTR{comp_algorithm}=\"${zramcomp}\", ATTR{disksize}=\"${zram}G\", RUN=\"/usr/bin/mkswap -U clear /dev/zram0\" | sudo tee /etc/udev/rules.d/99-zram.rules
     sudo sed -i 's;quiet;zswap.enabled=0 quiet;' /etc/default/grub
     sudo sh -c "echo '/dev/zram0 none swap defaults,pri=100 0 0' >> /etc/fstab"
 fi
