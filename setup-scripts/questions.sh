@@ -230,13 +230,13 @@ if ! grep Size <<< $(swapon -s);then
         if [ "$btrfs" == y ];then
             printf "What would you like your swap subvolume to be called?: "
             read swapvol
-            echo "Are you sure you want to call your swap subvolume ${swapvol}?"
+            echo "Are you sure you want to call your swap subvolume \"${swapvol}\"?"
             printf "[y/n]: "
             read swapvolconf
             until [ "$swapvolconf" == y ];do
                 printf "What would you like your swap subvolume to be called?: "
                 read swapvol
-                echo "Are you sure you want to call your swap subvolume ${swapvol}?"
+                echo "Are you sure you want to call your swap subvolume \"${swapvol}\"?"
                 printf "[y/n]: "
                 read swapvolconf
             done
