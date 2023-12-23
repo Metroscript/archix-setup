@@ -24,7 +24,7 @@ if [ $reflect == y ];then
     sudo sh -c "echo 'Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch' >> /etc/pacman.d/mirrorlist"
     sudo nvim /etc/pacman.d/mirrorlist
 fi
-sudo pacman -Syu pacman-contrib pkgfile
+sudo pacman -Syu --noconfirm --needed pacman-contrib pkgfile
 sudo pkgfile -uz "zstd --ultra -22 -T0"
 
 if [ "$btrfs" == y ];then
@@ -72,7 +72,6 @@ if [ "$swap" -gt 0 ];then
         if [ $de == 1 ];then
             sed -i "s/ctl suspend/ctl suspend-then-hibernate \|\| $(if [ "$artix" == y ];then echo loginctl;else echo systemctl;fi) suspend/" ${repo}dotfiles/hypr-rice/wlogout/layout
         fi
-    fi
 fi
 
 if [ "$zram" -gt 0 ];then
