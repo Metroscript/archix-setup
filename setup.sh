@@ -1,5 +1,5 @@
 repo=archix-setup/
-source ~/${repo}setup-scripts/questions.sh
-source ~/${repo}setup-scripts/mirrorswap.sh 
-source ~/${repo}setup-scripts/packages.sh
-source ~/${repo}setup-scripts/final_config.sh
+source ~/${repo}scripts/questions.sh
+source ~/${repo}scripts/mirrorswap.sh
+source ~/${repo}scripts/packages.sh
+source ~/${repo}scripts/final_config.sh
