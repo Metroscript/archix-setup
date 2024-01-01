@@ -204,9 +204,11 @@ if ! [ $shell == bash ];then
         cp ${repo}dotfiles/config.fish ~/.config/fish/
     fi
 fi
-sudo sed -i -e 's/#unix_sock_group = "libvirt"/unix_sock_group = "libvirt"/' -i -e 's/#unix_sock_ro_perms = "0777"/unix_sock_ro_perms = "0777"/' -i -e 's/#unix_sock_rw_perms = "0770"/unix_sock_rw_perms = "0770"/' /etc/libvirt/libvirtd.conf
-sudo sed -i 's/#group.*/group = "libvirt"/' /etc/libvirt/qemu.conf
-sudo gpasswd -a $USER libvirt
+if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
+    sudo sed -i -e 's/#unix_sock_group = "libvirt"/unix_sock_group = "libvirt"/' -i -e 's/#unix_sock_ro_perms = "0777"/unix_sock_ro_perms = "0777"/' -i -e 's/#unix_sock_rw_perms = "0770"/unix_sock_rw_perms = "0770"/' /etc/libvirt/libvirtd.conf
+    sudo sed -i 's/#group.*/group = "libvirt"/' /etc/libvirt/qemu.conf
+    sudo gpasswd -a $USER libvirt
+fi
 if ! grep localtime <<< $(ls /etc/);then
     sudo ln -sf /usr/share/zoneinfo/$tz /etc/localtime
     sudo hwclock --systohc
@@ -226,13 +228,18 @@ sudo ufw enable
 #Enable init services
 if ! [ "$artix" == y ];then
     sudo timedatectl set-ntp y
-    sudo systemctl enable systemd-timesyncd cups ufw $dm $cron libvirtd apparmor auditd rngd power-profiles-daemon
+    sudo systemctl enable systemd-timesyncd cups ufw $dm $cron apparmor auditd rngd power-profiles-daemon
+    if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
+        sudo systemctl enable libvirtd
+    fi
 elif [ $init == dinit ]; then
     sudo dinitctl enable ntpd
     sudo dinitctl enable ufw
     sudo dinitctl enable cupsd
     sudo dinitctl enable $cron
-    sudo dinitctl enable libvirtd
+    if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
+        sudo dinitctl enable libvirtd
+    fi
     sudo dinitctl enable apparmor
     sudo dinitctl enable auditd
     sudo dinitctl enable rngd
@@ -248,6 +255,9 @@ elif [ $init == runit ]; then
     sudo ln -s /etc/runit/sv/ufw /run/runit/service
     sudo ln -s /etc/runit/sv/rngd /run/runit/service
     sudo ln -s /etc/runit/sv/power-profiles-daemon /run/runit/service
+    if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
+        sudo ln -s /etc/runit/sv/libvirtd /run/runit/service
+    fi
 elif [ $init == openrc ]; then
     sudo rc-update add ntpd boot
     sudo rc-update add cupsd boot
@@ -258,7 +268,9 @@ elif [ $init == openrc ]; then
     sudo rc-update add apparmor default
     sudo rc-update add auditd default
     sudo rc-update add $cron default
-    sudo rc-update add libvirtd default
+    if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
+        sudo rc-update add libvirtd default
+    fi
 elif [ $init == s6 ];then
     sudo touch /etc/s6/adminsv/default/contents.d/ntpd
     sudo touch /etc/s6/adminsv/default/contents.d/ufw
@@ -269,6 +281,9 @@ elif [ $init == s6 ];then
     sudo touch /etc/s6/adminsv/default/contents.d/apparmor
     sudo touch /etc/s6/adminsv/default/contents.d/auditd
     sudo touch /etc/s6/adminsv/default/contents.d/power-profiles-daemon
+    if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
+        sudo touch /etc/s6/adminsv/default/contents.d/libvirtd
+    fi
     sudo s6-db-reload
 fi
 
