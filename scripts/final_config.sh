@@ -58,24 +58,7 @@ if [ $ply == y ];then
 fi
 
 if [ $de == 1 ];then
-    if ! grep Desktop <<< $(ls);then
-        mkdir Desktop
-    fi
-    if ! grep Documents <<< $(ls);then
-        mkdir Documents
-    fi
-    if ! grep Music <<< $(ls);then
-        mkdir Music
-    fi
-    if ! grep Pictures <<< $(ls);then
-        mkdir Pictures
-    fi
-    if ! grep Videos <<< $(ls);then
-        mkdir Videos
-    fi
-    if ! grep Downloads <<< $(ls);then
-        mkdir Downloads
-    fi
+    xdg-user-dirs-update
     mv ${repo}dotfiles/hypr-rice/* .config/
     bmpath=file:///home/$USER/
     echo -e '${bmpath}Documents Documents\n${bmpath}Music Music\n${bmpath}Pictures Pictures\n${bmpath}Videos Videos\n${bmpath}Downloads Downloads' > .config/gtk-3.0/bookmarks
@@ -120,7 +103,7 @@ if [ "$zram" -gt 0 ];then
         sudo sed -i 's/vm.page-cluster = 0/vm.page-cluster = 1' /etc/sysctl.d/99-ram.conf
     fi
 fi
-sudo sed -i "s/quiet/lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off quiet/" $bootdir
+sudo sed -i "s/quiet/lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off random.trust_cpu=off quiet/" $bootdir
 if ! grep loglevel <<< $(cat $bootdir);then
     sudo sed -i 's/quiet/loglevel=0 quiet/' $bootdir;else
     sudo sed -i 's/loglevel=./loglevel=0/' $bootdir
@@ -169,14 +152,21 @@ fi
 ######################################################################################################
 ######################################## END OF PROBLEM AREA #########################################
 ######################################################################################################
-if [ $de == 1 ];then
-    if ! grep .config <<< $(sudo ls -a /root/);then
-        sudo mkdir /root/.config/
-    fi
-    sudo cp -r ${repo}dotfiles/config/nvim /root/.config/
-    sudo mv ${repo}dotfiles/root/* /root/.config/
-fi
+#if [ $de == 1 ];then
+#    if ! grep .config <<< $(sudo ls -a /root/);then
+#        sudo mkdir /root/.config/
+#    fi
+#    sudo cp -r ${repo}dotfiles/config/nvim /root/.config/
+#    sudo mv ${repo}dotfiles/root/* /root/.config/
+#fi
 mv ${repo}dotfiles/config/* .config/
+cd .config/mpv/scripts/
+wget 'https://github.com/TheAMM/mpv_thumbnail_script/releases/download/0.4.2/mpv_thumbnail_script_client_osc.lua'
+wget 'https://github.com/TheAMM/mpv_thumbnail_script/releases/download/0.4.2/mpv_thumbnail_script_server.lua'
+cp mpv_thumbnail_script_server.lua mpv_thumbnail_script_server-2.lua
+cp mpv_thumbnail_script_server.lua mpv_thumbnail_script_server-3.lua
+mv mpv_thumbnail_script_server.lua mpv_thumbnail_script_server-1.lua
+cd
 if [ $gayms == y ];then
     if ! grep Games <<< $(ls);then
         mkdir Games
@@ -231,6 +221,9 @@ if ! [ "$artix" == y ];then
     sudo systemctl enable systemd-timesyncd cups ufw $dm $cron apparmor auditd rngd power-profiles-daemon
     if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
         sudo systemctl enable libvirtd
+    fi
+    if [ "$btrfs" == y ];then
+        sudo systemctl enable grub-btrfsd
     fi
 elif [ $init == dinit ]; then
     sudo dinitctl enable ntpd

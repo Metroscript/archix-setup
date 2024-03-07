@@ -28,7 +28,7 @@ sudo pacman -Syu --noconfirm --needed pacman-contrib pkgfile
 sudo pkgfile -uz "zstd --ultra -22 -T0"
 
 if [ "$btrfs" == y ];then
-   sudo pacman -Syu --needed --noconfirm grub-btrfs btrfs-progs
+   sudo pacman -Syu --needed --noconfirm grub-btrfs inotify-tools btrfs-progs
 fi
 
 #Make Swapfile

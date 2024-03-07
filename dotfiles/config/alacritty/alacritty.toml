@@ -1,36 +1,7 @@
 live_config_reload = true
 
-[window]
-opacity = 1
-decorations = "full"
-dynamic_padding = false
-dynamic_title = true
-#gtk_theme_variant = "none"
-title = "Alacritty"
-
-[window.class]
-general = "Alacritty"
-instance = "Alacritty"
-
-[window.padding]
-x = 2
-y = 2
-
-[env]
-TERM = "alacritty"
-
-#[enabled]
-#command = "xdg-open"
-#hyperlinks = true
-#post_processing = true
-
-#[mouse]
-
-#[mouse.double_click]
-#threshold = 300
-
-#[mouse.triple_click]
-#threshold = 300
+[colors]
+draw_bold_text_with_bright_colors = true
 
 [cursor]
 blink_interval = 750
@@ -41,44 +12,41 @@ unfocused_hollow = false
 blinking = "Always"
 shape = "Underline"
 
-[scrolling]
-history = 100000
-multiplier = 10
+[debug]
+log_level = "Warn"
+persistent_logging = false
+print_events = false
+render_timer = false
 
-[selection]
-save_to_clipboard = false
-semantic_escape_chars = ",│`|:\"' ()[]{}<>\t"
+[env]
+TERM = "alacritty"
 
 [font]
 size = 10
-
-# JetBrains Mono Nerd Font
-[font.normal]
-family = "Hack Nerd Font Mono"
-style = "Regular"
 
 [font.bold]
 family = "Hack Nerd Font Mono"
 style = "Bold"
 
-[font.italic]
-family = "Hack Nerd Font Mono"
-style = "Italic"
-
 [font.bold_italic]
 family = "Hack Nerd Font Mono"
 style = "Bold Italic"
-
-[font.offset]
-x = 0
-y = 0
 
 [font.glyph_offset]
 x = 0
 y = 0
 
-[colors]
-draw_bold_text_with_bright_colors = true
+[font.italic]
+family = "Hack Nerd Font Mono"
+style = "Italic"
+
+[font.normal]
+family = "Hack Nerd Font Mono"
+style = "Regular"
+
+[font.offset]
+x = -1
+y = -1
 
 [[keyboard.bindings]]
 action = "ToggleFullscreen"
@@ -119,8 +87,25 @@ action = "DecreaseFontSize"
 key = "Minus"
 mods = "Control"
 
-[debug]
-log_level = "Warn"
-persistent_logging = false
-print_events = false
-render_timer = false
+[scrolling]
+history = 100000
+multiplier = 10
+
+[selection]
+save_to_clipboard = false
+semantic_escape_chars = ",│`|:\"' ()[]{}<>\t"
+
+[window]
+decorations = "full"
+dynamic_padding = false
+dynamic_title = true
+opacity = 1
+title = "Alacritty"
+
+[window.class]
+general = "Alacritty"
+instance = "Alacritty"
+
+[window.padding]
+x = 2
+y = 2

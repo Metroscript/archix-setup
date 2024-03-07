@@ -6,13 +6,13 @@ set colored-completion-prefix on
 set show-all-if-ambiguous on
 set completion-ignore-case on
 
-#SEX
+#Partially Type Command to Get Previous Commands Using Those Characters in History Search
 "\e[A": history-search-backward
 "\e[B": history-search-forward
 
-#SEX^2
+#CTRL + Left/Right Arrow to Go Back or Forward a Word
 "\e[1;5D": backward-word
 "\e[1;5C": forward-word
 
-#Disable ^C <----- This crap
+#Disable ^C <----- This
 set echo-control-characters off

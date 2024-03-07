@@ -52,10 +52,6 @@ if grep opendoas <<< $(pacman -Q);then
     suas=y
     alias sudo='doas'
     sed -i "/stuff/a alias sudo='doas'" ${repo}dotfiles/bashrc
-    echo "-----------------------------------------------------------------------------------------"
-    echo -e "SudoLoop is enabled on paru, when tweaking doas.conf, put 'permit persist :wheel cmd true' so SudoLoop works\nYou should make any changes & run 'chmod 0400 /etc/doas.conf' as root after install"
-    echo "-----------------------------------------------------------------------------------------"
-    sleep 5
 fi
 
 ############################################################################

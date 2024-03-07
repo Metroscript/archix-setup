@@ -1,7 +1,0 @@
-#!/bin/bash
-if rg doas <<< $(pacman -Q);then
-    su=doas;else
-    su=sudo
-fi
-clear
-$su pacman -Syu

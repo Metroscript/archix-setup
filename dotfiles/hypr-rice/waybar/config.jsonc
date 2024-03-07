@@ -139,9 +139,7 @@
         "tooltip": true,
         "interval": 3600,                     // 3600=every hour
         "exec": "paru -Qu|wc -l;paru -Qu|column -t|tr '\n' '\r'",       // # of updates and tooltip details
-        "on-click": "hyprctl dispatch exec '[workspace e;float 1;opacity 1.0 override 1.0 override] alacritty -e ./.config/waybar/scripts/upgrade'", // update system
-        "on-click-right": "hyprctl dispatch exec '[workspace e;float 1;opacity 1.0 override 1.0 override] alacritty -e paru -Syua'",
-        "on-click-middle": "hyprctl dispatch exec '[workspace e;float 1;opacity 1.0 override 1.0 override] alacritty -e ./.config/waybar/scripts/iupgrade'",
+        "on-click": "hyprctl dispatch exec '[workspace e;float 1;opacity 1.0 override 1.0 override] alacritty -e \"paru -Syu;flatpak update;exit\""'", // update system
     },
 
     "custom/weather": {
@@ -149,7 +147,7 @@
         "format": "{}",
         "exec": "~/.config/waybar/scripts/waybar-wttr",
         "interval": 60,
-        "on-click": "librewolf https://wttr.in"
+        "on-click": "xdg-open https://wttr.in"
     },
 
     "hyprland/window": {

@@ -1,7 +1,3 @@
-[global]
-channel = "live" #live zcanary zintegration
-auto_kill_prefix = true
-
 [env]
 WINEDEBUG = "-all"
 WINEFSYNC = "1"
@@ -9,11 +5,23 @@ WINEFSYNC = "1"
 [player.env]
 DXVK_HUD = "0"
 
+[player.fflags]
+FStringPerformanceSendMeasurementAPISubomain = "opt-out"
+DFStringHttpPointsReporterUrl = "https://opt-out.roblox.com"
+DFStringAnalyticsEventStreamUrlEndpoint = "opt-out"
+DFStringAltHttpReporterUrl = "https://opt-out.roblox.com"
+DFStringAltTelegrafHTTPTransportUrl = "https://opt-out.roblox.com"
+
 [player]
 renderer = "D3D11" #D3D11 D3D11FL10 Vulkan OpenGL
+launcher = "gamemoderun gamescope -f -W WIDTH -H HEIGHT --cursor-scale-height 720 --force-grab-cursor --"
 dxvk = true
-launcher = "gamemoderun gamescope -f -W WIDTH -H HEIGHT --force-grab-cursor --" 
+discord_rpc = false
+auto_kill_prefix = true
+channel = "LIVE" #live zcanary zintegration
 
 [studio]
-renderer = "Vulkan"
-launcher = "gamemoderun"
+renderer = "D3D11" #D3D11 D3D11FL10 Vulkan OpenGL
+dxvk = true
+auto_kill_prefix = true
+channel = "LIVE" #live zcanary zintegration
