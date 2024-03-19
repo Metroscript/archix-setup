@@ -72,6 +72,14 @@ fi
 ####################### END OF PROBLEM AREA ################################
 ############################################################################
 
+printf "Use repo dotfiles? (Does not apply to Hyprland Rice) [y/n]: "
+read dotfs
+until [ $dotfs == y ] || [ $dotfs == n ];do
+    echo "Sorry, please try again."
+    printf "Use repo dotfiles? (Does not apply to Hyprland Rice) [y/n]: "
+    read dotfs
+done
+
 printf "Use precompiled AUR binaries where availiable? [y/n]: "
 read bin
 until [ $bin == y ] || [ $bin == n ];do
@@ -230,13 +238,37 @@ until [ $kignore == y ] || [ $kignore == n ];do
     read kignore
 done
 
+echo "Enable Kernel lockdown to prevent modification of kernel during runtime? (Prevents non-signed kernel modules from loading)"
+echo "0.No (Default) 1.Integrity (Standard Lockdown) 2.Confidential (Changes how RAM is accessed; Can cause issues)"
+printf "0/1/2: "
+read lckdwn
+until [ $lckdwn == 0 ] || [ $lckdwn == 1 ] || [ $lckdwn == 2 ];do
+    echo "Enable Kernel lockdown to prevent modification of kernel during runtime? (Prevents non-signed kernel modules from loading & disables hibernation)"
+    echo "0.No (Default) 1.Integrity (Standard Lockdown) 2.Confidential (Changes how RAM is accessed; Can cause issues)"
+    printf "0/1/2"
+    read lckdwn
+done
+
+if [ $lckdwn -gt 0 ] && [ $virt -ge 2 ];then
+    echo "VIRTUALBOX KERNEL MODULES DO NOT APPLY WITH LOCKDOWN. ARE YOU SURE YOU STILL WANT TO ENABLE LOCKDOWN?"
+    printf "[y/n]: "
+    read lckdwn_con
+    until [ $lckdwn_con == y ] || [ $lckdwn_con == n ];do
+        echo "VIRTUALBOX KERNEL MODULES DO NOT APPLY WITH LOCKDOWN. ARE YOU SURE YOU STILL WANT TO ENABLE LOCKDOWN?"
+        printf "[y/n]: "
+    done
+    if [ $lckdwn_con == n ];then
+        lckdwn=0
+    fi
+fi
+
 if ! grep Size <<< $(swapon -s);then
     echo "Swapfile size in GiB. Matching RAM size OR RAM x 1.5 sized swap is usually a good choice for hibernation. Put '0' for no swapfile."
     printf "Size of swapfile in GiB: "
     read swap
     until [ $swap -ge 0 ];do
         echo "Sorry, please try again."
-        echo "Swapfile size in GiB. Matching RAM size OR RAM x 1.5 sized swap is usually a good choice for hibernation. Put '0' for no swapfile."
+        echo "Swapfile size in GiB. Put '0' for no swapfile."
         printf "Size of swapfile in GiB: "
         read swap
     done
@@ -255,11 +287,49 @@ if ! grep Size <<< $(swapon -s);then
                 read swapvolconf
             done
         fi
-        printf "Enable suspend to & resume from disk support? [y/n]: "
-        read res
-        until [ $res == y ] || [ $res == n ];do 
+        if [ $swap -ge $(($(grep MemTotal /proc/meminfo|cut -d: -f2|cut -dk -f1)/1024/1024)) ] && [ "$lckdwn" == 0 ];then
             printf "Enable suspend to & resume from disk support? [y/n]: "
             read res
+            until [ $res == y ] || [ $res == n ];do 
+                printf "Enable suspend to & resume from disk support? [y/n]: "
+                read res
+            done
+        fi
+    fi
+fi
+if [ "$btrfs" == y ];then
+    echo "Install snapper for automated subvolume snapshots?"
+    printf "[y/n]: "
+    read snap
+    until [ $snap == y ] || [ $snap == n ];do
+        echo "Install snapper for automated subvolume snapshots?"
+        printf "[y/n]: "
+        read snap
+    done
+    if [ $snap == y ];then
+        echo "Additional changes to snapshot configs must be done manually after install"
+        sleep 5
+        if grep .snapshots <<< $(ls -a /);then
+            echo "/.snapshots directory detected! Prevents snapper from installing! /.snapshots will be unmounted and removed until snapper recreates the directory & any fstab entries for /.snapshots will be removed!"
+            sleep 5
+            snap_dir=y
+        fi
+        if [ "$suas" == y ];then
+            echo -e 'alias sudo=doas\n' > ~/archix-setup/snapper_conf_gen.sh
+        fi
+        for submnt in $(findmnt -nt btrfs|cut -d\  -f1|sed 's/─//'|sed 's/├//'|sed 's/└//');do 
+            subvol=$(findmnt -nt btrfs|grep "$submnt "|sed 's,.*subvol=/,,')
+            echo "Create snapshot config for $subvol (Mounted at $submnt)?"
+            printf "[y/n]: "
+            read snap_conf
+            until [ $snap_conf == y ] || [ $snap_conf == n ];do
+                echo "Create snapshot config for $subvol (Mounted at $submnt)?"
+                printf "[y/n]: "
+                read snap_conf
+            done
+            if [ $snap_conf == y ];then
+                echo -e "sudo snapper -c $subvol create-config $submnt\n" >> ~/archix-setup/snapper_conf_gen.sh
+            fi
         done
     fi
 fi

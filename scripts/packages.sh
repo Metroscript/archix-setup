@@ -8,22 +8,16 @@ elif grep -E "GenuineIntel" <<< $(lscpu) && ! grep -E "intel-ucode" <<< $(pacman
 fi
 sudo sed -i 's/quiet/efi=disable_early_pci_dma quiet/' $bootdir
 #Graphics drivers
-    #######################################
-    ##### NVIDIA DRIVERS MAY NOT WORK #####
-    #######################################
 gpu=$(lspci|grep VGA)
 if grep -E "Radeon|AMD|ATI" <<< $gpu && grep -E "Intel Corporation|UHD" <<< $gpu;then
     sudo pacman -Syu --noconfirm --needed vulkan-{radeon,intel,icd-loader} mesa{,-vdpau} opencl-rusticl-mesa libva-mesa-driver intel-media-driver
-    sudo sh -c "echo -e 'RUSTICL_ENABLE=radeonsi,iris\nRADV_PERFTEST=video_decode\nANV_VIDEO_DECODE=1' >> /etc/environment"
+    echo -e 'RUSTICL_ENABLE=radeonsi,iris\nRADV_PERFTEST=video_decode\nANV_VIDEO_DECODE=1' | sudo tee -a /etc/environment
 elif grep -E "Radeon|AMD|ATI" <<< $gpu;then
    sudo pacman -Syu --noconfirm --needed vulkan-{radeon,icd-loader} mesa{,-vdpau} opencl-rusticl-mesa libva-mesa-driver
-   sudo sh -c "echo -e 'RUSTICL_ENABLE=radeonsi\nRADV_PERFTEST=video_decode' >> /etc/environment"
-#elif grep -E "NVIDIA|GeForce" <<< $gpu;then
-#   sudo pacman -S --noconfirm --needed nvidia{,-utils} lib32-{nvidia-utils,vulkan-icd-loader} vulkan-icd-loader
-#   nvidia-xconfig
+   echo -e 'RUSTICL_ENABLE=radeonsi\nRADV_PERFTEST=video_decode' | sudo tee -a /etc/environment
 elif grep -E "Intel Corporation|UHD" <<< $gpu;then
      sudo pacman -Syu --noconfirm --needed vulkan-{intel,icd-loader} mesa opencl-rusticl-mesa lib{va-{intel-driver,utils},vdpau-va-gl} intel-media-driver
-     sudo sh -c "echo -e 'RUSTICL_ENABLE=iris\nANV_VIDEO_DECODE=1' >> /etc/environment"
+     echo -e 'RUSTICL_ENABLE=iris\nANV_VIDEO_DECODE=1' | sudo tee -a /etc/environment
 fi
 sudo pacman -Syu --needed --noconfirm vkd3d
 
@@ -35,7 +29,7 @@ fi
 flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
 
 #Basic packages
-sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber man-db wayland xorg-xwayland smartmontools strace v4l2loopback-dkms gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{dejavu,liberation,hack-nerd,ubuntu-font-family} bash-language-server cups{,-pk-helper,-pdf} gutenprint net-tools power-profiles-daemon gparted foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley ufw fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{archiver,rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay libreoffice-still{,-en-gb} hunspell{,-en_{au,gb,us}} hyphen-en mythes-en coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp lib{paper,wpg,pulse,mythes} keepassxc gst-{libav,plugins-{base,good}} phonon-qt5-gstreamer imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq nvme-cli apparmor audit python-{notify2,psutil} noise-suppression-for-voice wl-clipboard rng-tools opensc alacritty obs-studio btop mpv kdenlive movit bigsh0t dvgrab mediainfo open{cv,timelineio} recordmydesktop lollypop qbittorrent blender libdecor nvtop $shell
+sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber man-db wayland xorg-xwayland smartmontools strace v4l2loopback-dkms gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{dejavu,liberation,hack-nerd,ubuntu-font-family} bash-language-server cups{,-pk-helper,-pdf} gutenprint net-tools power-profiles-daemon gparted foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley ufw fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{archiver,rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay libreoffice-still{,-en-gb} hunspell{,-en_{au,gb,us}} hyphen-en mythes-en coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp lib{paper,wpg,pulse,mythes} keepassxc gst-{libav,plugins-{base,good}} imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq nvme-cli apparmor audit python-{notify2,psutil} noise-suppression-for-voice wl-clipboard rng-tools opensc alacritty obs-studio btop mpv kdenlive movit bigsh0t dvgrab mediainfo open{cv,timelineio} recordmydesktop lollypop qbittorrent blender libdecor nvtop $shell openntpd libressl
 
 if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
     sudo pacman -S qemu-full edk2-ovmf virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat
@@ -51,7 +45,7 @@ if [ $ply == y ];then
 fi
     #Games, etc
 if [ $gayms == y ];then
-    sudo pacman -Syu --needed --noconfirm wine{,-gecko,-mono} lutris steam gamescope gamemode lib32-gst-plugins-base
+    sudo pacman -Syu --needed --noconfirm wine{,-{gecko,mono}} lutris steam gamescope gamemode lib32-gst-plugins-base
     flatpak install -y --user pcsx2 cemu citra
 fi
 
@@ -95,7 +89,6 @@ if [ "$rlx" == y ];then
 fi
 if [ $makemkv == y ];then
     paru -S makemkv
-    #sudo sh -c "echo sg > /etc/modules-load.d/sg.conf"
 fi
 if [ $rgb == y ];then
     paru -S openrgb
@@ -110,7 +103,6 @@ if [ $bin == y ];then
     fi
 else
     if [ "$min" == y ];then
-        #export JAVA_HOME=/usr/lib/jvm/java-17-openjdk;
         paru -S prismlauncher jre{-openjdk,17-openjdk,11-openjdk,8-openjdk}
     fi
 fi
@@ -137,8 +129,8 @@ if [ $de == 1 ];then
     paru -S --needed wlogout rofi-lbonn-wayland-git waybar-hyprland-git hyprpicker-git swww nwg-look wlr-randr grimblast swaylock-effects-git
 sudo pacman -Syu --needed --noconfirm rofi-calc
 elif [ $de == 2 ];then
-    sudo pacman -Syu --needed --noconfirm plasma-meta cryfs flatpak-kcm fwupd packagekit-qt6 xdg-desktop-portal-{kde,gtk} gwenview kimageformats qt6-imageformats dolphin{,-plugins} ffmpegthumbs kde{-{inotify-survey,cli-tools},graphics-thumbnailers,network-filesharing} kio-{admin,fuse,extras} purpose icoutils libappimage openexr perl taglib kmousetool colord-kde kcolorchooser okular ebook-tools spectacle svgpart kcron ark filelight kate kbackup kcalc kcharselect kclock kdialog keditbookmarks kweather markdownpart print-manager skanpage maliit-keyboard
+    sudo pacman -Syu --needed --noconfirm plasma-meta cryfs flatpak-kcm fwupd packagekit-qt6 xdg-desktop-portal-{kde,gtk} gwenview kimageformats qt6-imageformats dolphin{,-plugins} ffmpegthumbs kde{-{inotify-survey,cli-tools},graphics-thumbnailers,network-filesharing} kio-{admin,fuse,extras} purpose icoutils libappimage openexr perl taglib kmousetool colord-kde kcolorchooser okular ebook-tools spectacle svgpart kcron ark filelight kate kcalc kcharselect kclock kdialog keditbookmarks kweather markdownpart print-manager skanpage tesseract-data-eng maliit-keyboard breeze5
     if [ $ply == y ];then
-        sudo pacman -S plymouth-kcm
+        sudo pacman -S --noconfirm plymouth-kcm
     fi
 fi

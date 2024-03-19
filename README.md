@@ -2,19 +2,26 @@
 
 A setup script with some personal dotfiles to aid you in installing Arch and/or Artix Linux with the Hyprland Window Compositor or KDE Plasma!
 
-# What does the script do?
+## What does the script do?
 
 The script is designed to install Arch/Artix Linux with my custom Hyprland rice though, I do not use it much any more, but the rice should still function as intended.
 Along with installing software, it includes support for installing a swapfile or zram if you lack swap & adding resume-from-disk/hibernate support, Plus some - to my knowledge; unintrusive security features which should have minimum compatability issues, aside from possible issues with slow hardware as vm.max_map_count is set to the 64 bit integer limit -3; same as Fedora.
 
-It should be noted that in order for this script to work: you have the 'quiet' kernel parameter enabled (May change later. I may add quiet with the script if it's not detected), are not using Systemd-Boot (If using Arch), are using mkinitcpio for initramfs generation (Support for others may come later) and have, until you boot into your GUI: Unrestricted sudo/doas privileges (Mainly used for pacman, sed, echoing settings to files, and obtaining disk UUIDs).
+## Script Requirements
+Before using this script, ensure that the arch installation you are planning to use this script with is: Using mkinitcpio for initramfs generation (Support for others may come later) and have, until you boot into your GUI: Unrestricted sudo/doas privileges (Mainly used for pacman, sed, echoing settings to files, and obtaining disk UUIDs).
 
-# Hardening the system... how?
+This script also assumes that the git folder was cloned in the $HOME directory and that the user is not using an Nvidia GPU
 
-The script sets multiple sysctl.d parameters, most of which are what you'd find built in to the linux-hardened kernel, activating apparmor & audit that, once rules are made; restricts an apps access what it needs & alerting you if apparmor stops an app from doing sometihing, along with enabling some other kernel parameters that manage memory, enabling ipv6 privacy extentions if networkmanager is installed, changing the machine-id so that it's generic, adding a delay when passwords fail, locking 'su' use to :wheel only, preventing root in ssh & installing the ufw firewall which you can configure to your liking later.
+## Hardening the system... how?
+
+The script sets multiple sysctl.d parameters, most of which are what you'd find built in to the linux-hardened kernel, activating apparmor & audit that, once rules are made; restricts an apps access what it needs & alerting you if apparmor stops an app from doing sometihing. Along with enabling some other kernel parameters that manage memory, enabling ipv6 privacy extentions if networkmanager is installed, changing the machine-id so that it's generic, adding a delay when passwords fail, locking 'su' use to :wheel only, preventing root in ssh & installing the ufw firewall which you can configure to your liking later.
+
+There is also an option to enable a kernel lockdown setting of your choice during installation.
+
+These setting modifications aren't perfect or necessarily significant to system security as a whole, but are nice to have and better than nothing.
 
 
-# What does install specifically?
+## What does install specifically?
 
 __System:__
 Pipewire (With noise-suppression-for-voice),
@@ -100,8 +107,7 @@ __AUR helper:__
 paru
 
 __KEEP IN MIND:__
-This script does not check or do driver installation for Nvidia cards. You'll have to do that manually before or after using this script.
-I am not familiar with init systems other than openrc & dinit so services for s6 or runit may need some changing in their runlevels.
+Init systems other than dinit may not have services configured properly, but it shouldn't impact booting; Change to your liking after completion.
 
 # Summary
 

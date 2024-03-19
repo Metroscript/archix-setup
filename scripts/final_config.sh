@@ -11,20 +11,20 @@ if [ $rgb == y ];then
             sudo groupadd --system i2c
         fi
         sudo usermod $USER -aG i2c
-        sudo sh -c 'echo "i2c-dev" > /etc/modules-load.d/i2c.conf'
+        echo "i2c-dev" | sudo tee /etc/modules-load.d/i2c.conf
         if grep amd <<< $(cat $bootdir);then
             sudo modprobe i2c-piix4
-            sudo sh -c 'echo "i2c-piix4" > /etc/modules-load.d/i2c-piix4.conf';else
+            echo "i2c-piix4" | sudo tee /etc/modules-load.d/i2c-piix4.conf;else
             sudo modprobe i2c-i801
-            sudo sh -c 'echo "i2c-i801" > /etc/modules-load.d/i2c-i801.conf'
+            echo "i2c-i801" | sudo tee /etc/modules-load.d/i2c-i801.conf
         fi
     fi
 fi
 #Load sg if optical drive is detected
 if grep sr0 <<< $(lsblk);then
-    sudo sh -c "echo 'sg' > /etc/modules-load.d/sg.conf"
+    echo "sg" | sudo tee /etc/modules-load.d/sg.conf
 fi
-    #Plymouth check & conf
+#Plymouth check & conf
 if [ $ply == y ];then
     if [ $img == mkinit ];then
         sudo sed -i 's/udev/udev plymouth/g' /etc/mkinitcpio.conf
@@ -81,8 +81,8 @@ fi
 echo -e "[Desktop Entry]\nType=Application\nName=Apparmor Notify\nComment=Notify User of Apparmor Denials\nTryExec=aa-notify\nExec=aa-notify -p -s 1 -w 60 -f /var/log/audit/audit.log\nStartupNotify=false\nNoDisplay=true" > .config/autostart/apparmor-notify.desktop
 if [ $dm == sddm ];then
     if [ $de == 2 ];then
-    sudo sh -c "echo -e '[Theme]\nCurrent=breeze' > /etc/sddm.conf";else
-    sudo sh -c "echo -e '[Theme]\nCurrent=archlinux-simplyblack' > /etc/sddm.conf"
+    echo -e '[Theme]\nCurrent=breeze' | sudo tee /etc/sddm.conf;else
+    echo -e '[Theme]\nCurrent=archlinux-simplyblack' | sudo tee /etc/sddm.conf
     fi
 fi
 ########################################
@@ -91,40 +91,50 @@ fi
 if ! grep "sysctl.d" <<< $(ls /etc/);then
     sudo mkdir /etc/sysctl.d/
 fi
-sudo sh -c "echo -e 'kernel.kptr_restrict=2\nkernel.dmesg_restrict=1\nkernel.printk=3 3 3 3\nkernel.unprivileged_bpf_disabled=1\nnet.core.bpf_jit_harden=2\ndev.tty.ldisc_autoload=0\nvm.unprivileged_userfaultfd=0\nkernel.kexec_load_disabled=1\nkernel.sysrq=4\nkernel.perf_event_paranoid=3\nvm.mmap_rnd_bits=32\nvm.mmap_rnd_compat_bits=16' > /etc/sysctl.d/99-kernel-hardening.conf"
-sudo sh -c "echo -e 'net.ipv4.tcp_syncookies=1\nnet.ipv4.tcp_rfc1337=1\nnet.ipv4.conf.all.rp_filter=1\nnet.ipv4.conf.default.rp_filter=1\nnet.ipv4.tcp_timestamps=0' > /etc/sysctl.d/99-network-security.conf"
-sudo sh -c "echo -e 'net.ipv6.conf.all.use_tempaddr = 2\nnet.ipv6.conf.default.use_tempaddr = 2' > /etc/sysctl.d/99-ipv6-privacy.conf"
-sudo sh -c "echo -e 'fs.protected_symlinks=1\nfs.protected_hardlinks=1\nfs.protected_fifos=2\nfs.protected_regular=2' > /etc/sysctl.d/99-userspace.conf"
-sudo sh -c "echo -e 'vm.max_map_count=2147483642\nvm.swappiness=50' > /etc/sysctl.d/99-ram.conf"
+echo -e "#Hide kernel pointers\nkernel.kptr_restrict=2\n\n#Restrict access to kernel log\nkernel.dmesg_restrict=1\n\n#Restrict kernel log output during boot\nkernel.printk=3 3 3 3\n\n#Restrict BPF & enable JIT hardening\nkernel.unprivileged_bpf_disabled=1\nnet.core.bpf_jit_harden=2\n\n#Restrict loading of TTY line disciplines\ndev.tty.ldisc_autoload=0\n\n#Mitigate use-after-free flaws\nvm.unprivileged_userfaultfd=0\n\n#Prevent loading of another kernel during runtime\nkernel.kexec_load_disabled=1\n\n#Restrict SysRq access to only through use of the secure attention key (Set to '0' to disable SysRq)\nkernel.sysrq=4\n\n#Restrict use of kernel performance events\nkernel.perf_event_paranoid=3" | sudo tee /etc/sysctl.d/99-kernel-security.conf
+echo -e '#Protect against SYN flood attacks\nnet.ipv4.tcp_syncookies=1\n\n#Drop RST packets in time-wait state\nnet.ipv4.tcp_rfc1337=1\n\n#IP source validation\nnet.ipv4.conf.all.rp_filter=1\nnet.ipv4.conf.default.rp_filter=1\n\n#Disable TCP timestamps\nnet.ipv4.tcp_timestamps=0\n\n#Prevent source routing\nnet.ipv4.conf.all.accept_source_route=0\nnet.ipv4.conf.default.accept_source_route=0\nnet.ipv6.conf.all.accept_source_route=0\nnet.ipv6.conf.default.accept_source_route=0\n\n#IPv6 privacy extentions\nnet.ipv6.conf.all.use_tempaddr = 2\nnet.ipv6.conf.default.use_tempaddr = 2' | sudo tee /etc/sysctl.d/99-network.conf
+echo -e '#Increase ASLR bit entropy\nvm.mmap_rnd_bits=32\nvm.mmap_rnd_compat_bits=16\n\n#Allow sym/hardlinks to be created only when destination is not world-writable or shares the same owner of the source\nfs.protected_symlinks=1\nfs.protected_hardlinks=1\n\n#Prevents access to files in world-writable directories by those who are not the owner\nfs.protected_fifos=2\nfs.protected_regular=2' | sudo tee /etc/sysctl.d/99-userspace.conf
+echo -e '#Improve compatability by increasing memory map count\nvm.max_map_count=2147483642\nvm.swappiness=50' | sudo tee /etc/sysctl.d/99-ram.conf
 if [ "$zram" -gt 0 ];then
     sudo sed -i '/vm.swappiness/d' /etc/sysctl.d/99-ram.conf
-    sudo sh -c "echo -e 'vm.watermark_boost_factor = 0\nvm.watermark_scale_factor = 125\nvm.page-cluster = 0' >> /etc/sysctl.d/99-ram.conf"
+    echo -e '\n#Optimise zram performance\nvm.watermark_boost_factor = 0\nvm.watermark_scale_factor = 125\nvm.page-cluster = 0' | sudo tee -a /etc/sysctl.d/99-ram.conf
     if [ "$zramcomp" == lz4 ];then
         sudo sed -i 's/vm.page-cluster = 0/vm.page-cluster = 1' /etc/sysctl.d/99-ram.conf
     fi
 fi
-sudo sed -i "s/quiet/lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off random.trust_cpu=off quiet/" $bootdir
+if ! grep quiet $bootdir;then
+    sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="quiet/' $bootdir
+fi
+sudo sed -i 's/quiet/lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off random.trust_cpu=off quiet/' $bootdir
 if ! grep loglevel <<< $(cat $bootdir);then
     sudo sed -i 's/quiet/loglevel=0 quiet/' $bootdir;else
     sudo sed -i 's/loglevel=./loglevel=0/' $bootdir
 fi
+if [ $lckdwn -gt 0 ];then
+    if [ $lckdwn == 1 ];then
+        sudo sed -i 's/audit=1/lockdown=integrity audit=1/' $bootdir
+    else
+        sudo sed -i 's/audit=1/lockdown=confidentiality audit=1/' $bootdir
+    fi
+fi
 sudo grub-mkconfig -o /boot/grub/grub.cfg
 #Enable NetworkManager ipv6 privacy features
 if grep networkmanager <<< $(pacman -Q) && ! grep 'ipv6.ip6-privacy=2' <<< $(cat /etc/NetworkManager/conf.d/*);then
-    sudo sh -c "echo -e '[connection]\nipv6.ip6-privacy=2' > /etc/NetworkManager/conf.d/ipv6-privacy-features.conf"
+    echo -e '[connection]\nipv6.ip6-privacy=2' | sudo tee /etc/NetworkManager/conf.d/ipv6-privacy-features.conf
 fi
 #set machine ID to generic whonix machine ID
 if ! grep b08dfa6083e7567a1921a715000001fb <<< $(cat /etc/machine-id);then
-    sudo sh -c "echo b08dfa6083e7567a1921a715000001fb > /etc/machine-id ; echo b08dfa6083e7567a1921a715000001fb /var/lib/dbus/machine-id"
+    echo "b08dfa6083e7567a1921a715000001fb" | sudo tee /etc/machine-id
+    echo "b08dfa6083e7567a1921a715000001fb" /var/lib/dbus/machine-id
 fi
 #Add 5 second delay between failed password attempts
 if ! grep pam_faildelay <<< $(cat /etc/pam.d/system-login);then
-    sudo sh -c "echo 'auth       optional   pam_faildelay.so   delay=5000000' >> /etc/pam.d/system-login"
+    echo 'auth       optional   pam_faildelay.so   delay=5000000' | sudo tee -a /etc/pam.d/system-login
 fi
 #Restrict 'su' to :wheel
 sudo sed -i 's/#auth           required        pam_wheel.so use_uid/auth            required        pam_wheel.so use_uid/' /etc/pam.d/su /etc/pam.d/su-l
-#Prevent ssh gaining root
-sudo sed -i 's/#PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
+#Prevent ssh gaining root (REMOVE OR MAKE OPTION, SSH IS NOT ENABLED BY DEFAULT)
+    #sudo sed -i 's/#PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
 #Apparmor audit settings
 sudo sed -i 's/#write-cache/write-cache/' /etc/apparmor/parser.conf
 sudo groupadd -r audit
@@ -152,46 +162,40 @@ fi
 ######################################################################################################
 ######################################## END OF PROBLEM AREA #########################################
 ######################################################################################################
-#if [ $de == 1 ];then
-#    if ! grep .config <<< $(sudo ls -a /root/);then
-#        sudo mkdir /root/.config/
-#    fi
-#    sudo cp -r ${repo}dotfiles/config/nvim /root/.config/
-#    sudo mv ${repo}dotfiles/root/* /root/.config/
-#fi
-mv ${repo}dotfiles/config/* .config/
-cd .config/mpv/scripts/
-wget 'https://github.com/TheAMM/mpv_thumbnail_script/releases/download/0.4.2/mpv_thumbnail_script_client_osc.lua'
-wget 'https://github.com/TheAMM/mpv_thumbnail_script/releases/download/0.4.2/mpv_thumbnail_script_server.lua'
-cp mpv_thumbnail_script_server.lua mpv_thumbnail_script_server-2.lua
-cp mpv_thumbnail_script_server.lua mpv_thumbnail_script_server-3.lua
-mv mpv_thumbnail_script_server.lua mpv_thumbnail_script_server-1.lua
-cd
-if [ $gayms == y ];then
-    if ! grep Games <<< $(ls);then
-        mkdir Games
+if [ "$dotfs" == y ];then
+    mv ${repo}dotfiles/config/* .config/
+    #mkdir .config/mpv/scripts/
+    cd .config/mpv/scripts/
+    wget 'https://github.com/TheAMM/mpv_thumbnail_script/releases/download/0.4.2/mpv_thumbnail_script_client_osc.lua'
+    wget 'https://github.com/TheAMM/mpv_thumbnail_script/releases/download/0.4.2/mpv_thumbnail_script_server.lua'
+    cp mpv_thumbnail_script_server.lua mpv_thumbnail_script_server-2.lua
+    cp mpv_thumbnail_script_server.lua mpv_thumbnail_script_server-3.lua
+    mv mpv_thumbnail_script_server.lua mpv_thumbnail_script_server-1.lua
+    cd
+    if [ $gayms == y ];then
+        if ! grep Games <<< $(ls);then
+            mkdir Games
+        fi
+        if ! grep "retroarch" <<< $(ls .config);then
+            mkdir .config/retroarch
+        fi
+        mv ${repo}dotfiles/retroarch.cfg .config/retroarch
     fi
-    if ! grep "retroarch" <<< $(ls .config);then
-        mkdir .config/retroarch
+    if [ "$rlx" == y ];then
+        mv ${repo}dotfiles/vinegar .config/
+        sed -i -e "s,WIDTH,$(xdpyinfo | awk -F'[ x]+' '/dimensions:/{print $3}') ," -i -e "s,HEIGHT,$(xdpyinfo | awk -F'[ x]+' '/dimensions:/{print $4}') ," .config/vinegar/config.toml
     fi
-    mv ${repo}dotfiles/retroarch.cfg .config/retroarch
+    mv ${repo}dotfiles/bashrc .bashrc
+    mv ${repo}dotfiles/inputrc .inputrc
 fi
-if [ "$rlx" == y ];then
-    mv ${repo}dotfiles/vinegar .config/
-    sed -i -e "s,WIDTH,$(xdpyinfo | awk -F'[ x]+' '/dimensions:/{print $3}') ," -i -e "s,HEIGHT,$(xdpyinfo | awk -F'[ x]+' '/dimensions:/{print $4}') ," .config/vinegar/config.toml
-fi
-#if [ "$min" == y ];then
-#    sed -i 's,paru,set -x JAVA_HOME /usr/lib/jvm/java-17-openjdk;paru,' ${repo}dotfiles/config.fish
-#    sed -i 's,paru,JAVA_HOME=/usr/lib/jvm/java-17-openjdk paru,' ${repo}dotfiles/bashrc
-#fi
-mv ${repo}dotfiles/bashrc .bashrc
-mv ${repo}dotfiles/inputrc .inputrc
 #Set Shell
 if ! [ $shell == bash ];then
     chsh -s /bin/$shell
     if [ $shell == fish ];then
         fish -c 'set -U fish_greeting'
-        cp ${repo}dotfiles/config.fish ~/.config/fish/
+        if [ "$dotfs" == y ];then
+            cp ${repo}dotfiles/config.fish ~/.config/fish/
+        fi
     fi
 fi
 if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
@@ -218,9 +222,10 @@ sudo ufw enable
 #Enable init services
 if ! [ "$artix" == y ];then
     sudo timedatectl set-ntp y
-    sudo systemctl enable systemd-timesyncd cups ufw $dm $cron apparmor auditd rngd power-profiles-daemon
+    sudo systemctl enable openntpd cups ufw $dm $cron apparmor auditd rngd power-profiles-daemon
     if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
-        sudo systemctl enable libvirtd
+        sudo systemctl enable --now libvirtd.service virtlogd.socket
+        sudo virsh net-autostart default
     fi
     if [ "$btrfs" == y ];then
         sudo systemctl enable grub-btrfsd
@@ -260,7 +265,7 @@ elif [ $init == openrc ]; then
     sudo rc-update add power-profiles-daemon default
     sudo rc-update add apparmor default
     sudo rc-update add auditd default
-    sudo rc-update add $cron default
+sudo rc-update add $cron default
     if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
         sudo rc-update add libvirtd default
     fi
