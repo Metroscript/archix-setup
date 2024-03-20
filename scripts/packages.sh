@@ -21,13 +21,6 @@ elif grep -E "Intel Corporation|UHD" <<< $gpu;then
 fi
 sudo pacman -Syu --needed --noconfirm vkd3d
 
-#Flatpak
-if grep "linux-hardened" <<< $(pacman -Q);then
-   sudo pacman -Syu --needed --noconfirm flatpak bubblewrap-suid;else
-   sudo pacman -Syu --needed --noconfirm flatpak bubblewrap
-fi
-flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
-
 #Basic packages
 sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber man-db wayland xorg-xwayland smartmontools strace v4l2loopback-dkms gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{dejavu,liberation,hack-nerd,ubuntu-font-family} bash-language-server cups{,-pk-helper,-pdf} gutenprint net-tools power-profiles-daemon gparted foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley ufw fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{archiver,rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay hunspell{,-en_{au,gb,us}} libpulse keepassxc gst-{libav,plugins-{base,good}} imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq nvme-cli apparmor audit python-{notify2,psutil} noise-suppression-for-voice wl-clipboard rng-tools opensc alacritty btop mpv lollypop qbittorrent nvtop $shell openntpd libressl
 
@@ -52,7 +45,14 @@ fi
 if [ $ply == y ];then
     sudo pacman -S --noconfirm --needed plymouth
 fi
-    #Games, etc
+#Flatpak
+if grep "linux-hardened" <<< $(pacman -Q);then
+   sudo pacman -Syu --needed --noconfirm flatpak bubblewrap-suid;else
+   sudo pacman -Syu --needed --noconfirm flatpak bubblewrap
+fi
+flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
+
+#Games, etc
 if [ $games == y ];then
     sudo pacman -Syu --needed --noconfirm wine{,-{gecko,mono}} lutris steam game{scope,mode} lib32-gst-plugins-base
     flatpak install -y --user com.heroicgameslauncher.hgl org.freedesktop.Platform.VulkanLayer.gamescope/x86_64/23.08
@@ -125,6 +125,7 @@ if [ $mkfirm == y ];then
 fi
 if [ $makemkv == y ];then
     paru -S makemkv
+    echo "sg" | sudo tee /etc/modules-load.d/sg.conf
 fi
 if [ $rgb == y ];then
     paru -S openrgb

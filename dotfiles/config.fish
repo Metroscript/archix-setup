@@ -1,6 +1,5 @@
 if status is-interactive
     #System stuff
-    alias sudo 'doas'
     alias ls 'lsd'
     alias ll 'lsd -l'
     alias la 'lsd -a'
@@ -17,24 +16,24 @@ if status is-interactive
     alias free 'free -mht'
     alias tree 'tree --dirsfirst -C'
     alias dmesg 'dmesg -HePxL=auto'
+    alias ffmpeg='ffmpeg -hide_banner'
     set -x VISUAL /usr/bin/nvim
     set -x EDITOR $VISUAL
-    set -x GOPATH "$HOME/.go"
-    set -x PATH "$PATH:$GOPATH/bin"
+    set -x PATH "$PATH:$HOME/.cargo/bin"
     set HISTCONTROL ignoreboth
     set HISTSIZE 10000
     set HISTFILESIZE 5000
-
+    
     #Pacman
     alias p 'sudo pacman -S'
     alias r 'sudo pacman -Rns'
-    alias u 'paru -Syu;flatpak update;exit'
     alias s 'pacman -Ss'
     alias q 'pacman -Qs'
+    alias u 'paru -Syu;flatpak update;exit'
 
     #YT-DLP
     alias ytm 'yt-dlp -x -f ba/b --audio-quality 0 --add-metadata --embed-thumbnail'
-    alias yt 'yt-dlp -f bv+ba/b'
+    alias yt 'yt-dlp -f bv+ba/b --embed-thumbnail --merge-output-format mp4'
 
     #KEK
     alias pony 'fortune|ponysay'

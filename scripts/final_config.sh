@@ -11,7 +11,7 @@ if [ $rgb == y ];then
             sudo groupadd --system i2c
         fi
         sudo usermod $USER -aG i2c
-        echo "i2c-dev" | sudo tee /etc/modules-load.d/i2c.conf
+        echo "i2c_dev" | sudo tee /etc/modules-load.d/i2c.conf
         if grep amd <<< $(cat $bootdir);then
             sudo modprobe i2c-piix4
             echo "i2c-piix4" | sudo tee /etc/modules-load.d/i2c-piix4.conf;else
@@ -19,10 +19,6 @@ if [ $rgb == y ];then
             echo "i2c-i801" | sudo tee /etc/modules-load.d/i2c-i801.conf
         fi
     fi
-fi
-#Load sg if optical drive is detected
-if grep sr0 <<< $(lsblk);then
-    echo "sg" | sudo tee /etc/modules-load.d/sg.conf
 fi
 #Plymouth check & conf
 if [ $ply == y ];then
@@ -172,7 +168,6 @@ if [ "$dotfs" == y ];then
     if [ "$rlx" == y ];then
         mkdir -p .var/app/org.vinegarhq.Vinegar/config/
         mv ${repo}dotfiles/vinegar .var/app/org.vinegarhq.Vinegar/config
-        sed -i -e "s,WIDTH,$(xdpyinfo | awk -F'[ x]+' '/dimensions:/{print $3}') ," -i -e "s,HEIGHT,$(xdpyinfo | awk -F'[ x]+' '/dimensions:/{print $4}') ," .var/app/org.vinegarhq.Vinegar/config/vinegar/config.toml
     fi
     mv ${repo}dotfiles/bashrc .bashrc
     mv ${repo}dotfiles/inputrc .inputrc
@@ -210,7 +205,8 @@ sudo ufw allow qbittorrent
 
 # Install snap-pac (done late to reduce snapshot count)
 if [ "$snap" == y ];then
-    sudo SNAP_PAC_SKIP=y pacman -S --noconfirm --needed snap-pac
+    sudo pacman -S --noconfirm --needed snap-pac
+
 fi
 
 # Regenerate the initramfs in case it has been updated
@@ -220,7 +216,6 @@ fi
 
 #Enable init services
 if ! [ "$artix" == y ];then
-    sudo timedatectl set-ntp y
     sudo systemctl disable systemd-timesyncd
     sudo systemctl enable openntpd cups ufw $dm $cron apparmor auditd rngd power-profiles-daemon
     if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
