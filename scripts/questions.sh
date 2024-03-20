@@ -200,6 +200,7 @@ if [ $games == y ];then
             printf "Install PPSSPP? (PS Portable emulator) [y/n]: "
             read ppsspp
         done
+    fi
 fi
 echo "What shell would you like to use? (Use BASH if unsure) 1.BASH 2.FISH"
 printf "[1/2]: "
