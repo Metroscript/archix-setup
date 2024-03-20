@@ -313,6 +313,7 @@ if [ $lckdwn -gt 0 ] && [ "$virt" -ge 2 ];then
     until [ "$lckdwn_con" == y ] || [ "$lckdwn_con" == n ];do
         echo "VIRTUALBOX KERNEL MODULES DO NOT APPLY WITH LOCKDOWN. ARE YOU SURE YOU STILL WANT TO ENABLE LOCKDOWN?"
         printf "[y/n]: "
+        read lckdwn_con
     done
     if [ $lckdwn_con == n ];then
         lckdwn=0
