@@ -202,6 +202,31 @@ if [ $games == y ];then
         done
     fi
 fi
+echo "Install Multimedia tools? (Kdenlive, OBS)"
+printf "[y/n]: "
+read multitools
+until [ "$multitools" == y ] || [ "$multitools" == n ];do
+    echo "Install Multimedia tools? (Kdenlive, OBS)"
+    printf "[y/n]: "
+    read multitools
+done
+
+echo "Install Graphics tools? (GIMP, Blender)"
+printf "[y/n]: "
+read graphitools
+until [ "$graphitools" == y ] || [ "$graphitools" == n ];do
+    echo "Install Graphics tools? (GIMP, Blender)"
+    printf "[y/n]: "
+    read graphitools
+done
+echo "Install LibreOffice?"
+printf "[y/n]: "
+read office
+until [ "$office" == y ] || [ "$office" == n ];do
+    echo "Install LibreOffice?"
+    printf "[y/n]: "
+    read office
+done
 echo "What shell would you like to use? (Use BASH if unsure) 1.BASH 2.FISH"
 printf "[1/2]: "
 read shell

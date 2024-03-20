@@ -125,7 +125,7 @@ fi
 #set machine ID to generic whonix machine ID
 if ! grep b08dfa6083e7567a1921a715000001fb <<< $(cat /etc/machine-id);then
     echo "b08dfa6083e7567a1921a715000001fb" | sudo tee /etc/machine-id
-    echo "b08dfa6083e7567a1921a715000001fb" /var/lib/dbus/machine-id
+    echo "b08dfa6083e7567a1921a715000001fb" > /var/lib/dbus/machine-id
 fi
 #Add 5 second delay between failed password attempts
 if ! grep pam_faildelay <<< $(cat /etc/pam.d/system-login);then
@@ -166,7 +166,7 @@ if [ "$dotfs" == y ];then
     cp mpv_thumbnail_script_server.lua mpv_thumbnail_script_server-3.lua
     mv mpv_thumbnail_script_server.lua mpv_thumbnail_script_server-1.lua
     cd
-    if [ $games == y ] && if ! grep Games <<< $(ls);then
+    if [ $games == y ] && ! grep Games <<< $(ls);then
         mkdir Games
     fi
     if [ "$rlx" == y ];then
