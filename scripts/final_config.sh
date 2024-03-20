@@ -164,7 +164,7 @@ fi
 ######################################################################################################
 if [ "$dotfs" == y ];then
     mv ${repo}dotfiles/config/* .config/
-    #mkdir .config/mpv/scripts/
+    mkdir .config/mpv/scripts/
     cd .config/mpv/scripts/
     wget 'https://github.com/TheAMM/mpv_thumbnail_script/releases/download/0.4.2/mpv_thumbnail_script_client_osc.lua'
     wget 'https://github.com/TheAMM/mpv_thumbnail_script/releases/download/0.4.2/mpv_thumbnail_script_server.lua'
@@ -172,7 +172,7 @@ if [ "$dotfs" == y ];then
     cp mpv_thumbnail_script_server.lua mpv_thumbnail_script_server-3.lua
     mv mpv_thumbnail_script_server.lua mpv_thumbnail_script_server-1.lua
     cd
-    if [ $gayms == y ];then
+    if [ $games == y ];then
         if ! grep Games <<< $(ls);then
             mkdir Games
         fi
@@ -221,7 +221,7 @@ sudo ufw allow qbittorrent
 
 # Install snap-pac (done late to reduce snapshot count)
 if [ "$snap" == y ];then
-    sudo pacman -S snap-pac
+    sudo SNAP_PAC_SKIP=y pacman -S --noconfirm --needed snap-pac
 fi
 
 # Regenerate the initramfs in case it has been updated
@@ -232,6 +232,7 @@ fi
 #Enable init services
 if ! [ "$artix" == y ];then
     sudo timedatectl set-ntp y
+    sudo systemctl disable systemd-timesyncd
     sudo systemctl enable openntpd cups ufw $dm $cron apparmor auditd rngd power-profiles-daemon
     if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
         sudo systemctl enable --now libvirtd.service virtlogd.socket

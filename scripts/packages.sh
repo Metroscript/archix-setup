@@ -44,7 +44,7 @@ if [ $ply == y ];then
     sudo pacman -S --noconfirm --needed plymouth
 fi
     #Games, etc
-if [ $gayms == y ];then
+if [ $games == y ];then
     sudo pacman -Syu --needed --noconfirm wine{,-{gecko,mono}} lutris steam gamescope gamemode lib32-gst-plugins-base
     flatpak install -y --user pcsx2 cemu citra
 fi
