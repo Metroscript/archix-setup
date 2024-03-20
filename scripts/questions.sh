@@ -123,11 +123,11 @@ if [ $vir == y ];then
     done;else
     virt=0
 fi
-printf "Install Emulation & Steam/WINE support? [y/n]: "
+printf "Install WINE Games support? (Steam, Lutris, HeroicLauncher) [y/n]: "
 read games
 until [ "$games" == y ] || [ "$games" == n ];do
     echo "Sorry, please try again"
-    printf "Install Emulation & Steam/WINE support? [y/n]: "
+    printf "Install WINE Games support? (Steam, Lutris, HeroicLauncher) [y/n]: "
     read games
 done
 if [ $games == y ];then
@@ -138,13 +138,68 @@ if [ $games == y ];then
         printf "Install Vinegar? (A WINE wrapper for Roblox) [y/n]: "
         read rlx
     done
-    printf "Install Prismlauncher? (A custom Minecraft launcher with mod support) [y/n]: "
+    printf "Install Prismlauncher? (A custom Minecraft launcher with mod support - Flatpak) [y/n]: "
     read min
     until [ "$min" == y ] || [ "$min" == n ];do
         echo "Sorry, please try again."
-        printf "Install Prismlauncher? (A custom Minecraft launcher with mod support) [y/n]: "
+        printf "Install Prismlauncher? (A custom Minecraft launcher with mod support - Flatpak) [y/n]: "
         read min
     done
+    printf "Install console emulators? (Most are installed through Flatpak) [y/n]: "
+    read emu
+    until [ "$emu" == y ] || [ "$emu" == n ];do
+        printf "Install console emulators? (Most are installed through Flatpak) [y/n]: "
+        read emu
+    done
+    if [ "$emu" == y ];then
+        printf "Install MelonDS? (DS emulator) [y/n]: "
+        read melonds
+        until [ "$melonds" == y ] || [ "$melonds" == n ];do
+            printf "Install MelonDS? (DS emulator) [y/n]: "
+            read melonds
+        done
+        printf "Install Citra? (3DS emulator [NO LONGER MAINTAINED]) [y/n]: "
+        read citra
+        until [ "$citra" == y ] || [ "$citra" == n ];do
+            printf "Install Citra? (3DS emulator [NO LONGER MAINTAINED]) [y/n]: "
+            read citra
+        done
+        printf "Install Dolphin? (Gamecube/Wii emulator) [y/n]: "
+        read dolphin
+        until [ "$dolphin" == y ] || [ "$dolphin" == n ];do
+            printf "Install Dolphin? (Gamecube/Wii emulator) [y/n]: "
+            read dolphin
+        done
+        printf "Install Cemu? (Wii U emulator) [y/n]: "
+        read cemu
+        until [ "$cemu" == y ] || [ "$cemu" == n ];do
+            printf "Install Cemu? (Wii U emulator) [y/n]: "
+            read cemu
+        done
+        printf "Install Yuzu? (Switch emulator [NO LONGER MAINTAINED]) [y/n]: "
+        read yuzu
+        until [ "$yuzu" == y ] || [ "$yuzu" == n ];do
+            printf "Install Yuzu? (Switch emulator [NO LONGER MAINTAINED]) [y/n]: "
+            read yuzu
+        done
+        printf "Install Duckstation? (PS1 emulator) [y/n]: "
+        read duckstation
+        until [ "$duckstation" == y ] || [ "$duckstation" == n ];do
+            printf "Install Duckstation? (PS1 emulator) [y/n]: "
+            read duckstation
+        done
+        printf "Install PCSX2? (PS2 emulator) [y/n]: "
+        read pcsx2
+        until [ "$pcsx2" == y ] || [ "$pcsx2" == n ];do
+            printf "Install PCSX2? (PS2 emulator) [y/n]: "
+            read pcsx2
+        done
+        printf "Install PPSSPP? (PS Portable emulator) [y/n]: "
+        read ppsspp
+        until [ "$ppsspp" == y ] || [ "$ppsspp" == n ];do
+            printf "Install PPSSPP? (PS Portable emulator) [y/n]: "
+            read ppsspp
+        done
 fi
 echo "What shell would you like to use? (Use BASH if unsure) 1.BASH 2.FISH"
 printf "[1/2]: "
@@ -231,13 +286,13 @@ if [ $img == mkinit ];then
         read mkfirm
     done
 fi
-printf "Add installed kernels & firmware to IgnorePkg? [y/n]: "
-read kignore
-until [ "$kignore" == y ] || [ "$kignore" == n ];do
-    echo "Sorry, please try again."
-    printf "Add installed kernels & firmware to IgnorePkg? [y/n]: "
-    read kignore
-done
+#printf "Add installed kernels & firmware to IgnorePkg? [y/n]: "
+#read kignore
+#until [ "$kignore" == y ] || [ "$kignore" == n ];do
+#    echo "Sorry, please try again."
+#    printf "Add installed kernels & firmware to IgnorePkg? [y/n]: "
+#    read kignore
+#done
 
 echo "Enable Kernel lockdown to prevent modification of kernel during runtime? (Prevents non-signed kernel modules from loading)"
 echo "0.No (Default) 1.Integrity (Standard Lockdown) 2.Confidential (Changes how RAM is accessed; Can cause issues)"
@@ -246,7 +301,7 @@ read lckdwn
 until [ "$lckdwn" == 0 ] || [ "$lckdwn" == 1 ] || [ "$lckdwn" == 2 ];do
     echo "Enable Kernel lockdown to prevent modification of kernel during runtime? (Prevents non-signed kernel modules from loading & disables hibernation)"
     echo "0.No (Default) 1.Integrity (Standard Lockdown) 2.Confidential (Changes how RAM is accessed; Can cause issues)"
-    printf "0/1/2"
+    printf "0/1/2: "
     read lckdwn
 done
 

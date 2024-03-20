@@ -32,10 +32,10 @@ flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flath
 sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber man-db wayland xorg-xwayland smartmontools strace v4l2loopback-dkms gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{dejavu,liberation,hack-nerd,ubuntu-font-family} bash-language-server cups{,-pk-helper,-pdf} gutenprint net-tools power-profiles-daemon gparted foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley ufw fuse neofetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{archiver,rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay libreoffice-still{,-en-gb} hunspell{,-en_{au,gb,us}} hyphen-en mythes-en coin-or-mp beanshell mariadb-libs postgresql-libs pstoedit sane gimp lib{paper,wpg,pulse,mythes} keepassxc gst-{libav,plugins-{base,good}} imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq nvme-cli apparmor audit python-{notify2,psutil} noise-suppression-for-voice wl-clipboard rng-tools opensc alacritty obs-studio btop mpv kdenlive movit bigsh0t dvgrab mediainfo open{cv,timelineio} recordmydesktop lollypop qbittorrent blender libdecor nvtop $shell openntpd libressl
 
 if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
-    sudo pacman -S qemu-full edk2-ovmf virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat
+    sudo pacman -S --needed --noconfirm qemu-full edk2-ovmf virt-{manager,viewer} dnsmasq vde2 bridge-utils openbsd-netcat
 fi
 if [ "$virt" == 2 ] || [ "$virt" == 3 ];then
-    sudo pacman -S virtualbox{,-{host-dkms,guest-iso}}
+    sudo pacman -S --needed --noconfirm virtualbox{,-{host-dkms,guest-iso}}
 fi
 if [ $mtdi == y ];then
     sudo pacman -S --noconfirm --needed lbzip2 pigz
@@ -45,10 +45,40 @@ if [ $ply == y ];then
 fi
     #Games, etc
 if [ $games == y ];then
-    sudo pacman -Syu --needed --noconfirm wine{,-{gecko,mono}} lutris steam gamescope gamemode lib32-gst-plugins-base
-    flatpak install -y --user pcsx2 cemu citra
+    sudo pacman -Syu --needed --noconfirm wine{,-{gecko,mono}} lutris steam game{scope,mode} lib32-gst-plugins-base
+    flatpak install -y --user com.heroicgameslauncher.hgl org.freedesktop.Platform.VulkanLayer.gamescope/x86_64/23.08
+fi
+if [ "$melonds" == y ];then
+    flatpak install -y --user net.kuribo64.melonDS
+fi
+if [ "$citra" == y ];then
+    flatpak install -y --user org.citra_emu.citra
+fi
+if [ "$dolphin" == y ];then
+    sudo pacman -S --needed --noconfirm dolphin-emu
+fi
+if [ "$cemu" == y ];then
+    flatpak install -y --user info.cemu.Cemu
+fi
+if [ "$yuzu" == y ];then
+    flatpak install -y --user org.yuzu_emu.yuzu
+fi
+if [ "$duckstation" == y ];then
+    flatpak install -y --user org.duckstation.DuckStation
+fi
+if [ "$pcsx2" == y ];then
+    flatpak install -y --user net.pcsx2.PCSX2
+fi
+if [ "$ppsspp" == y ];then
+    flatpak install -y --user org.ppsspp.PPSSPP
+fi
+if [ "$rlx" == y ];then
+    flatpak install -y --user org.vinegarhq.Vinegar
 fi
 
+if [ "$min" == y ];then
+    flatpak install -y --user org.prismlauncher.PrismLauncher
+fi
 #AUR
 if [ "$suas" == y ];then
     sudo sed -i 's,#PACMAN_AUTH=(),PACMAN_AUTH=(/bin/doas),' /etc/makepkg.conf
@@ -84,9 +114,6 @@ fi
 if [ $mkfirm == y ];then
     paru -S mkinitcpio-firmware
 fi
-if [ "$rlx" == y ];then
-    flatpak install -y --user org.vinegarhq.Vinegar
-fi
 if [ $makemkv == y ];then
     paru -S makemkv
 fi
@@ -97,15 +124,15 @@ if [ "$artix" == y ];then
     sudo pacman -S --needed --noconfirm librewolf;else
     paru -S librewolf-bin
 fi
-if [ $bin == y ];then
-    if [ "$min" == y ];then
-        paru -S prismlauncher-bin jre{-openjdk,17-openjdk,11-openjdk,8-openjdk}
-    fi
-else
-    if [ "$min" == y ];then
-        paru -S prismlauncher jre{-openjdk,17-openjdk,11-openjdk,8-openjdk}
-    fi
-fi
+#if [ $bin == y ];then
+#    if [ "$min" == y ];then
+#        paru -S prismlauncher-bin jre{-openjdk,17-openjdk,11-openjdk,8-openjdk}
+#    fi
+#else
+#    if [ "$min" == y ];then
+#        paru -S prismlauncher jre{-openjdk,17-openjdk,11-openjdk,8-openjdk}
+#    fi
+#fi
 
 if ! [ $cron == fcron ];then
     if [ "$artix" == y ];then

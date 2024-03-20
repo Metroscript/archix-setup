@@ -133,35 +133,29 @@ if ! grep pam_faildelay <<< $(cat /etc/pam.d/system-login);then
 fi
 #Restrict 'su' to :wheel
 sudo sed -i 's/#auth           required        pam_wheel.so use_uid/auth            required        pam_wheel.so use_uid/' /etc/pam.d/su /etc/pam.d/su-l
-#Prevent ssh gaining root (REMOVE OR MAKE OPTION, SSH IS NOT ENABLED BY DEFAULT)
-    #sudo sed -i 's/#PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
+
 #Apparmor audit settings
 sudo sed -i 's/#write-cache/write-cache/' /etc/apparmor/parser.conf
 sudo groupadd -r audit
 sudo gpasswd -a $USER audit
 sudo sed -i '/log_group/a log_group = audit/' /etc/audit/auditd.conf 
 
-if [ $kignore == y ];then
-    sudo sed -i 's/#IgnorePkg   =/IgnorePkg   =linux-firmware/' /etc/pacman.conf
-######################################################################################################
-############################### NEEDS WORKING ON!!! (bashrc editing) #################################
-######################################################################################################
-    if grep 'local/linux ' <<< $(pacman -Qs);then
-        sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux linux-headers /' /etc/pacman.conf
-    fi
-    if grep linux-lts <<< $(pacman -Q);then
-        sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-lts linux-lts-headers /' /etc/pacman.conf
-    fi
-    if grep linux-zen <<< $(pacman -Q);then
-        sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-zen linux-zen-headers /' /etc/pacman.conf
-    fi
-    if grep linux-hardened <<< $(pacman -Q);then
-        sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-hardened linux-hardened-headers /' /etc/pacman.conf
-    fi
-fi
-######################################################################################################
-######################################## END OF PROBLEM AREA #########################################
-######################################################################################################
+#if [ $kignore == y ];then
+#    sudo sed -i 's/#IgnorePkg   =/IgnorePkg   =linux-firmware/' /etc/pacman.conf
+#    if grep 'local/linux ' <<< $(pacman -Qs);then
+#        sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux linux-headers /' /etc/pacman.conf
+#    fi
+#    if grep linux-lts <<< $(pacman -Q);then
+#        sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-lts linux-lts-headers /' /etc/pacman.conf
+#    fi
+#    if grep linux-zen <<< $(pacman -Q);then
+#        sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-zen linux-zen-headers /' /etc/pacman.conf
+#    fi
+#    if grep linux-hardened <<< $(pacman -Q);then
+#        sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-hardened linux-hardened-headers /' /etc/pacman.conf
+#    fi
+#fi
+
 if [ "$dotfs" == y ];then
     mv ${repo}dotfiles/config/* .config/
     mkdir .config/mpv/scripts/
@@ -172,18 +166,13 @@ if [ "$dotfs" == y ];then
     cp mpv_thumbnail_script_server.lua mpv_thumbnail_script_server-3.lua
     mv mpv_thumbnail_script_server.lua mpv_thumbnail_script_server-1.lua
     cd
-    if [ $games == y ];then
-        if ! grep Games <<< $(ls);then
-            mkdir Games
-        fi
-        if ! grep "retroarch" <<< $(ls .config);then
-            mkdir .config/retroarch
-        fi
-        mv ${repo}dotfiles/retroarch.cfg .config/retroarch
+    if [ $games == y ] && if ! grep Games <<< $(ls);then
+        mkdir Games
     fi
     if [ "$rlx" == y ];then
-        mv ${repo}dotfiles/vinegar .config/
-        sed -i -e "s,WIDTH,$(xdpyinfo | awk -F'[ x]+' '/dimensions:/{print $3}') ," -i -e "s,HEIGHT,$(xdpyinfo | awk -F'[ x]+' '/dimensions:/{print $4}') ," .config/vinegar/config.toml
+        mkdir -p .var/app/org.vinegarhq.Vinegar/config/
+        mv ${repo}dotfiles/vinegar .var/app/org.vinegarhq.Vinegar/config
+        sed -i -e "s,WIDTH,$(xdpyinfo | awk -F'[ x]+' '/dimensions:/{print $3}') ," -i -e "s,HEIGHT,$(xdpyinfo | awk -F'[ x]+' '/dimensions:/{print $4}') ," .var/app/org.vinegarhq.Vinegar/config/vinegar/config.toml
     fi
     mv ${repo}dotfiles/bashrc .bashrc
     mv ${repo}dotfiles/inputrc .inputrc
