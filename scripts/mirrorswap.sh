@@ -39,7 +39,6 @@ if [ "$btrfs" == y ];then
         sh ~/archix-setup/snapper_conf_gen.sh
         if [ $img == mkinit ];then
             sudo sed -i 's/fsck/fsck grub-btrfs-overlayfs/g' /etc/mkinitcpio.conf
-            sudo mkinitcpio -P
         fi
     fi
 fi
@@ -52,7 +51,7 @@ if [ "$swap" -gt 0 ];then
         sudo btrfs filesystem mkswapfile --size ${swap}G --uuid clear ${swapvol}/swapfile
         sudo swapon ${swapvol}/swapfile
         sudo cp /etc/fstab /etc/fstab.bak
-        echo '/${swapvol}/swapfile none swap defaults 0 0' | sudo tee -a /etc/fstab
+        echo "/$swapvol/swapfile none swap defaults 0 0" | sudo tee -a /etc/fstab
         cd;else
         sudo dd if=/dev/zero of=/.swapfile bs=1M count=$((${swap}*1024)) status=progress
         sudo chmod 600 /.swapfile
@@ -64,10 +63,8 @@ if [ "$swap" -gt 0 ];then
     fi
     if [ $res == y ];then
         sudo sed -i "s.quiet.resume=$(cat /etc/fstab | grep '/ ' | cut -d/ -f1 | awk '{$1=$1};1') resume_offset=$(if [ "$btrfs" == y ];then sudo btrfs inspect-internal map-swapfile -r /${swapvol}/swapfile;else sudo filefrag -v /.swapfile | awk '$1=="0:" {print substr($4, 1, length($4)-2)}';fi) quiet." $bootdir
-    fi
         if [ $img == mkinit ];then
             sudo sed -i 's/filesystems/filesystems resume/' /etc/mkinitcpio.conf
-            sudo mkinitcpio -P
         ###############################################
         ####### OTHER INITRAMFS GEN SUPPORT ###########
         ###############################################
@@ -84,6 +81,7 @@ if [ "$swap" -gt 0 ];then
         if [ $de == 1 ];then
             sed -i "s/ctl suspend/ctl suspend-then-hibernate \|\| $(if [ "$artix" == y ];then echo loginctl;else echo systemctl;fi) suspend/" ${repo}dotfiles/hypr-rice/wlogout/layout
         fi
+    fi
 fi
 
 if [ "$zram" -gt 0 ];then

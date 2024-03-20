@@ -43,7 +43,7 @@ if [ $ply == y ];then
         if [ "$plytheme" == breeze ] || [ "$plytheme" == breeze-text ];then
             sudo pacman -Syu --needed --noconfirm breeze-plymouth
         fi
-        sudo plymouth-set-default-theme -R $plytheme
+        sudo plymouth-set-default-theme $plytheme
         ###########################################
         ###### OTHER INITRAMFS GEN SUPPORT ########
         ###########################################;else
@@ -209,6 +209,7 @@ if ! grep localtime <<< $(ls /etc/);then
 fi
 
 #Enable Firewall settings
+sudo ufw enable
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
 sudo ufw allow http
@@ -217,7 +218,16 @@ sudo ufw allow dns
 sudo ufw allow mdns
 sudo ufw allow 631
 sudo ufw allow qbittorrent
-sudo ufw enable
+
+# Install snap-pac (done late to reduce snapshot count)
+if [ "$snap" == y ];then
+    sudo pacman -S snap-pac
+fi
+
+# Regenerate the initramfs in case it has been updated
+if [ $img == mkinit ];then
+    sudo mkinitcpio -P
+fi
 
 #Enable init services
 if ! [ "$artix" == y ];then

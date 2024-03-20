@@ -249,7 +249,7 @@ until [ $lckdwn == 0 ] || [ $lckdwn == 1 ] || [ $lckdwn == 2 ];do
     read lckdwn
 done
 
-if [ $lckdwn -gt 0 ] && [ $virt -ge 2 ];then
+if [ $lckdwn -gt 0 ] && [ "$virt" -ge 2 ];then
     echo "VIRTUALBOX KERNEL MODULES DO NOT APPLY WITH LOCKDOWN. ARE YOU SURE YOU STILL WANT TO ENABLE LOCKDOWN?"
     printf "[y/n]: "
     read lckdwn_con
@@ -298,11 +298,11 @@ if ! grep Size <<< $(swapon -s);then
     fi
 fi
 if [ "$btrfs" == y ];then
-    echo "Install snapper for automated subvolume snapshots?"
+    echo "Install snapper & snap-pac for automated subvolume snapshots?"
     printf "[y/n]: "
     read snap
     until [ $snap == y ] || [ $snap == n ];do
-        echo "Install snapper for automated subvolume snapshots?"
+        echo "Install snapper & snap-pac for automated subvolume snapshots?"
         printf "[y/n]: "
         read snap
     done
@@ -319,11 +319,11 @@ if [ "$btrfs" == y ];then
         fi
         for submnt in $(findmnt -nt btrfs|cut -d\  -f1|sed 's/─//'|sed 's/├//'|sed 's/└//');do 
             subvol=$(findmnt -nt btrfs|grep "$submnt "|sed 's,.*subvol=/,,')
-            echo "Create snapshot config for $subvol (Mounted at $submnt)?"
+            echo "Create snapshot config for subvolume: \"$subvol\" (Mounted at $submnt)?"
             printf "[y/n]: "
             read snap_conf
             until [ $snap_conf == y ] || [ $snap_conf == n ];do
-                echo "Create snapshot config for $subvol (Mounted at $submnt)?"
+                echo "Create snapshot config for subvolume: \"$subvol\" (Mounted at $submnt)?"
                 printf "[y/n]: "
                 read snap_conf
             done
