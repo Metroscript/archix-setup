@@ -69,8 +69,8 @@ fi
 if [ "$cemu" == y ];then
     flatpak install -y --user info.cemu.Cemu
 fi
-if [ "$yuzu" == y ];then
-    flatpak install -y --user org.yuzu_emu.yuzu
+if [ "$switch" == y ];then
+    flatpak install -y --user org.ryujinx.Ryujinx
 fi
 if [ "$duckstation" == y ];then
     flatpak install -y --user org.duckstation.DuckStation

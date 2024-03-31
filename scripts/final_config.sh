@@ -232,6 +232,7 @@ elif [ $init == dinit ]; then
     sudo dinitctl enable $cron
     if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
         sudo dinitctl enable libvirtd
+        sudo virsh net-autostart default
     fi
     sudo dinitctl enable apparmor
     sudo dinitctl enable auditd
@@ -250,6 +251,7 @@ elif [ $init == runit ]; then
     sudo ln -s /etc/runit/sv/power-profiles-daemon /run/runit/service
     if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
         sudo ln -s /etc/runit/sv/libvirtd /run/runit/service
+        sudo virsh net-autostart default
     fi
 elif [ $init == openrc ]; then
     sudo rc-update add ntpd boot
@@ -263,6 +265,7 @@ elif [ $init == openrc ]; then
 sudo rc-update add $cron default
     if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
         sudo rc-update add libvirtd default
+        sudo virsh net-autostart default
     fi
 elif [ $init == s6 ];then
     sudo touch /etc/s6/adminsv/default/contents.d/ntpd
@@ -276,6 +279,7 @@ elif [ $init == s6 ];then
     sudo touch /etc/s6/adminsv/default/contents.d/power-profiles-daemon
     if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
         sudo touch /etc/s6/adminsv/default/contents.d/libvirtd
+        sudo virsh net-autostart default
     fi
     sudo s6-db-reload
 fi

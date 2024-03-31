@@ -176,11 +176,11 @@ if [ $games == y ];then
             printf "Install Cemu? (Wii U emulator) [y/n]: "
             read cemu
         done
-        printf "Install Yuzu? (Switch emulator [NO LONGER MAINTAINED]) [y/n]: "
-        read yuzu
-        until [ "$yuzu" == y ] || [ "$yuzu" == n ];do
-            printf "Install Yuzu? (Switch emulator [NO LONGER MAINTAINED]) [y/n]: "
-            read yuzu
+        printf "Install Ryujinx? (Switch emulator) [y/n]: "
+        read switch
+        until [ "$switch" == y ] || [ "$switch" == n ];do
+            printf "Install Ryujinx? (Switch emulator) [y/n]: "
+            read switch
         done
         printf "Install Duckstation? (PS1 emulator) [y/n]: "
         read duckstation
