@@ -48,7 +48,7 @@ if grep -q opendoas <<< $(pacman -Q);then
     suas=y
     alias sudo='doas'
     sed -i "/stuff/a alias sudo=doas" ${repo}dotfiles/bashrc
-    sed -i "s/stuff/a alias sudo 'doas'" ${repo}dotfiles/config.fish
+    sed -i "/stuff/a alias sudo 'doas'" ${repo}dotfiles/config.fish
 fi
 
 if grep -q btrfs <<< $(sudo blkid);then
