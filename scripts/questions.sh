@@ -25,18 +25,18 @@ fi
 #    fi
 #fi
 
-if grep Artix <<< $(cat /etc/issue);then
+if grep -q Artix <<< $(cat /etc/issue);then
     artix=y
     sdir=/etc/elogind/
     sed -i -e 's/#exec-once/exec-once/' -i -e '/--systemd/d' -i -e '/systemctl/d' ${repo}dotfiles/hypr-rice/hypr/hyprland.conf
     sed -i -e 's/action" : "reboot/action" : "loginctl reboot/' -i -e 's/poweroff/loginctl poweroff/' -i -e 's/action" : "suspend/action" : "loginctl suspend/' ${repo}dotfiles/hypr-rice/wlogout/layout
-    if grep openrc <<< $(pacman -Q);then
+    if grep -q openrc <<< $(pacman -Q);then
         init=openrc
-    elif grep runit <<< $(pacman -Q);then
+    elif grep -q runit <<< $(pacman -Q);then
         init=runit
-    elif grep s6-base <<< $(pacman -Q);then
+    elif grep -q s6-base <<< $(pacman -Q);then
         init=s6
-    elif grep dinit <<< $(pacman -Q);then
+    elif grep -q dinit <<< $(pacman -Q);then
         init=dinit
     fi;else
     sdir=/etc/systemd/
@@ -44,14 +44,15 @@ fi
 
 bootdir=/etc/default/grub
 
-if grep btrfs <<< $(lsblk -oFSTYPE);then
-    btrfs=y
-fi
-
-if grep opendoas <<< $(pacman -Q);then
+if grep -q opendoas <<< $(pacman -Q);then
     suas=y
     alias sudo='doas'
     sed -i "/stuff/a alias sudo=doas" ${repo}dotfiles/bashrc
+    sed -i "s/stuff/a alias sudo 'doas'" ${repo}dotfiles/config.fish
+fi
+
+if grep -q btrfs <<< $(sudo blkid);then
+    btrfs=y
 fi
 
 ############################################################################
@@ -251,11 +252,11 @@ if [ $cron == 1 ];then
     cron=cronie;else
     cron=fcron
 fi
-printf "Install reflector to find closer package mirrors? [y/n]: "
-read reflect
-until [ "$reflect" == y ] || [ "$reflect" == n ];do
-    printf "Install reflector to find close package mirrors? [y/n]: "
-    read reflect
+printf printf "Sort package mirrors to prioritse faster servers? [y/n]: "
+read mirrorsort
+until [ "$mirrorsort" == y ] || [ "$mirrorsort" == n ];do
+    printf "Sort package mirrors to prioritse faster servers? [y/n]: "
+    read mirrorsort
 done
 printf "Install Plymouth? (Adds boot splash screen) [y/n]: "
 read ply

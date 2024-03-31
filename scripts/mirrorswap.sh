@@ -14,16 +14,17 @@ fi
 sudo pacman -Syu --noconfirm --needed pacman-contrib pkgfile
 sudo pkgfile -uz "zstd -T0 -19"
 tz=$(curl https://ipapi.co/timezone)
-if [ $reflect == y ];then
+if [ $mirrorsort == y ];then
     sudo pacman -Syu --needed --noconfirm reflector rsync neovim
     country=$(curl https://ipapi.co/timezone | cut -d/ -f1)
     if [ "$artix" == y ];then
         sudo mv /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.pacnew
         rankmirrors -vn 5 /etc/pacman.d/mirrorlist.pacnew | sudo tee /etc/pacman.d/mirrorlist
-        sudo reflector --save /etc/pacman.d/mirrorlist-arch --sort rate -c $country -p https;else
+        sudo reflector --save /etc/pacman.d/mirrorlist-arch --sort rate -c $country -p https
+        echo 'Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch' | sudo tee -a /etc/pacman.d/mirrorlist-arch;else
         sudo reflector --save /etc/pacman.d/mirrorlist --sort rate -c $country -p https
+        echo 'Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch' | sudo tee -a /etc/pacman.d/mirrorlist
     fi
-    echo 'Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch' | sudo tee -a /etc/pacman.d/mirrorlist
     sudo nvim /etc/pacman.d/mirrorlist
 fi
 
