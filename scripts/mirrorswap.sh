@@ -1,11 +1,11 @@
 #Repo config + doas base-devel packages
 if [ "$artix" == y ];then
-    sudo sed -i -z -e 's,\[galaxy\]\nInclude = /etc/pacman.d/mirrorlist,\[galaxy\]\nInclude = /etc/pacman.d/mirrorlist\n\n\[universe\]\nServer = https://universe.artixlinux.org/$arch\nServer = https://mirror1.artixlinux.org/universe/$arch\nServer = https://mirror.pascalpuffke.de/artix-universe/$arch\nServer = https://mirrors.qontinuum.space/artixlinux-universe/$arch\nServer = https://mirror1.cl.netactuate.com/artix/universe/$arch\nServer = https://ftp.crifo.org/artix-universe/$arch\nServer = https://artix.sakamoto.pl/universe/$arch,' -i -z -e 's,\[lib32\]\n#Include = /etc/pacman.d/mirrorlist,\[lib32\]\n#Include = /etc/pacman.d/mirrorlist\n\n#Arch Repos\n\n#\[extra-testing\]\n#Include = /etc/pacman.d/mirrorlist-arch\n\n#\[extra\]\n#Include = /etc/pacman.d/mirrorlist-arch\n\n#\[multilib-testing\]\n#Include = /etc/pacman.d/mirrorlist-arch\n\n#\[multilib\]\n#Include = /etc/pacman.d/mirrorlist-arch,' /etc/pacman.conf
+    sudo sed -i -z -e 's,\[galaxy\]\nInclude = /etc/pacman.d/mirrorlist,\[galaxy\]\nInclude = /etc/pacman.d/mirrorlist,' -i -z -e 's,\[lib32\]\n#Include = /etc/pacman.d/mirrorlist,\[lib32\]\n#Include = /etc/pacman.d/mirrorlist\n\n#Arch Repos\n\n#\[extra-testing\]\n#Include = /etc/pacman.d/mirrorlist-arch\n\n#\[extra\]\n#Include = /etc/pacman.d/mirrorlist-arch\n\n#\[multilib-testing\]\n#Include = /etc/pacman.d/mirrorlist-arch\n\n#\[multilib\]\n#Include = /etc/pacman.d/mirrorlist-arch,' /etc/pacman.conf
     sudo pacman -Syu --needed --noconfirm artix-archlinux-support
     sudo sed -i -e "/\[lib32\]/,/Include/"'s/^#//' -i -e "/\[extra\]/,/Include/"'s/^#//' /etc/pacman.conf
     sudo pacman-key --populate
 fi
-    sudo sed -i -e 's/#Color/Color/' -i -e '/Color/a ILoveCandy' -i -e 's/#Verbose/Verbose/' -i -e 's/#Parallel/Parallel/' -i -e "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
+sudo sed -i -e 's/#Color/Color/' -i -e '/Color/a ILoveCandy' -i -e 's/#Verbose/Verbose/' -i -e 's/#Parallel/Parallel/' -i -e "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
 sudo pacman -Syu --needed --noconfirm base-devel
 if [ "$suas" == y ];then
     sudo pacman -R --noconfirm base-devel
@@ -17,19 +17,23 @@ tz=$(curl https://ipapi.co/timezone)
 if [ $mirrorsort == y ];then
     sudo pacman -Syu --needed --noconfirm reflector rsync neovim
     country=$(curl https://ipapi.co/timezone | cut -d/ -f1)
+    sudo mv /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.pacnew
     if [ "$artix" == y ];then
-        sudo mv /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.pacnew
-        rankmirrors -vn 5 /etc/pacman.d/mirrorlist.pacnew | sudo tee /etc/pacman.d/mirrorlist
+        sudo sed -i '/http:/d' /etc/pacman.d/mirrorlist.pacnew #Remove HTTP mirrors
+        rankmirrors -vwn 5 /etc/pacman.d/mirrorlist.pacnew | sudo tee /etc/pacman.d/mirrorlist
+        echo -e 'Server = https://mirrors.dotsrc.org/artix-linux/repos/$repo/os/$arch\nServer = https://mirror.clarkson.edu/artix/linux/repos/$repo/os/$arch' | sudo tee -a /etc/pacman.d/mirrorlist
+        sudo nvim /etc/pacman.d/mirrorlist
         sudo reflector --save /etc/pacman.d/mirrorlist-arch --sort rate -c $country -p https
-        echo 'Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch' | sudo tee -a /etc/pacman.d/mirrorlist-arch;else
+        echo -e 'Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch\nServer = https://mirror.rackspace.com/archlinux/$repo/os/$arch' | sudo tee -a /etc/pacman.d/mirrorlist-arch
+        sudo nvim /etc/pacman.d/mirrorlist-arch;else
         sudo reflector --save /etc/pacman.d/mirrorlist --sort rate -c $country -p https
-        echo 'Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch' | sudo tee -a /etc/pacman.d/mirrorlist
+        echo -e 'Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch\nServer = https://mirror.rackspace.com/archlinux/$repo/os/$arch' | sudo tee -a /etc/pacman.d/mirrorlist
+        sudo nvim /etc/pacman.d/mirrorlist
     fi
-    sudo nvim /etc/pacman.d/mirrorlist
 fi
 
 if [ "$btrfs" == y ];then
-   sudo pacman -Syu --needed --noconfirm grub-btrfs inotify-tools btrfs-progs
+    sudo pacman -Syu --needed --noconfirm btrfs-progs grub-btrfs inotify-tools
     if [ "$snap" == y ];then
         if [ "$snap_dir" == y ];then
             sudo umount /.snapshots

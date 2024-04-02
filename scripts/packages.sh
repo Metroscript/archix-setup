@@ -130,6 +130,9 @@ fi
 if [ $rgb == y ];then
     paru -S openrgb
 fi
+if [ "$32gperf" == y ];then
+    paru -S lib32-gperftools
+fi
 if [ "$artix" == y ];then
     sudo pacman -S --needed --noconfirm librewolf;else
     paru -S librewolf-bin

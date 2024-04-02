@@ -28,7 +28,7 @@ if [ $ply == y ];then
     if ! grep splash <<< $(cat $bootdir);then
         sudo sed -i 's/quiet/quiet splash/' $bootdir
     fi
-    sudo sed -i 's/splash/splash plymouth.nolog/' $bootdir
+    sudo sed -i 's/quiet/plymouth.nolog quiet/' $bootdir
     if ! [ $plytheme == bgrt ];then
         sudo sed -i -e 's/DialogVerticalAlignment=.382/DialogVerticalAlignment=.75/' -i -e 's/WatermarkVerticalAlignment=.96/WatermarkVerticalAlignment=.5/' /usr/share/plymouth/themes/spinner/spinner.plymouth
     fi
@@ -192,6 +192,9 @@ if ! grep localtime <<< $(ls /etc/);then
     sudo hwclock --systohc
 fi
 
+#Configure NTP Servers
+sudo sed -i -e '/cloudflare/d' -i -e -z 's/servers 2.arch.pool.ntp.org/servers 0.arch.pool.ntp.org\nservers 1.arch.pool.ntp.org\nservers 2.arch.pool.ntp.org\nservers 3.arch.pool.ntp.org/' /etc/ntpd.conf
+
 #Enable Firewall settings
 sudo ufw enable
 sudo ufw default deny incoming
@@ -205,8 +208,11 @@ sudo ufw allow qbittorrent
 
 # Install snap-pac (done late to reduce snapshot count)
 if [ "$snap" == y ];then
+    SNAP_PAC_SKIP=y
     sudo pacman -S --noconfirm --needed snap-pac
-
+    if [ "$artix" == y ];then
+        paru -S snap-pac-grub
+    fi
 fi
 
 # Regenerate the initramfs in case it has been updated

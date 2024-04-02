@@ -4,7 +4,6 @@ elif grep dracut <<< $(pacman -Q);then
     img=dracut;else
     img=booster
 fi
-
 ###################################################################################################
 ########### ADD SUPPORT FOR OTHER INITRAMFs GENERATORs? ###########################################
 ###################################################################################################
@@ -124,14 +123,16 @@ if [ $vir == y ];then
     done;else
     virt=0
 fi
-printf "Install WINE Games support? (Steam, Lutris, HeroicLauncher) [y/n]: "
-read games
-until [ "$games" == y ] || [ "$games" == n ];do
-    echo "Sorry, please try again"
+until [[ "$games" == y ]] || [[ "$games" == n ]];do
     printf "Install WINE Games support? (Steam, Lutris, HeroicLauncher) [y/n]: "
     read games
 done
 if [ $games == y ];then
+    until [[ "$32gperf" == y ]] || [[ "$32gperf" == n ]];do
+        echo "Install 32-bit gperf tools for VAC games?"
+        printf "[y/n]: "
+        read 32gperf
+    done
     printf "Install Vinegar? (A WINE wrapper for Roblox) [y/n]: "
     read rlx
     until [ "$rlx" == y ] || [ "$rlx" == n ];do
@@ -252,7 +253,7 @@ if [ $cron == 1 ];then
     cron=cronie;else
     cron=fcron
 fi
-printf printf "Sort package mirrors to prioritse faster servers? [y/n]: "
+printf "Sort package mirrors to prioritse faster servers? [y/n]: "
 read mirrorsort
 until [ "$mirrorsort" == y ] || [ "$mirrorsort" == n ];do
     printf "Sort package mirrors to prioritse faster servers? [y/n]: "
@@ -404,6 +405,9 @@ if [ "$btrfs" == y ];then
     done
     if [ $snap == y ];then
         echo "Additional changes to snapshot configs must be done manually after install"
+        if [ "$artix" == y ];then
+            echo "Installing snap-pac-grub for automated grub snapshot boot entries"
+        fi
         sleep 5
         if grep .snapshots <<< $(ls -a /);then
             echo "/.snapshots directory detected! Prevents snapper from installing! /.snapshots will be unmounted and removed until snapper recreates the directory & any fstab entries for /.snapshots will be removed!"
