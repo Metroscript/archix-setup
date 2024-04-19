@@ -405,7 +405,12 @@ if [ "$btrfs" == y ];then
     done
     if [ $snap == y ];then
         echo "Additional changes to snapshot configs must be done manually after install"
-        if [ "$artix" == y ];then
+        until [[ "$grbtrfs" == y ]] || [[ "$grbtrfs" == n ]];do
+            echo "Install grub-btrfs to boot from snapshots?"
+            printf "[y/n]: "
+            read grbtrfs 
+        done
+        if [ "$grbtrfs" == y ] && [ "$artix" == y ];then
             echo "Installing snap-pac-grub for automated grub snapshot boot entries"
         fi
         sleep 5

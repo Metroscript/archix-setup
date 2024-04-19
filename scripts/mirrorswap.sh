@@ -33,7 +33,7 @@ if [ $mirrorsort == y ];then
 fi
 
 if [ "$btrfs" == y ];then
-    sudo pacman -Syu --needed --noconfirm btrfs-progs grub-btrfs inotify-tools
+    sudo pacman -Syu --needed --noconfirm btrfs-progs 
     if [ "$snap" == y ];then
         if [ "$snap_dir" == y ];then
             sudo umount /.snapshots
@@ -42,8 +42,11 @@ if [ "$btrfs" == y ];then
         fi
         sudo pacman -S --needed --noconfirm snapper
         sh ~/archix-setup/snapper_conf_gen.sh
-        if [ $img == mkinit ];then
-            sudo sed -i 's/fsck/fsck grub-btrfs-overlayfs/g' /etc/mkinitcpio.conf
+        if [ "$grbtrfs" == y ];then
+            sudo pacman -S --needed --noconfirm grub-btrfs inotify-tools
+            if [ $img == mkinit ];then
+                sudo sed -i 's/fsck/fsck grub-btrfs-overlayfs/g' /etc/mkinitcpio.conf
+            fi
         fi
     fi
 fi

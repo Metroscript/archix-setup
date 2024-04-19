@@ -154,13 +154,12 @@ sudo sed -i '/log_group/a log_group = audit/' /etc/audit/auditd.conf
 
 if [ "$dotfs" == y ];then
     mv ${repo}dotfiles/config/* .config/
+    #Install Thumbfast
     mkdir .config/mpv/scripts/
     cd .config/mpv/scripts/
-    wget 'https://github.com/TheAMM/mpv_thumbnail_script/releases/download/0.4.2/mpv_thumbnail_script_client_osc.lua'
-    wget 'https://github.com/TheAMM/mpv_thumbnail_script/releases/download/0.4.2/mpv_thumbnail_script_server.lua'
-    cp mpv_thumbnail_script_server.lua mpv_thumbnail_script_server-2.lua
-    cp mpv_thumbnail_script_server.lua mpv_thumbnail_script_server-3.lua
-    mv mpv_thumbnail_script_server.lua mpv_thumbnail_script_server-1.lua
+    #Standard OSC
+    wget 'https://github.com/po5/thumbfast/blob/5fefc9b8e995cf5e663666aa10649af799e60186/player/lua/osc.lua'
+    wget 'https://github.com/po5/thumbfast/blob/03e93feee5a85bf7c65db953ada41b4826e9f905/thumbfast.lua'
     cd
     if [ $games == y ] && ! grep Games <<< $(ls);then
         mkdir Games
@@ -193,7 +192,9 @@ if ! grep localtime <<< $(ls /etc/);then
 fi
 
 #Configure NTP Servers
-sudo sed -i -e '/cloudflare/d' -i -e -z 's/servers 2.arch.pool.ntp.org/servers 0.arch.pool.ntp.org\nservers 1.arch.pool.ntp.org\nservers 2.arch.pool.ntp.org\nservers 3.arch.pool.ntp.org/' /etc/ntpd.conf
+sudo sed -i '/cloudflare/d' /etc/ntpd.conf
+sudo sed -i 's/servers 2.arch.pool.ntp.org/servers 0.arch.pool.ntp.org/' /etc/ntpd.conf
+sudo sed -i -z 's/servers 0.arch.pool.ntp.org/servers 0.arch.pool.ntp.org\nservers 1.arch.pool.ntp.org\nservers 2.arch.pool.ntp.org\nservers 3.arch.pool.ntp.org/' /etc/ntpd.conf
 
 #Enable Firewall settings
 sudo ufw enable
@@ -210,7 +211,7 @@ sudo ufw allow qbittorrent
 if [ "$snap" == y ];then
     SNAP_PAC_SKIP=y
     sudo pacman -S --noconfirm --needed snap-pac
-    if [ "$artix" == y ];then
+    if [ "$artix" == y ] && [ "$grbtrfs" == y ];then
         paru -S snap-pac-grub
     fi
 fi
@@ -228,7 +229,7 @@ if ! [ "$artix" == y ];then
         sudo systemctl enable --now libvirtd.service virtlogd.socket
         sudo virsh net-autostart default
     fi
-    if [ "$btrfs" == y ];then
+    if [ "$grbtrfs" == y ];then
         sudo systemctl enable grub-btrfsd
     fi
 elif [ $init == dinit ]; then
