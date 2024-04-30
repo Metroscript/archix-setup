@@ -1,3 +1,6 @@
+#Start in $HOME to require less user input
+cd ~
+
 if grep mkinitcpio <<< $(pacman -Q);then
     img=mkinit
 elif grep dracut <<< $(pacman -Q);then
@@ -103,6 +106,27 @@ until [ "$mtdi" == y ] || [ "$mtdi" == n ];do
     printf "Install multithreaded drop-ins for gzip & bzip2? [y/n]: "
     read mtdi
 done
+
+until [[ "$terminal" == 1 ]] || [[ "$terminal" == 2 ]] || [[ "$terminal" == 3 ]];do
+    echo "Install 1.Alacritty, 2.Kitty or 3.Wezterm for terminal emulatior?"
+    printf "[1,2,3]: "
+    read terminal
+done
+if [ $terminal == 1 ];then
+    terminal=alacritty
+elif [ $terminal == 2 ];then
+    terminal=kitty
+    sed -i 's/alacritty/kitty/' ${repo}dotfiles/hypr-rice/hypr/hyprland.conf
+    sed -i 's/alacritty/kitty/g' ${repo}dotfiles/hypr-rice/waybar/config.jsonc
+    sed -i "/ffmpeg/a   alias icat='kitty icat'" ${repo}dotfiles/bashrc
+    sed -i "/ffmpeg/a   alias icat 'kitty icat'" ${repo}dotfiles/config.fish
+else
+    terminal=wezterm
+    sed -i 's/alacritty/wezterm/' ${repo}dotfiles/hypr-rice/hypr/hyprland.conf
+    sed -i 's/alacritty/wezterm/g' ${repo}dotfiles/hypr-rice/waybar/config.jsonc
+    sed -i "/ffmpeg/a   alias icat='wezterm imgcat'" ${repo}dotfiles/bashrc
+    sed -i "/ffmpeg/a   alias icat 'wezterm imgcat'" ${repo}dotfiles/config.fish
+fi
 
 printf "Install Virtualisation Software? [y/n]: "
 read vir
@@ -395,16 +419,19 @@ if ! grep Size <<< $(swapon -s);then
     fi
 fi
 if [ "$btrfs" == y ];then
-    echo "Install snapper & snap-pac for automated subvolume snapshots?"
-    printf "[y/n]: "
-    read snap
-    until [ $snap == y ] || [ $snap == n ];do
-        echo "Install snapper & snap-pac for automated subvolume snapshots?"
+    until [[ "$snap" == y ]] || [[ "$snap" == n ]];do
+        echo "Install snapper for automated subvolume snapshots?"
         printf "[y/n]: "
         read snap
     done
     if [ $snap == y ];then
         echo "Additional changes to snapshot configs must be done manually after install"
+        sleep 3
+        until [[ "$snapac" == y ]] || [[ "$snapac" == n ]];do
+            echo "Install snap-pac for snapshots on each pacman [in/un]install?"
+            printf "[y/n]: "
+            read snapac
+        done
         until [[ "$grbtrfs" == y ]] || [[ "$grbtrfs" == n ]];do
             echo "Install grub-btrfs to boot from snapshots?"
             printf "[y/n]: "

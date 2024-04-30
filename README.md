@@ -10,7 +10,7 @@ Along with installing software, it includes support for installing a swapfile or
 ## Script Requirements
 Before using this script, ensure that the arch installation you are planning to use this script with is: Using mkinitcpio for initramfs generation (Support for others may come later) and have, until you boot into your GUI: Unrestricted sudo/doas privileges (Mainly used for pacman, sed, echoing settings to files, and obtaining disk UUIDs).
 
-This script also assumes that the git folder was cloned in the $HOME directory and that the user is not using an Nvidia GPU
+This script also assumes that the user is not using an Nvidia GPU
 
 ## Hardening the system... how?
 

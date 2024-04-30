@@ -66,13 +66,14 @@ if [ $de == 1 ];then
     chmod +x rofi-calc.desktop powermenu.desktop
     cd
     gsettings set org.cinnamon.desktop.privacy remember-recent-files false
-    gsettings set org.cinnamon.desktop.default-applications.terminal exec alacritty
+    gsettings set org.cinnamon.desktop.default-applications.terminal exec $terminal
 fi
 if ! grep "autostart" <<< $(ls .config/);then
     mkdir .config/autostart
 fi
 if [ "$artix" == y ] && ! [ $de == 1 ];then
-    echo -e "[Desktop Entry]\nExec=/usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/wireplumber\nName=pipewire\nPath=\nType=Application\nX-KDE-AutostartScript=true" > .config/autostart/pipewire.desktop
+    #/usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/wireplumber
+    echo -e "[Desktop Entry]\nExec=/usr/bin/artix-pipewire-launcher\nName=pipewire\nPath=\nType=Application\nX-KDE-AutostartScript=true" > .config/autostart/pipewire.desktop
 fi
 echo -e "[Desktop Entry]\nType=Application\nName=Apparmor Notify\nComment=Notify User of Apparmor Denials\nTryExec=aa-notify\nExec=aa-notify -p -s 1 -w 60 -f /var/log/audit/audit.log\nStartupNotify=false\nNoDisplay=true" > .config/autostart/apparmor-notify.desktop
 if [ $dm == sddm ];then
@@ -136,24 +137,15 @@ sudo groupadd -r audit
 sudo gpasswd -a $USER audit
 sudo sed -i '/log_group/a log_group = audit/' /etc/audit/auditd.conf 
 
-#if [ $kignore == y ];then
-#    sudo sed -i 's/#IgnorePkg   =/IgnorePkg   =linux-firmware/' /etc/pacman.conf
-#    if grep 'local/linux ' <<< $(pacman -Qs);then
-#        sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux linux-headers /' /etc/pacman.conf
-#    fi
-#    if grep linux-lts <<< $(pacman -Q);then
-#        sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-lts linux-lts-headers /' /etc/pacman.conf
-#    fi
-#    if grep linux-zen <<< $(pacman -Q);then
-#        sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-zen linux-zen-headers /' /etc/pacman.conf
-#    fi
-#    if grep linux-hardened <<< $(pacman -Q);then
-#        sudo sed -i 's/IgnorePkg   =/IgnorePkg   =linux-hardened linux-hardened-headers /' /etc/pacman.conf
-#    fi
-#fi
-
 if [ "$dotfs" == y ];then
     mv ${repo}dotfiles/config/* .config/
+    if [ $terminal == alacritty ];then
+        mv ${repo}dotfiles/alacritty .config/
+    elif [ $terminal == kitty ];then
+        mv ${repo}dotfiles/kitty .config/
+    else
+        mv ${repo}dotfiles/wezterm .config/
+    fi
     #Install Thumbfast
     mkdir .config/mpv/scripts/
     cd .config/mpv/scripts/
@@ -208,7 +200,7 @@ sudo ufw allow 631
 sudo ufw allow qbittorrent
 
 # Install snap-pac (done late to reduce snapshot count)
-if [ "$snap" == y ];then
+if [ "$snapac" == y ];then
     SNAP_PAC_SKIP=y
     sudo pacman -S --noconfirm --needed snap-pac
     if [ "$artix" == y ] && [ "$grbtrfs" == y ];then
