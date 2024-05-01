@@ -1,5 +1,5 @@
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
   vim.fn.system({
     "git",
     "clone",
@@ -11,49 +11,63 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+
 local plugins = {
-    {
-        'romgrk/barbar.nvim',
-        dependencies = {'nvim-tree/nvim-web-devicons'}
-    },
-    {
-        'williamboman/mason.nvim',
-        run = 'MasonUpdate',
-        config = function() require('vim.plugins.mason') end
-    },
-    {
-        'vimwiki/vimwiki',
-        config = function() require('vim.plugins.vimwiki') end
-    },
-    {
-        'nvim-tree/nvim-tree.lua',
-        config = function() require('vim.plugins.nvim-tree') end
-    },
-    {
-        'nvim-treesitter/nvim-treesitter',
-        run = ':TSupdate',
-        config = function() require('vim.plugins.treesitter') end
-    },
-    {
+    { --Status Bar 
         'nvim-lualine/lualine.nvim',
         dependencies = {'nvim-tree/nvim-web-devicons'},
         config = function() require('vim.plugins.lualine') end
     },
-    
-    {
-        'nvim-telescope/telescope.nvim',
-        tag = '0.1.0',
-        dependencies = { {'nvim-lua/plenary.nvim'} },
-        config = function() require('vim.plugins.telescope') end
+    { -- Tabs
+        'romgrk/barbar.nvim',
+        dependencies = {
+        'nvim-tree/nvim-web-devicons',
+        'lewis6991/gitsigns.nvim'
+        },
+        init = function() vim.g.barbar_auto_setup = false end,
+        opts = {}
     },
-    {
-	
+    { -- Syntax Highlighting
+    "nvim-treesitter/nvim-treesitter",
+        build = ":TSUpdate",
+        config = function () 
+            local configs = require("nvim-treesitter.configs")
+        end
+    },
+    { -- Show Indents
+        "lukas-reineke/indent-blankline.nvim", 
+        main = "ibl", 
+        opts = {} 
+    },
+    { -- Autorepairs
+        'windwp/nvim-autopairs',
+        event = "InsertEnter",
+        config = true
+
+    },
+    { --Completions
+        "hrsh7th/nvim-cmp",
+        dependencies = {
+            "hrsh7th/cmp-buffer",
+            "hrsh7th/cmp-path",
+            "hrsh7th/cmp-cmdline",
+            "saadparwaiz1/cmp_luasnip",
+   --         "hrsh7th/cmp-nvim-lsp"
+        },
+    },
+    { --Snippets
 	    "L3MON4D3/LuaSnip",
-	    version = "1.*", 
-	    build = "make install_jsregexp"
+	    version = "v2.*",
+        dependencies = { "rafamadriz/friendly-snippets" },
+	    --build = "make install_jsregexp"
+    },
+    { -- LSP
+        "neovim/nvim-lspconfig",
+        dependencies = { 
+            "williamboman/mason.nvim",
+            "williamboman/mason-lspconfig"
+        }
     }
 }
-
-local opts = {}
 
 require("lazy").setup(plugins, opts)

@@ -1,11 +1,19 @@
 require'nvim-treesitter.configs'.setup {
-  -- A list of parser names, or "all"
-  ensure_installed = { "c", "cpp", "lua", "rust", "python", "haskell", "ruby", "vim" },
+    -- A list of parser names, or "all"
+    ensure_installed = { 
+        "bash",
+        "lua"
+    },
+    ignore_install = {""}, -- Parsers to Never Install
+    sync_install = true, -- Install "Ensure_Installed" Parsers in Sync
+    auto_install = true, -- Installs Missing Parsers Upon Entering Buffer
 
-  -- Install parsers synchronously (only applied to `ensure_installed`)
-  sync_install = false,
-  auto_install = true,
-  highlight = {
-    enable = true,
-  },
+    highlight = {
+        enable = true, -- Disabling Turns off Syntax Highliting
+        disable = {""} -- Specific Languages to Disable
+    },
+
+    indent = {
+        enable = true -- Enable Auto-Indentation
+    }
 }

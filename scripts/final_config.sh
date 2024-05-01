@@ -72,8 +72,8 @@ if ! grep "autostart" <<< $(ls .config/);then
     mkdir .config/autostart
 fi
 if [ "$artix" == y ] && ! [ $de == 1 ];then
-    #/usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/wireplumber
-    echo -e "[Desktop Entry]\nExec=/usr/bin/artix-pipewire-launcher\nName=pipewire\nPath=\nType=Application\nX-KDE-AutostartScript=true" > .config/autostart/pipewire.desktop
+    #/usr/bin/artix-pipewire-launcher
+    echo -e "[Desktop Entry]\nExec=/usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/wireplumber\nName=pipewire\nPath=\nType=Application\nX-KDE-AutostartScript=true" > .config/autostart/pipewire.desktop
 fi
 echo -e "[Desktop Entry]\nType=Application\nName=Apparmor Notify\nComment=Notify User of Apparmor Denials\nTryExec=aa-notify\nExec=aa-notify -p -s 1 -w 60 -f /var/log/audit/audit.log\nStartupNotify=false\nNoDisplay=true" > .config/autostart/apparmor-notify.desktop
 if [ $dm == sddm ];then
@@ -188,6 +188,14 @@ sudo sed -i '/cloudflare/d' /etc/ntpd.conf
 sudo sed -i 's/servers 2.arch.pool.ntp.org/servers 0.arch.pool.ntp.org/' /etc/ntpd.conf
 sudo sed -i -z 's/servers 0.arch.pool.ntp.org/servers 0.arch.pool.ntp.org\nservers 1.arch.pool.ntp.org\nservers 2.arch.pool.ntp.org\nservers 3.arch.pool.ntp.org/' /etc/ntpd.conf
 
+# Configure earlyoom
+if ! [ "$artix" == y ];then
+    sudo sed -i s,EARLYOOM_ARGS=".*",EARLYOOM_ARGS="-n -m 5 -s 5 -r 60 --ignore-root-user --avoid '(^|/)(init|Xorg|Xwayland|systemd)'", /etc/default/earlyoom
+elif [ "$init" == dinit ];then
+    sudo sed -i s,EARLYOOM_ARGS=".*",EARLYOOM_ARGS="-n -m 5 -s 5 -r 60 --ignore-root-user --avoid '(^|/)(init|Xorg|Xwayland|dinit)'", /etc/dinit.d/config/earlyoom.conf 
+#### SUPPORT FOR OTHER INITS?
+fi
+
 #Enable Firewall settings
 sudo ufw enable
 sudo ufw default deny incoming
@@ -216,7 +224,7 @@ fi
 #Enable init services
 if ! [ "$artix" == y ];then
     sudo systemctl disable systemd-timesyncd
-    sudo systemctl enable openntpd cups ufw $dm $cron apparmor auditd rngd power-profiles-daemon
+    sudo systemctl enable openntpd cups ufw $dm $cron apparmor auditd rngd earlyoom power-profiles-daemon
     if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
         sudo systemctl enable --now libvirtd.service virtlogd.socket
         sudo virsh net-autostart default
@@ -236,6 +244,7 @@ elif [ $init == dinit ]; then
     sudo dinitctl enable apparmor
     sudo dinitctl enable auditd
     sudo dinitctl enable rngd
+    sudo dinitctl enable earlyoom
     sudo dinitctl enable power-profiles-daemon
     sudo ln -s /etc/dinit.d/$dm /etc/dinit.d/boot.d/
 elif [ $init == runit ]; then
@@ -248,6 +257,7 @@ elif [ $init == runit ]; then
     sudo ln -s /etc/runit/sv/ufw /run/runit/service
     sudo ln -s /etc/runit/sv/rngd /run/runit/service
     sudo ln -s /etc/runit/sv/power-profiles-daemon /run/runit/service
+    sudo ln -s /etc/runit/sv/earlyoom /run/runit/service
     if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
         sudo ln -s /etc/runit/sv/libvirtd /run/runit/service
         sudo virsh net-autostart default
@@ -261,7 +271,8 @@ elif [ $init == openrc ]; then
     sudo rc-update add power-profiles-daemon default
     sudo rc-update add apparmor default
     sudo rc-update add auditd default
-sudo rc-update add $cron default
+    sudo rc-update add $cron default
+    sudo rc-update add earlyoom default
     if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
         sudo rc-update add libvirtd default
         sudo virsh net-autostart default
