@@ -437,7 +437,7 @@ if [ "$btrfs" == y ];then
             printf "[y/n]: "
             read grbtrfs 
         done
-        if [ "$grbtrfs" == y ] && && [ "$snapac" == y ] && [ "$artix" == y ];then
+        if [ "$grbtrfs" == y ] && [ "$snapac" == y ] && [ "$artix" == y ];then
             echo "Installing snap-pac-grub for automated grub snapshot boot entries"
         fi
         sleep 5
