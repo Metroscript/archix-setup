@@ -16,7 +16,7 @@ elif grep -E "Radeon|AMD|ATI" <<< $gpu;then
    sudo pacman -Syu --noconfirm --needed vulkan-{radeon,icd-loader} mesa{,-vdpau} opencl-rusticl-mesa libva-{mesa,vdpau}-driver
    echo -e 'RUSTICL_ENABLE=radeonsi\nRADV_PERFTEST=video_decode' | sudo tee -a /etc/environment
 elif grep -E "Intel Corporation|UHD" <<< $gpu;then
-     sudo pacman -Syu --noconfirm --needed vulkan-{intel,icd-loader} mesa opencl-rusticl-mesa lib{va-{intel-driver,utils},vdpau-driver} intel-media-driver
+     sudo pacman -Syu --noconfirm --needed vulkan-{intel,icd-loader} mesa opencl-rusticl-mesa libva-{{intel-driver,utils},vdpau-driver} intel-media-driver
      echo -e 'RUSTICL_ENABLE=iris\nANV_VIDEO_DECODE=1' | sudo tee -a /etc/environment
 fi
 sudo pacman -Syu --needed --noconfirm vkd3d
