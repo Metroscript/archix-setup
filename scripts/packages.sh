@@ -157,7 +157,10 @@ if ! [ $cron == fcron ];then
 fi
 #Artix Init Services
 if [ "$artix" == y ];then
-    sudo pacman -S --needed --noconfirm ${dm}-$init ${init}-system cups-$init openntpd-$init ufw-$init power-profiles-daemon-$init avahi-$init libvirt-$init apparmor-$init audit-$init rng-tools-$init earlyoom-$init
+    sudo pacman -S --needed --noconfirm ${dm}-$init ${init}-system cups-$init openntpd-$init ufw-$init power-profiles-daemon-$init avahi-$init apparmor-$init audit-$init rng-tools-$init earlyoom-$init
+   if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
+       sudo pacman -S libvirt-$init
+   fi
     if [ $cron == fcron ];then
        sudo pacman -Rns --noconfirm cronie-$init
        sudo pacman -S --noconfirm fcron-$init
