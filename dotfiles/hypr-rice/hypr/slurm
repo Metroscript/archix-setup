@@ -1,0 +1,95 @@
+#!/bin/sh
+#Prevent Process Stacking
+if [[ $(pgrep -f $0) != "$$" ]];then
+    echo "Error: Slurm is already running!"
+    exit 1
+fi
+
+help () {
+    printf %b "Usage: slurm [options...] [copy|save|copysave] [screen|area]\n\n  -h, --help          Display help message & exit\n  -f, --no-freeze     Don't freeze the screen when area capturing\n  -n, --no-notify     Don't send a notification with screenshot results\n"
+}
+
+while [ $# -gt 0 ]; do
+  arg="$1"
+  case $arg in
+      save | copy | copysave)
+          ACT=$arg
+          shift
+          ;;
+      screen | area )
+          ZONE=$arg
+          shift
+          ;;
+      -h | --help)
+          help
+          exit
+          ;;
+      -n | --no-notify)
+          NOTIFY=n
+          shift
+          ;;
+      -f | --no-freeze)
+          FREEZE=n
+          shift
+          ;;
+      *)      # unknown option
+          help
+          exit 2
+          ;;
+  esac
+done
+
+if ([ "$ACT" != save ] && [ "$ACT" != copy ] && [ "$ACT" != copysave ]) || ([ "$ZONE" != screen ] && [ "$ZONE" != area ]);then
+    help
+    exit 2
+fi
+
+if [ $ACT != copy ];then
+    DIR=~/Pictures/Screenshots
+    #Mkdir if not existent 
+    if ! test -d $DIR;then
+        mkdir -p $DIR
+    fi
+    FILE="Screenshot_$(date +'%Y%m%d'_'%H%M%S').png"
+    DEST=$DIR/$FILE
+fi
+
+end_freeze () {
+    if [ "$HYPRPICKER_PID" != "" ];then
+        kill $HYPRPICKER_PID
+    fi
+}
+
+if [ $ZONE == screen ];then
+    ZONE=Screen
+    SHOT=grim;else
+    ZONE=Area
+    SHOT=grim\ -g
+    if [ "$FREEZE" != n ] && command -v hyprpicker > /dev/null 2>&1;then
+        hyprpicker -rz &
+        HYPRPICKER_PID="$!"
+        sleep 0.1
+    fi
+    AREA=$(slurp)
+    if [ "$AREA" == "" ];then
+        end_freeze
+        exit
+    fi
+fi
+if [ $ACT == copy ];then
+    $SHOT"$AREA" - | wl-copy;else
+    $SHOT"$AREA" -l 9 "$DEST"
+fi
+end_freeze
+if [ $ACT == copysave ];then
+    wl-copy "$DEST"
+fi
+if [ "$NOTIFY" != n ];then
+    if [ $ACT == save ];then
+        MSG=Saved
+    elif [ $ACT == copy ];then
+        MSG="Copied to Buffer";else
+        MSG="Copied & Saved"
+    fi
+    notify-send -t 2000 -i "$DEST" "$ZONE $MSG"
+fi
