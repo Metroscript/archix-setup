@@ -157,14 +157,14 @@ fi
 #Artix Init Services
 if [ "$artix" == y ];then
     sudo pacman -S --needed --noconfirm ${dm}-$init ${init}-system cups-$init openntpd-$init ufw-$init power-profiles-daemon-$init avahi-$init apparmor-$init audit-$init rng-tools-$init earlyoom-$init clamav-$init
+    if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
+       sudo pacman -S libvirt-$init
+    fi
     if [ $cron == fcron ];then
        sudo pacman -Rns --noconfirm cronie-$init
-       sudo pacman -S --noconfirm fcron-$init
-    fi;else
-    sudo pacman -S --needed --noconfirm $cron
-    if [ $virt == 1 ] || [ $virt == 3 ];then
-        sudo pacman -S --needed --noconfirm libvirt-$init
-    if
+       sudo pacman -S --noconfirm fcron-$init;else
+       sudo pacman -S --needed --noconfirm $cron
+    fi
 fi
 
 #Hyprland 
