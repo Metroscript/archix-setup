@@ -54,7 +54,6 @@ obs,
 btop,
 mpv,
 kdenlive,
-rhythmbox (Podcast grabber),
 lollypop,
 krita,
 okular,
@@ -81,10 +80,7 @@ waybar,
 hyprpicker,
 swww,
 nwg-look,
-wlr-randr,
-grimblast,
-swaylock-effects,
-psuinfo.
+wlr-randr.
 
 __Optional:__
 Steam/WINE,
@@ -100,14 +96,13 @@ waydroid,
 plymouth,
 makeMKV,
 virtualbox
-virt-manager
-openRGB.
+virt-manager.
 
 __AUR helper:__
 paru
 
 __KEEP IN MIND:__
-Init systems other than dinit may not have services configured properly, but it shouldn't impact booting; Change to your liking after completion.
+Init systems other than dinit or runit may not have services configured properly, but it shouldn't impact booting; Change to your liking after completion.
 
 # Summary
 

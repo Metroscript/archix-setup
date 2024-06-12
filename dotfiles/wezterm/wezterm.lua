@@ -14,7 +14,7 @@ local config = {
     cursor_thickness = "0.15pt",
 
     -- Terminal Appearance
-   -- window_background_image = "$PATH_TO",
+--    window_background_image = "$PATH_TO",
     use_fancy_tab_bar = false,
     show_tab_index_in_tab_bar = false,
     hide_tab_bar_if_only_one_tab = true,
@@ -39,7 +39,6 @@ local config = {
     scrollback_lines = 10000,
     enable_scroll_bar = false,
     swallow_mouse_click_on_pane_focus = true,
-    front_end = "WebGpu",
 
     -- Alacritty Theming
     colors = {
@@ -262,4 +261,10 @@ local config = {
         },
     }
 }
+-- Enable Xwayland if using Hyprland due to bug preventing launching
+if os.getenv("XDG_CURRENT_DESKTOP") == "Hyprland" then
+	config.enable_wayland = false
+else
+	config.enable_wayland = true
+end
 return config

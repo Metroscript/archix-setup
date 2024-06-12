@@ -1,15 +1,28 @@
-#!/bin/bash
-id=~/.config/mako/icons/
-br=$(brightnessctl -m | cut -d, -f4 | sed 's/%//')
-
-if [ $br -le 20 ];then
-    i="${id}brightness-20.png"
-elif [ $br -le 40 ];then
-    i="${id}brightness-40.png"
-elif [ $br -le 60 ];then
-    i="${id}brightness-60.png"
-elif [ $br -le 80 ];then
-    i="${id}brightness-80.png";else
-    i="${id}brightness-100.png"
+#!/bin/sh
+if [ "$1" != up ] && [ "$1" != down ];then
+    echo "Error: Brightness Settings Not Set!"
+    exit 2
 fi
-notify-send -h string:x-canonical-private-synchronous:sys-notify -t 2000 -i "$i" "$br%"
+bf=$(brightnessctl -m | cut -d, -f4 | sed 's/%//')
+
+if [ $1 == up ];then
+    brightnessctl s +5%;else
+    brightnessctl s 5%-
+fi
+
+id=~/.config/mako/icons/
+ba=$(brightnessctl -m | cut -d, -f4 | sed 's/%//')
+
+if ! ([ $bf -eq 0 ] && [ $1 == down ]) && ! ([ $bf == 100 ] && [ $1 == up ]);then
+    if [ $ba -le 20 ];then
+        i="${id}brightness-20.png"
+    elif [ $ba -le 40 ];then
+        i="${id}brightness-40.png"
+    elif [ $ba -le 60 ];then
+        i="${id}brightness-60.png"
+    elif [ $ba -le 80 ];then
+        i="${id}brightness-80.png";else
+        i="${id}brightness-100.png"
+    fi
+    notify-send -h string:x-canonical-private-synchronous:sys-notify -t 2000 -i "$i" "$ba%"
+fi

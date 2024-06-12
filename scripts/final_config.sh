@@ -1,25 +1,4 @@
 #Final Configuration
-    #OpenRGB setup
-if [ $rgb == y ];then
-    #sudo sed -i 's/quiet/acpi_enforce_resources=lax quiet/' $bootdir
-    if [ $rgsmb == y ];then
-        if ! grep i2c-tools <<< $(pacman -Q);then
-            sudo pacman -Syu ic2-tools
-        fi
-        sudo modprobe i2c-dev
-        if ! grep i2c <<< $(cat /etc/group);then
-            sudo groupadd --system i2c
-        fi
-        sudo usermod $USER -aG i2c
-        echo "i2c_dev" | sudo tee /etc/modules-load.d/i2c.conf
-        if grep amd <<< $(cat $bootdir);then
-            sudo modprobe i2c-piix4
-            echo "i2c-piix4" | sudo tee /etc/modules-load.d/i2c-piix4.conf;else
-            sudo modprobe i2c-i801
-            echo "i2c-i801" | sudo tee /etc/modules-load.d/i2c-i801.conf
-        fi
-    fi
-fi
 #Plymouth check & conf
 if [ $ply == y ];then
     if [ $img == mkinit ];then
@@ -56,6 +35,7 @@ fi
 if [ $de == 1 ];then
     xdg-user-dirs-update
     mv ${repo}dotfiles/hypr-rice/* .config/
+    curl -L https://raw.githubusercontent.com/KDE/plasma-workspace/master/menu/desktop/plasma-applications.menu -o $HOME/.config/menus/applications.menu
     bmpath=file:///home/$USER/
     echo -e '${bmpath}Documents Documents\n${bmpath}Music Music\n${bmpath}Pictures Pictures\n${bmpath}Videos Videos\n${bmpath}Downloads Downloads' > .config/gtk-3.0/bookmarks
     mv ${repo}dotfiles/thumbnailers .local/share/
@@ -67,13 +47,19 @@ if [ $de == 1 ];then
     cd
     gsettings set org.cinnamon.desktop.privacy remember-recent-files false
     gsettings set org.cinnamon.desktop.default-applications.terminal exec $terminal
+    #Prevent dbus errors with flatpaks
+    sudo sed -i 's/Exec=Hyprland/Exec=dbus-run-session Hyprland/' /usr/share/wayland-sessions/hyprland.desktop
+    hyprpm update
+    hyprpm add https://github.com/hyprwm/hyprland-plugins
+    if [ $games == y ];then
+        hyprpm enable csgo-vulkan-fix
+    fi
 fi
 if ! grep "autostart" <<< $(ls .config/);then
     mkdir .config/autostart
 fi
 if [ "$artix" == y ] && ! [ $de == 1 ];then
-    #/usr/bin/artix-pipewire-launcher
-    echo -e "[Desktop Entry]\nExec=/usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/wireplumber\nName=pipewire\nPath=\nType=Application\nX-KDE-AutostartScript=true" > .config/autostart/pipewire.desktop
+    echo -e "[Desktop Entry]\nExec=/usr/bin/pkill -x pipewire\|wireplumber ; /usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/sleep 1 ; /usr/bin/wireplumber &\nName=Pipewire\nType=Application\nX-KDE-AutostartScript=true" > .config/autostart/pipewire.desktop
 fi
 echo -e "[Desktop Entry]\nType=Application\nName=Apparmor Notify\nComment=Notify User of Apparmor Denials\nTryExec=aa-notify\nExec=aa-notify -p -s 1 -w 60 -f /var/log/audit/audit.log\nStartupNotify=false\nNoDisplay=true" > .config/autostart/apparmor-notify.desktop
 if [ $dm == sddm ];then
@@ -103,6 +89,9 @@ if ! grep quiet $bootdir;then
     sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="quiet/' $bootdir
 fi
 sudo sed -i 's/quiet/lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off random.trust_cpu=off quiet/' $bootdir
+if ! grep nowatchdog <<< $(cat $bootdir);then
+    sudo sed -i 's/quiet/nowatchdog quiet/' $bootdir
+fi
 if ! grep loglevel <<< $(cat $bootdir);then
     sudo sed -i 's/quiet/loglevel=0 quiet/' $bootdir;else
     sudo sed -i 's/loglevel=./loglevel=0/' $bootdir
@@ -150,8 +139,8 @@ if [ "$dotfs" == y ];then
     mkdir .config/mpv/scripts/
     cd .config/mpv/scripts/
     #Standard OSC
-    wget 'https://github.com/po5/thumbfast/blob/5fefc9b8e995cf5e663666aa10649af799e60186/player/lua/osc.lua'
-    wget 'https://github.com/po5/thumbfast/blob/03e93feee5a85bf7c65db953ada41b4826e9f905/thumbfast.lua'
+    wget 'https://raw.githubusercontent.com/po5/thumbfast/5fefc9b8e995cf5e663666aa10649af799e60186/player/lua/osc.lua'
+    wget 'https://raw.githubusercontent.com/po5/thumbfast/master/thumbfast.lua'
     cd
     if [ $games == y ] && ! grep Games <<< $(ls);then
         mkdir Games
@@ -192,7 +181,9 @@ sudo sed -i -z 's/servers 0.arch.pool.ntp.org/servers 0.arch.pool.ntp.org\nserve
 if ! [ "$artix" == y ];then
     sudo sed -i s,EARLYOOM_ARGS=".*",EARLYOOM_ARGS="-n -m 5 -s 5 -r 60 --ignore-root-user --avoid '(^|/)(init|Xorg|Xwayland|systemd)'", /etc/default/earlyoom
 elif [ "$init" == dinit ];then
-    sudo sed -i s,EARLYOOM_ARGS=".*",EARLYOOM_ARGS="-n -m 5 -s 5 -r 60 --ignore-root-user --avoid '(^|/)(init|Xorg|Xwayland|dinit)'", /etc/dinit.d/config/earlyoom.conf 
+    sudo sed -i s,EARLYOOM_ARGS=".*",EARLYOOM_ARGS="-n -m 5 -s 5 -r 60 --ignore-root-user --avoid '(^|/)(init|Xorg|Xwayland|dinit)'", /etc/dinit.d/config/earlyoom.conf
+else
+    sudo sed -i s,EARLYOOM_ARGS=".*",EARLYOOM_ARGS="-n -m 5 -s 5 -r 60 --ignore-root-user --avoid '(^|/)(init|Xorg|Xwayland|$init)'", /etc/default/earlyoom
 #### SUPPORT FOR OTHER INITS?
 fi
 
@@ -221,10 +212,13 @@ if [ $img == mkinit ];then
     sudo mkinitcpio -P
 fi
 
+# ClamAV setup
+sudo touch /var/log/clamav/freshclam.log
+
 #Enable init services
 if ! [ "$artix" == y ];then
     sudo systemctl disable systemd-timesyncd
-    sudo systemctl enable openntpd cups ufw $dm $cron apparmor auditd rngd earlyoom power-profiles-daemon
+    sudo systemctl enable openntpd cups ufw $dm $cron apparmor auditd rngd earlyoom power-profiles-daemon freshclam
     if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
         sudo systemctl enable --now libvirtd.service virtlogd.socket
         sudo virsh net-autostart default
@@ -239,6 +233,7 @@ elif [ $init == dinit ]; then
     sudo dinitctl enable $cron
     if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
         sudo dinitctl enable libvirtd
+        sudo dinitctl enable virtlogd
         sudo virsh net-autostart default
     fi
     sudo dinitctl enable apparmor
@@ -246,6 +241,7 @@ elif [ $init == dinit ]; then
     sudo dinitctl enable rngd
     sudo dinitctl enable earlyoom
     sudo dinitctl enable power-profiles-daemon
+    sudo dinitctl enable freshclam 
     sudo ln -s /etc/dinit.d/$dm /etc/dinit.d/boot.d/
 elif [ $init == runit ]; then
     sudo ln -s /etc/runit/sv/ntpd /run/runit/service
@@ -258,8 +254,10 @@ elif [ $init == runit ]; then
     sudo ln -s /etc/runit/sv/rngd /run/runit/service
     sudo ln -s /etc/runit/sv/power-profiles-daemon /run/runit/service
     sudo ln -s /etc/runit/sv/earlyoom /run/runit/service
+    sudo ln -s /etc/runit/sv/freshclam /run/runit/service
     if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
         sudo ln -s /etc/runit/sv/libvirtd /run/runit/service
+        sudo ln -s /etc/runit/sv/virtlogd /run/runit/service
         sudo virsh net-autostart default
     fi
 elif [ $init == openrc ]; then
@@ -273,8 +271,10 @@ elif [ $init == openrc ]; then
     sudo rc-update add auditd default
     sudo rc-update add $cron default
     sudo rc-update add earlyoom default
+    sudo rc-update add freshclam default
     if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
         sudo rc-update add libvirtd default
+        sudo rc-update add virtlogd default
         sudo virsh net-autostart default
     fi
 elif [ $init == s6 ];then
@@ -287,8 +287,11 @@ elif [ $init == s6 ];then
     sudo touch /etc/s6/adminsv/default/contents.d/apparmor
     sudo touch /etc/s6/adminsv/default/contents.d/auditd
     sudo touch /etc/s6/adminsv/default/contents.d/power-profiles-daemon
+    sudo touch /etc/s6/adminsv/default/contents.d/earlyoom
+    sudo touch /etc/s6/adminsv/default/contents.d/freshclam
     if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
         sudo touch /etc/s6/adminsv/default/contents.d/libvirtd
+        sudo touch /etc/s6/adminsv/default/contents.d/virtlogd
         sudo virsh net-autostart default
     fi
     sudo s6-db-reload

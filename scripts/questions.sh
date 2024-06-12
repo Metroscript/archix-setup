@@ -30,7 +30,6 @@ fi
 if grep -q Artix <<< $(cat /etc/issue);then
     artix=y
     sdir=/etc/elogind/
-    sed -i -e 's/#exec-once/exec-once/' -i -e '/--systemd/d' -i -e '/systemctl/d' ${repo}dotfiles/hypr-rice/hypr/hyprland.conf
     sed -i -e 's/action" : "reboot/action" : "loginctl reboot/' -i -e 's/poweroff/loginctl poweroff/' -i -e 's/action" : "suspend/action" : "loginctl suspend/' ${repo}dotfiles/hypr-rice/wlogout/layout
     if grep -q openrc <<< $(pacman -Q);then
         init=openrc
@@ -50,7 +49,7 @@ if grep -q opendoas <<< $(pacman -Q);then
     suas=y
     alias sudo='doas'
     sed -i "/stuff/a alias sudo=doas" ${repo}dotfiles/bashrc
-    sed -i "/stuff/a alias sudo 'doas'" ${repo}dotfiles/config.fish
+    sed -i "/stuff/a alias sudo doas" ${repo}dotfiles/config.fish
 fi
 
 if grep -q btrfs <<< $(sudo blkid);then
@@ -91,6 +90,12 @@ until [ "$bin" == y ] || [ "$bin" == n ];do
     read bin
 done
 
+until [ "$fver" == y ] || [ "$fver" == n ];do
+    echo "Sorry, please try again."
+    printf "Configure flatpak to only install verified apps? [y/n]: "
+    read fver
+done
+
 printf "Enable compile optimisations such as multithreading & native binaries to makepkg.conf? [y/n]: "
 read opt
 until [ "$opt" == y ] || [ "$opt" == n ];do
@@ -116,13 +121,13 @@ if [ $terminal == 1 ];then
     terminal=alacritty
 elif [ $terminal == 2 ];then
     terminal=kitty
-    sed -i 's/alacritty/kitty/' ${repo}dotfiles/hypr-rice/hypr/hyprland.conf
+    sed -i 's/bind = CONTROL ALT, T, exec, alacritty/bind = CONTROL ALT, T, exec, kitty/' ${repo}dotfiles/hypr-rice/hypr/hyprland.conf
     sed -i 's/alacritty/kitty/g' ${repo}dotfiles/hypr-rice/waybar/config.jsonc
     sed -i "/ffmpeg/a   alias icat='kitty icat'" ${repo}dotfiles/bashrc
     sed -i "/ffmpeg/a   alias icat 'kitty icat'" ${repo}dotfiles/config.fish
 else
     terminal=wezterm
-    sed -i 's/alacritty/wezterm/' ${repo}dotfiles/hypr-rice/hypr/hyprland.conf
+    sed -i 's/bind = CONTROL ALT, T, exec, alacritty/bind = CONTROL ALT, T, exec, wezterm/' ${repo}dotfiles/hypr-rice/hypr/hyprland.conf
     sed -i 's/alacritty/wezterm/g' ${repo}dotfiles/hypr-rice/waybar/config.jsonc
     sed -i "/ffmpeg/a   alias icat='wezterm imgcat'" ${repo}dotfiles/bashrc
     sed -i "/ffmpeg/a   alias icat 'wezterm imgcat'" ${repo}dotfiles/config.fish
@@ -152,11 +157,11 @@ until [[ "$games" == y ]] || [[ "$games" == n ]];do
     read games
 done
 if [ $games == y ];then
-    until [[ "$32gperf" == y ]] || [[ "$32gperf" == n ]];do
-        echo "Install 32-bit gperf tools for VAC games?"
-        printf "[y/n]: "
-        read 32gperf
-    done
+#    until [[ "$32gperf" == y ]] || [[ "$32gperf" == n ]];do
+#        echo "Install 32-bit gperf tools for VAC games?"
+#        printf "[y/n]: "
+#        read 32gperf
+#    done
     printf "Install Vinegar? (A WINE wrapper for Roblox) [y/n]: "
     read rlx
     until [ "$rlx" == y ] || [ "$rlx" == n ];do
@@ -315,20 +320,6 @@ until [ "$makemkv" == y ] || [ "$makemkv" == n ];do
     printf "Install MakeMKV? (A DVD/Bluray ripper) [y/n]: "
     read makemkv
 done
-printf "Install OpenRGB? (RGB management software) [y/n]: "
-read rgb
-until [ "$rgb" == y ] || [ "$rgb" == n ];do
-    printf "Install OpenRGB? (RGB management software) [y/n]: "
-    read rgb
-done
-if [ $rgb == y ];then
-    printf "Are you planning to control motherboard or RAM LEDs? [y/n]: "
-    read rgsmb
-    until [ "$rgsmb" == y ] || [ "$rgsmb" == n ];do
-        printf "Are you planning to control motherboard or RAM LEDs? [y/n]: "
-        read rgsmb
-    done
-fi
 if [ $img == mkinit ];then
     printf "Install mkinitcpio-firmware (Removes missing firmware warnings when generating initramfs) [y/n]: "
     read mkfirm
@@ -338,13 +329,6 @@ if [ $img == mkinit ];then
         read mkfirm
     done
 fi
-#printf "Add installed kernels & firmware to IgnorePkg? [y/n]: "
-#read kignore
-#until [ "$kignore" == y ] || [ "$kignore" == n ];do
-#    echo "Sorry, please try again."
-#    printf "Add installed kernels & firmware to IgnorePkg? [y/n]: "
-#    read kignore
-#done
 
 echo "Enable Kernel lockdown to prevent modification of kernel during runtime? (Prevents non-signed kernel modules from loading & disables hibernation)"
 echo "0.No (Default) 1.Integrity (Standard Lockdown) 2.Confidential (Changes how RAM is accessed; Can cause issues)"
