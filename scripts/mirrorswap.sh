@@ -1,10 +1,11 @@
-#Repo config + doas base-devel packages
+#Artix Repos
 if [ "$artix" == y ];then
     sudo sed -i -z -e 's,\[galaxy\]\nInclude = /etc/pacman.d/mirrorlist,\[galaxy\]\nInclude = /etc/pacman.d/mirrorlist,' -i -z -e 's,\[lib32\]\n#Include = /etc/pacman.d/mirrorlist,\[lib32\]\n#Include = /etc/pacman.d/mirrorlist\n\n#Arch Repos\n\n#\[extra-testing\]\n#Include = /etc/pacman.d/mirrorlist-arch\n\n#\[extra\]\n#Include = /etc/pacman.d/mirrorlist-arch\n\n#\[multilib-testing\]\n#Include = /etc/pacman.d/mirrorlist-arch\n\n#\[multilib\]\n#Include = /etc/pacman.d/mirrorlist-arch,' /etc/pacman.conf
     sudo pacman -Syu --needed --noconfirm artix-archlinux-support
     sudo sed -i -e "/\[lib32\]/,/Include/"'s/^#//' -i -e "/\[extra\]/,/Include/"'s/^#//' /etc/pacman.conf
     sudo pacman-key --populate
 fi
+#Pacman Config
 sudo sed -i -e 's/#Color/Color/' -i -e '/Color/a ILoveCandy' -i -e 's/#Verbose/Verbose/' -i -e 's/#Parallel/Parallel/' -i -e "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
 sudo pacman -Syu --needed --noconfirm base-devel
 if [ "$suas" == y ];then
@@ -13,6 +14,7 @@ if [ "$suas" == y ];then
 fi
 sudo pacman -Syu --noconfirm --needed pacman-contrib pkgfile
 sudo pkgfile -uz "zstd -T0 -19"
+#Mirror Setup
 tz=$(curl https://ipapi.co/timezone)
 if [ $mirrorsort == y ];then
     sudo pacman -Syu --needed --noconfirm reflector rsync neovim
@@ -32,6 +34,7 @@ if [ $mirrorsort == y ];then
     fi
 fi
 
+#BTRFS Snapshots
 if [ "$btrfs" == y ];then
     sudo pacman -Syu --needed --noconfirm btrfs-progs 
     if [ "$snap" == y ];then
@@ -51,7 +54,7 @@ if [ "$btrfs" == y ];then
     fi
 fi
 
-#Make Swapfile
+#Swapfile
 if [ "$swap" -gt 0 ];then
     if [ "$btrfs" == y ];then
         cd /
@@ -73,14 +76,6 @@ if [ "$swap" -gt 0 ];then
         sudo sed -i "s.quiet.resume=$(cat /etc/fstab | grep '/ ' | cut -d/ -f1 | awk '{$1=$1};1') resume_offset=$(if [ "$btrfs" == y ];then sudo btrfs inspect-internal map-swapfile -r /${swapvol}/swapfile;else sudo filefrag -v /.swapfile | awk '$1=="0:" {print substr($4, 1, length($4)-2)}';fi) quiet." $bootdir
         if [ $img == mkinit ];then
             sudo sed -i 's/filesystems/filesystems resume/' /etc/mkinitcpio.conf
-        ###############################################
-        ####### OTHER INITRAMFS GEN SUPPORT ###########
-        ###############################################
-        #elif [ $img == dracut ];then
-        #    sudo sh -c 'echo add_dracutmodules+=\" resume \" > /etc/dracut.conf.d/resume.conf'
-        #    sudo dracut-rebuild #;else
-            #BOOSTER STUFF HERE
-            #sudo booster build
         fi
         if ! grep 'sleep.conf.d' <<< $(ls $sdir);then
             sudo mkdir ${sdir}sleep.conf.d
@@ -92,6 +87,7 @@ if [ "$swap" -gt 0 ];then
     fi
 fi
 
+#ZRAM
 if [ "$zram" -gt 0 ];then
     echo 'zram' | sudo tee /etc/modules-load.d/zram.conf
     echo 'options zram num_devices=1' | sudo tee /etc/modprobe.d/zram.conf

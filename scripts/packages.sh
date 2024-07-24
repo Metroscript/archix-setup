@@ -30,7 +30,10 @@ elif grep -E "Intel Corporation|UHD" <<< $gpu;then
 fi
 
 #Basic packages
-sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber man-db wayland xorg-xwayland smartmontools strace v4l2loopback-dkms gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{dejavu,liberation,hack-nerd,ubuntu-font-family} bash-language-server cups{,-pk-helper,-pdf} gutenprint net-tools power-profiles-daemon gparted foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley ufw fuse fastfetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{archiver,rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay hunspell{,-en_{au,gb,us}} libpulse keepassxc gst-{libav,plugins-{base,good}} imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq nvme-cli apparmor audit python-{notify2,psutil} noise-suppression-for-voice wl-clipboard rng-tools opensc btop mpv lollypop qbittorrent nvtop $shell openntpd libressl earlyoom $terminal clamav
+sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber man-db wayland xorg-xwayland smartmontools strace v4l2loopback-dkms gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{dejavu,liberation,hack-nerd,ubuntu-font-family} bash-language-server cups{,-pk-helper,-pdf} gutenprint net-tools power-profiles-daemon gparted foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley ufw fuse fastfetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{archiver,rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay hunspell{,-en_{au,gb,us}} libpulse keepassxc gst-{libav,plugins-{base,good}} imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq nvme-cli noise-suppression-for-voice wl-clipboard rng-tools opensc btop mpv lollypop qbittorrent nvtop $shell openntpd libressl earlyoom $terminal clamav
+if [ $apparmr == y ];then
+    sudo pacman -S --needed --noconfirm apparmor audit python-{notify2,psutil}
+fi
 if [ $terminal == kitty ];then
     sudo pacman -S --needed --noconfirm python-pygments
 fi
@@ -60,10 +63,8 @@ if grep "linux-hardened" <<< $(pacman -Q);then
    sudo pacman -Syu --needed --noconfirm flatpak bubblewrap-suid;else
    sudo pacman -Syu --needed --noconfirm flatpak bubblewrap
 fi
-if [ $fver == y ];then
-    flatpak remote-add --if-not-exists --subset=verified flathub https://flathub.org/repo/flathub.flatpakrepo;else
-    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-fi
+
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
 #Games, etc
 if [ $games == y ];then
@@ -140,9 +141,6 @@ if [ "$makemkv" == y ];then
     paru -S makemkv
     echo "sg" | sudo tee /etc/modules-load.d/sg.conf
 fi
-#if [ "$32gperf" == y ];then
-#    paru -S lib32-gperftools
-#fi
 if [ "$artix" == y ];then
     sudo pacman -S --needed --noconfirm librewolf;else
     paru -S librewolf-bin
@@ -156,7 +154,10 @@ if ! [ $cron == fcron ];then
 fi
 #Artix Init Services
 if [ "$artix" == y ];then
-    sudo pacman -S --needed --noconfirm ${dm}-$init ${init}-system cups-$init openntpd-$init ufw-$init power-profiles-daemon-$init avahi-$init apparmor-$init audit-$init rng-tools-$init earlyoom-$init clamav-$init
+    sudo pacman -S --needed --noconfirm ${dm}-$init ${init}-system cups-$init openntpd-$init ufw-$init power-profiles-daemon-$init avahi-$init audit-$init rng-tools-$init earlyoom-$init clamav-$init
+    if [ $apparmr == y ];then
+        sudo pacman -S --needed --noconfirm apparmor-$init
+    fi
     if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
        sudo pacman -S libvirt-$init
     fi
@@ -167,12 +168,13 @@ if [ "$artix" == y ];then
     fi
 fi
 
-#Hyprland 
+#Hyprland
 if [ $de == 1 ];then
     sudo pacman -Syu --needed --noconfirm rofi-wayland waybar wlr-randr nwg-look cliphist qt6-wayland pavucontrol nemo{,-{fileroller,share}} catdoc odt2txt poppler libgsf gvfs-{mtp,afc,nfs,smb} ffmpegthumbnailer polkit-kde-agent imv calcurse brightnessctl udiskie wlsunset hypr{land,idle,lock} xdg-desktop-portal-hyprland papirus-icon-theme breeze-{icons,gtk} mako simple-scan gnome-font-viewer okular ttf-noto-nerd
     paru -S --needed wlogout hyprpicker swww qt6ct-kde
     flatpak install -y com.github.tchx84.Flatseal
 sudo pacman -Syu --needed --noconfirm rofi-calc
+#KDE
 elif [ $de == 2 ];then
     sudo pacman -Syu --needed --noconfirm plasma-meta cryfs flatpak-kcm fwupd packagekit-qt6 xdg-desktop-portal-{kde,gtk} gwenview kimageformats qt6-imageformats dolphin{,-plugins} ffmpegthumbs kde{-{inotify-survey,cli-tools},graphics-thumbnailers,network-filesharing} kio-{admin,fuse,extras} purpose icoutils libappimage openexr perl taglib kmousetool colord-kde kcolorchooser okular ebook-tools spectacle svgpart kcron ark filelight kate kcalc kcharselect kclock kdialog keditbookmarks kweather markdownpart print-manager skanpage tesseract-data-eng maliit-keyboard breeze5
     if [ $ply == y ];then

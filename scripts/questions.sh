@@ -1,32 +1,25 @@
 #Start in $HOME to require less user input
-cd ~
+cd $HOME
 
-if grep mkinitcpio <<< $(pacman -Q);then
+if grep -q mkinitcpio <<< $(pacman -Q);then
     img=mkinit
-elif grep dracut <<< $(pacman -Q);then
+elif grep -q dracut <<< $(pacman -Q);then
     img=dracut;else
     img=booster
 fi
-###################################################################################################
-########### ADD SUPPORT FOR OTHER INITRAMFs GENERATORs? ###########################################
-###################################################################################################
-#if ( [ $img == dracut ] && ! grep 'hostonly="true"' /etc/dracut.conf.d/* ) || ( [ $img == booster ] && ! grep 'universal: false' /etc/booster.yaml && ! grep 'universal: true' /etc/booster.yaml );then
-#    printf "Enable hostonly initramfs generation? (Speeds up generation by excluding modules your system doesn't need) [y/n]: "
-#    read hostonly
-#    until [ $hostonly == y ] || [ $hostonly == n ];do
-#        printf "Enable hostonly initramfs generation? (Speeds up generation by excluding modules your system doesn't need) [y/n]: "
-#        read hostonly
-#    done
-#    if [ $hostonly == y ];then
-#        if [ $img == dracut ];then
-#            sudo sh -c 'echo hostonly=\"yes\" > /etc/dracut.conf.d/hostonly.conf'
-#            sudo dracut-rebuild #;else
-            #sudo sh -c 'echo "universal: false" >> /etc/booster.yaml'
-            #sudo booster build
-#        fi
-#    fi
-#fi
 
+if ! [ $img == mkinit ];then
+    echo "ERROR: This script doesn't support initramfs generators other than mkinitcpio. Proceed at your own risk."
+    wait 3
+    until [ "$imgcont" == y ] || [ "$imgcont" == n ];do
+        printf "Continue? [y/n]: "
+        read imgcont
+    done
+    if [ $imgcont == n ];then
+        echo EXITING....
+        exit 1
+    fi
+fi
 if grep -q Artix <<< $(cat /etc/issue);then
     artix=y
     sdir=/etc/elogind/
@@ -56,9 +49,6 @@ if grep -q btrfs <<< $(sudo blkid);then
     btrfs=y
 fi
 
-############################################################################
-########### ADD SUPPORT FOR OTHER GUIs? ####################################
-############################################################################
 echo "Which DE/WM would you like to install? 1.Hyprland or 2.KDE Plasma"
 printf "[1/2]: "
 read de
@@ -70,9 +60,6 @@ done
 if [ $de == 1 ] || [ $de == 2 ];then
     dm=sddm
 fi
-############################################################################
-####################### END OF PROBLEM AREA ################################
-############################################################################
 
 printf "Use repo dotfiles? (Does not apply to Hyprland Rice) [y/n]: "
 read dotfs
@@ -90,12 +77,6 @@ until [ "$bin" == y ] || [ "$bin" == n ];do
     read bin
 done
 
-until [ "$fver" == y ] || [ "$fver" == n ];do
-    echo "Sorry, please try again."
-    printf "Configure flatpak to only install verified apps? [y/n]: "
-    read fver
-done
-
 printf "Enable compile optimisations such as multithreading & native binaries to makepkg.conf? [y/n]: "
 read opt
 until [ "$opt" == y ] || [ "$opt" == n ];do
@@ -104,11 +85,9 @@ until [ "$opt" == y ] || [ "$opt" == n ];do
     read opt
 done
 
-printf "Install multithreaded drop-ins for gzip & bzip2? [y/n]: "
-read mtdi
-until [ "$mtdi" == y ] || [ "$mtdi" == n ];do
-    echo "Sorry, please try again."
-    printf "Install multithreaded drop-ins for gzip & bzip2? [y/n]: "
+until [[ "$mtdi" == y ]] || [[ "$mtdi" == n ]];do
+    echo "Install multithreaded drop-ins for gzip & bzip2?"
+    printf "[y/n]: "
     read mtdi
 done
 
@@ -157,11 +136,6 @@ until [[ "$games" == y ]] || [[ "$games" == n ]];do
     read games
 done
 if [ $games == y ];then
-#    until [[ "$32gperf" == y ]] || [[ "$32gperf" == n ]];do
-#        echo "Install 32-bit gperf tools for VAC games?"
-#        printf "[y/n]: "
-#        read 32gperf
-#    done
     printf "Install Vinegar? (A WINE wrapper for Roblox) [y/n]: "
     read rlx
     until [ "$rlx" == y ] || [ "$rlx" == n ];do
@@ -258,17 +232,18 @@ until [ "$office" == y ] || [ "$office" == n ];do
     printf "[y/n]: "
     read office
 done
-echo "What shell would you like to use? (Use BASH if unsure) 1.BASH 2.FISH"
-printf "[1/2]: "
-read shell
-until [ "$shell" == 1 ] || [ "$shell" == 2 ];do
-    echo "What shell would you like to use? (Use BASH if unsure) 1.BASH 2.FISH"
-    printf "[1/2]: "
+until [[ "$shell" == 1 ]] || [[ "$shell" == 2 ]] || [[ "$shell" == 3 ]] || [[ "$shell" == 4 ]];do
+    echo "What shell would you like to use? (Use BASH if unsure) 1.BASH 2.FISH 3.ZSH 4.DASH"
+    printf "[1/2/3/4]: "
     read shell
 done
 if [ $shell == 1 ];then
-    shell=bash;else
+    shell=bash
+elif [ $shell == 2 ];then
     shell=fish
+elif [ $shell == 3 ];then
+    shell=zsh;else
+    shell=dash
 fi
 echo "What cron would you like? (If unsure, choose Cronie) 1.Cronie or 2.Fcron"
 printf "[1/2]: "
@@ -354,6 +329,12 @@ if [ $lckdwn -gt 0 ] && [ "$virt" -ge 2 ];then
         lckdwn=0
     fi
 fi
+
+until [ "$apparmr" == y ] || [ "$apparmr" == n ];do
+    echo "Install apparmor for app sandboxing / Mandatory Access Control configuration?"
+    printf "[y/n]: "
+    read apparmr
+done
 
 if ! grep Size <<< $(swapon -s);then
     echo "Swapfile size in GiB. Matching RAM size OR RAM x 1.5 sized swap is usually a good choice for hibernation. Put '0' for no swapfile."

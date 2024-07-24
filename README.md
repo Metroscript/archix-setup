@@ -5,20 +5,20 @@ A setup script with some personal dotfiles to aid you in installing Arch and/or 
 ## What does the script do?
 
 The script is designed to install Arch/Artix Linux with my custom Hyprland rice though, I do not use it much any more, but the rice should still function as intended.
-Along with installing software, it includes support for installing a swapfile or zram if you lack swap & adding resume-from-disk/hibernate support, Plus some - to my knowledge; unintrusive security features which should have minimum compatability issues, aside from possible issues with slow hardware as vm.max_map_count is set to the 64 bit integer limit -3; same as Fedora.
+Along with installing software, it includes support for installing a swapfile or zram if you lack swap & adding resume-from-disk/hibernate support, Plus some security parameters which should have minimum compatability issues, aside from possible issues with slow hardware as vm.max_map_count is set to the 64 bit integer limit -3; same as Fedora.
 
 ## Script Requirements
-Before using this script, ensure that the arch installation you are planning to use this script with is: Using mkinitcpio for initramfs generation (Support for others may come later) and have, until you boot into your GUI: Unrestricted sudo/doas privileges (Mainly used for pacman, sed, echoing settings to files, and obtaining disk UUIDs).
+Before using this script, ensure that the arch installation you are planning to use this script with is: Using mkinitcpio for initramfs generation and have sudo/doas privileges.
 
 This script also assumes that the user is not using an Nvidia GPU
 
 ## Hardening the system... how?
 
-The script sets multiple sysctl.d parameters, most of which are what you'd find built in to the linux-hardened kernel, activating apparmor & audit that, once rules are made; restricts an apps access what it needs & alerting you if apparmor stops an app from doing sometihing. Along with enabling some other kernel parameters that manage memory, enabling ipv6 privacy extentions if networkmanager is installed, changing the machine-id so that it's generic, adding a delay when passwords fail, locking 'su' use to :wheel only, preventing root in ssh & installing the ufw firewall which you can configure to your liking later.
+The script sets multiple sysctl.d parameters, most of which are what you'd find built in to the linux-hardened kernel, activating apparmor & audit that, once rules are made; restricts an apps access what it needs & alerting you if apparmor stops an app from doing sometihing. Along with enabling some other kernel parameters that manage memory, enabling ipv6 privacy extentions if networkmanager is installed, adding a delay when passwords fail, locking 'su' use to :wheel only, preventing root in ssh & installing the ufw firewall which you can configure to your liking later.
 
 There is also an option to enable a kernel lockdown setting of your choice during installation.
 
-These setting modifications aren't perfect or necessarily significant to system security as a whole, but are nice to have and better than nothing.
+These modifications aren't perfect or necessarily significant to system security as a whole, but are nice to have and better than nothing.
 
 
 ## What does install specifically?

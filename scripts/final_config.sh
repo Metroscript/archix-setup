@@ -1,4 +1,3 @@
-#Final Configuration
 #Plymouth check & conf
 if [ $ply == y ];then
     if [ $img == mkinit ];then
@@ -19,16 +18,6 @@ if [ $ply == y ];then
             sudo pacman -Syu --needed --noconfirm breeze-plymouth
         fi
         sudo plymouth-set-default-theme $plytheme
-        ###########################################
-        ###### OTHER INITRAMFS GEN SUPPORT ########
-        ###########################################;else
-        #if [ $de == 2 ];then
-        #    sudo sed -i "s/Theme=.*/Theme=$plytheme/" /etc/plymouth/plymouthd.conf;else
-        #fi
-        #if [ $img == dracut ];then
-        #    sudo dracut-rebuild #;else
-        #    #sudo booster build
-        #fi
     fi
 fi
 
@@ -61,16 +50,17 @@ fi
 if [ "$artix" == y ] && ! [ $de == 1 ];then
     echo -e "[Desktop Entry]\nExec=/usr/bin/pkill -x pipewire\|wireplumber ; /usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/sleep 1 ; /usr/bin/wireplumber &\nName=Pipewire\nType=Application\nX-KDE-AutostartScript=true" > .config/autostart/pipewire.desktop
 fi
-echo -e "[Desktop Entry]\nType=Application\nName=Apparmor Notify\nComment=Notify User of Apparmor Denials\nTryExec=aa-notify\nExec=aa-notify -p -s 1 -w 60 -f /var/log/audit/audit.log\nStartupNotify=false\nNoDisplay=true" > .config/autostart/apparmor-notify.desktop
+if [ $apparmr == y ];then
+    echo -e "[Desktop Entry]\nType=Application\nName=Apparmor Notify\nComment=Notify User of Apparmor Denials\nTryExec=aa-notify\nExec=aa-notify -p -s 1 -w 60 -f /var/log/audit/audit.log\nStartupNotify=false\nNoDisplay=true" > .config/autostart/apparmor-notify.desktop
+fi
 if [ $dm == sddm ];then
     if [ $de == 2 ];then
     echo -e '[Theme]\nCurrent=breeze' | sudo tee /etc/sddm.conf;else
     echo -e '[Theme]\nCurrent=archlinux-simplyblack' | sudo tee /etc/sddm.conf
     fi
 fi
-########################################
-############# HARDENING ################
-########################################
+
+#Sysctl rules
 if ! grep "sysctl.d" <<< $(ls /etc/);then
     sudo mkdir /etc/sysctl.d/
 fi
@@ -88,7 +78,15 @@ fi
 if ! grep quiet $bootdir;then
     sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="quiet/' $bootdir
 fi
-sudo sed -i 's/quiet/lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off random.trust_cpu=off quiet/' $bootdir
+if [ $apparmr == y ];then
+    sudo sed -i 's/quiet/lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off random.trust_cpu=off quiet/' $bootdir
+    #Apparmor audit settings
+    sudo sed -i 's/#write-cache/write-cache/' /etc/apparmor/parser.conf
+    sudo groupadd -r audit
+    sudo gpasswd -a $USER audit
+    sudo sed -i '/log_group/a log_group = audit' /etc/audit/auditd.conf;else
+    sudo sed -i 's/quiet/slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off random.trust_cpu=off quiet/' $bootdir
+fi
 if ! grep nowatchdog <<< $(cat $bootdir);then
     sudo sed -i 's/quiet/nowatchdog quiet/' $bootdir
 fi
@@ -98,9 +96,9 @@ if ! grep loglevel <<< $(cat $bootdir);then
 fi
 if [ $lckdwn -gt 0 ];then
     if [ $lckdwn == 1 ];then
-        sudo sed -i 's/audit=1/lockdown=integrity audit=1/' $bootdir
+        sudo sed -i 's/slab_nomerge/lockdown=integrity slab_nomerge/' $bootdir
     else
-        sudo sed -i 's/audit=1/lockdown=confidentiality audit=1/' $bootdir
+        sudo sed -i 's/slab_nomerge/lockdown=confidentiality slab_nomerge/' $bootdir
     fi
 fi
 sudo grub-mkconfig -o /boot/grub/grub.cfg
@@ -120,12 +118,6 @@ fi
 #Restrict 'su' to :wheel
 sudo sed -i 's/#auth           required        pam_wheel.so use_uid/auth            required        pam_wheel.so use_uid/' /etc/pam.d/su /etc/pam.d/su-l
 
-#Apparmor audit settings
-sudo sed -i 's/#write-cache/write-cache/' /etc/apparmor/parser.conf
-sudo groupadd -r audit
-sudo gpasswd -a $USER audit
-sudo sed -i '/log_group/a log_group = audit/' /etc/audit/auditd.conf 
-
 if [ "$dotfs" == y ];then
     mv ${repo}dotfiles/config/* .config/
     if [ $terminal == alacritty ];then
@@ -144,6 +136,7 @@ if [ "$dotfs" == y ];then
     cd
     if [ $games == y ] && ! grep Games <<< $(ls);then
         mkdir Games
+        sudo setcap 'CAP_SYS_NICE=eip' $(which gamescope)
     fi
     if [ "$rlx" == y ];then
         mkdir -p .var/app/org.vinegarhq.Vinegar/config/
@@ -184,7 +177,6 @@ elif [ "$init" == dinit ];then
     sudo sed -i s,EARLYOOM_ARGS=".*",EARLYOOM_ARGS="-n -m 5 -s 5 -r 60 --ignore-root-user --avoid '(^|/)(init|Xorg|Xwayland|dinit)'", /etc/dinit.d/config/earlyoom.conf
 else
     sudo sed -i s,EARLYOOM_ARGS=".*",EARLYOOM_ARGS="-n -m 5 -s 5 -r 60 --ignore-root-user --avoid '(^|/)(init|Xorg|Xwayland|$init)'", /etc/default/earlyoom
-#### SUPPORT FOR OTHER INITS?
 fi
 
 #Enable Firewall settings
@@ -198,11 +190,16 @@ sudo ufw allow mdns
 sudo ufw allow 631
 sudo ufw allow qbittorrent
 
+#Dinit grub-btrfsd service
+if [ "$grbtrfs" == y ] && [ "$init" == dinit ];then
+    echo -e "type            = process\nenv-file        = /etc/default/grub-btrfs/config\ncommand         = /usr/bin/grub-btrfsd --syslog /.snapshots\nsmooth-recovery = true" | sudo tee /etc/dinit.d/grub-btrfsd
+fi
+
 # Install snap-pac (done late to reduce snapshot count)
 if [ "$snapac" == y ];then
-    SNAP_PAC_SKIP=y
+    export SNAP_PAC_SKIP=y
     sudo pacman -S --noconfirm --needed snap-pac
-    if [ "$artix" == y ] && [ "$grbtrfs" == y ];then
+    if [ "$grbtrfs" == y ] && ! [ "$init" == dinit ];then
         paru -S snap-pac-grub
     fi
 fi
@@ -218,7 +215,10 @@ sudo touch /var/log/clamav/freshclam.log
 #Enable init services
 if ! [ "$artix" == y ];then
     sudo systemctl disable systemd-timesyncd
-    sudo systemctl enable openntpd cups ufw $dm $cron apparmor auditd rngd earlyoom power-profiles-daemon freshclam
+    sudo systemctl enable openntpd cups ufw $dm $cron apparmor rngd earlyoom power-profiles-daemon freshclam
+    if [ $apparmr == y ];then
+        sudo systemctl enable auditd
+    fi
     if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
         sudo systemctl enable --now libvirtd.service virtlogd.socket
         sudo virsh net-autostart default
@@ -237,11 +237,16 @@ elif [ $init == dinit ]; then
         sudo virsh net-autostart default
     fi
     sudo dinitctl enable apparmor
-    sudo dinitctl enable auditd
+    if [ $apparmr == y ];then
+        sudo dinitctl enable auditd
+    fi
     sudo dinitctl enable rngd
     sudo dinitctl enable earlyoom
     sudo dinitctl enable power-profiles-daemon
-    sudo dinitctl enable freshclam 
+    sudo dinitctl enable freshclam
+    if [ "$grbtrfs" == y ];then
+        sudo dinitctl enable grub-btrfsd
+    fi
     sudo ln -s /etc/dinit.d/$dm /etc/dinit.d/boot.d/
 elif [ $init == runit ]; then
     sudo ln -s /etc/runit/sv/ntpd /run/runit/service
@@ -249,7 +254,9 @@ elif [ $init == runit ]; then
     sudo ln -s /etc/runit/sv/$dm /run/runit/service
     sudo ln -s /etc/runit/sv/$cron /run/runit/service
     sudo ln -s /etc/runit/sv/apparmor /run/runit/service
-    sudo ln -s /etc/runit/sv/auditd /run/runit/service
+    if [ $apparmr == y ];then
+        sudo ln -s /etc/runit/sv/auditd /run/runit/service
+    fi
     sudo ln -s /etc/runit/sv/ufw /run/runit/service
     sudo ln -s /etc/runit/sv/rngd /run/runit/service
     sudo ln -s /etc/runit/sv/power-profiles-daemon /run/runit/service
@@ -268,7 +275,9 @@ elif [ $init == openrc ]; then
     sudo rc-update add ufw default
     sudo rc-update add power-profiles-daemon default
     sudo rc-update add apparmor default
-    sudo rc-update add auditd default
+    if [ $apparmr == y ];then
+        sudo rc-update add auditd default
+    fi
     sudo rc-update add $cron default
     sudo rc-update add earlyoom default
     sudo rc-update add freshclam default
@@ -285,7 +294,9 @@ elif [ $init == s6 ];then
     sudo touch /etc/s6/adminsv/default/contents.d/cupsd
     sudo touch /etc/s6/adminsv/default/contents.d/$cron
     sudo touch /etc/s6/adminsv/default/contents.d/apparmor
-    sudo touch /etc/s6/adminsv/default/contents.d/auditd
+    if [ $apparmr == y ];then
+        sudo touch /etc/s6/adminsv/default/contents.d/auditd
+    fi
     sudo touch /etc/s6/adminsv/default/contents.d/power-profiles-daemon
     sudo touch /etc/s6/adminsv/default/contents.d/earlyoom
     sudo touch /etc/s6/adminsv/default/contents.d/freshclam
