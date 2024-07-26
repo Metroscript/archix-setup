@@ -286,9 +286,7 @@ if ! grep Size <<< $(swapon -s);then
                 until [[ "$swapvolconf" == y ]];do
                     printf "What would you like your swap subvolume to be called?: "
                     read swapvol
-                    echo "Are you sure you want to call your swap subvolume \"${swapvol}\"?"
-                    printf "[y/n]: "
-                    read swapvolconf
+                    unset swapvolconf
                     until [ "$swapvolconf" == y ] || [ "$swapvolconf" == n ];do
                         echo "Are you sure you want to call your swap subvolume \"${swapvol}\"?"
                         printf "[y/n]: "
@@ -338,7 +336,8 @@ if [ "$btrfs" == y ];then
         fi
         for submnt in $(findmnt -nt btrfs|cut -d\  -f1|sed 's/─//'|sed 's/├//'|sed 's/└//');do 
             subvol=$(findmnt -nt btrfs|grep "$submnt "|sed 's,.*subvol=/,,')
-            until [[ $snap_conf == y ]] || [[ $snap_conf == n ]];do
+            unset snap_conf
+            until [ "$snap_conf" == y ] || [ "$snap_conf" == n ];do
                 echo "Create snapshot config for subvolume: \"$subvol\" (Mounted at $submnt)?"
                 printf "[y/n]: "
                 read snap_conf

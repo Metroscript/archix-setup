@@ -219,14 +219,18 @@ if [ "$artix" != y ];then
     sudo systemctl enable openntpd cups ufw $dm $cron rngd earlyoom freshclam$APPARMOR$TLP
 else
     for SERVICE in $(echo "ntpd ufw cupsd $cron rngd earlyoom freshclam $dm$APPARMOR$TLP");do
+        if [ "$suas" == y ];then
+            ESCALATE=doas;else
+            ESCALATE=sudo
+        fi
         if [ $init == dinit ];then
-            INITSTART="sudo ln -s /etc/dinit.d/$SERVICE /etc/dinit.d/boot.d/"
+            INITSTART="$ESCALATE ln -s /etc/dinit.d/$SERVICE /etc/dinit.d/boot.d/"
         elif [ $init == runit ];then
-            INITSTART="sudo ln -s /etc/runit/sv/$SERVICE /run/runit/service/"
+            INITSTART="$ESCALATE ln -s /etc/runit/sv/$SERVICE /run/runit/service/"
         elif [ $init == openrc ];then
-            INITSTART="sudo rc-update add $SERVICE default"
+            INITSTART="$ESCALATE rc-update add $SERVICE default"
         elif [ $init == s6 ];then
-            INITSTART="sudo touch /etc/s6/adminsv/default/contents.d/$SERVICE"
+            INITSTART="$ESCALATE touch /etc/s6/adminsv/default/contents.d/$SERVICE"
         fi
         $INITSTART
     done
