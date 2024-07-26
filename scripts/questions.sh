@@ -268,7 +268,7 @@ until [[ "$apparmr" == y ]] || [[ "$apparmr" == n ]];do
 done
 
 if ! grep Size <<< $(swapon -s);then
-    until [[ "$swap" -ge 0 ]];do
+    until [ "$swap" -ge 0 ] >/dev/null 2>&1;do
         echo "Swapfile size in GiB. Swap at least equal to RAM for hibernation. Put '0' for no swapfile."
         printf "Size of swapfile in GiB: "
         read swap
@@ -350,7 +350,7 @@ if [ "$btrfs" == y ];then
     fi
 fi
 if ! grep zram <<< $(lsblk);then
-    until [[ "$zram" -ge 0 ]];do
+    until [ "$zram" -ge 0 ] >/dev/null 2>&1;do
         echo "Would you like to use zram? (Compressed RAM; faster than standard swap) Please input the size in GiB of uncompressed data zram should have. 50% of real RAM is reccommended. Put 0 for no zram"
         printf "Size of zram in GiB: "
         read zram
