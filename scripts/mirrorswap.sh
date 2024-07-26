@@ -36,7 +36,7 @@ fi
 
 #BTRFS Snapshots
 if [ "$btrfs" == y ];then
-    sudo pacman -Syu --needed --noconfirm btrfs-progs 
+    sudo pacman -Syu --needed --noconfirm btrfs-progs compsize 
     if [ "$snap" == y ];then
         if [ "$snap_dir" == y ];then
             sudo umount /.snapshots

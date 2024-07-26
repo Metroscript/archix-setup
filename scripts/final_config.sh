@@ -45,7 +45,7 @@ if [ $de == 1 ];then
     fi
 fi
 if ! grep "autostart" <<< $(ls .config/);then
-    mkdir .config/autostart
+    mkdir $HOME/.config/autostart
 fi
 if [ "$artix" == y ] && ! [ $de == 1 ];then
     echo -e "[Desktop Entry]\nExec=/usr/bin/pkill -u \"\$USER\" -x pipewire\|wireplumber ; /usr/bin/pidwait -u \"\$USER\" -x pipewire\|wireplumber ; /usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/sleep 1 ; /usr/bin/wireplumber &\nName=Pipewire\nType=Application\nX-KDE-AutostartScript=true" > ~/.config/autostart/pipewire.desktop
@@ -54,7 +54,7 @@ if [ "$artix" == y ] && ! [ $de == 1 ];then
     #echo -e "#!/bin/sh\n/usr/bin/pkill -u \"\$USER\" -x pipewire\|wireplumber\n/usr/bin/pidwait -u \"\$USER\" -x pipewire\|wireplumber\n/usr/bin/pipewire &\n/usr/bin/pipewire-pulse &\n/usr/bin/sleep 1\n/usr/bin/wireplumber &" > ~/.config/plasma-workspace/env/pipewire.sh
 fi
 if [ $apparmr == y ];then
-    echo -e "[Desktop Entry]\nType=Application\nName=Apparmor Notify\nComment=Notify User of Apparmor Denials\nTryExec=aa-notify\nExec=aa-notify -p -s 1 -w 60 -f /var/log/audit/audit.log\nStartupNotify=false\nNoDisplay=true" > .config/autostart/apparmor-notify.desktop
+    echo -e "[Desktop Entry]\nType=Application\nName=Apparmor Notify\nComment=Notify User of Apparmor Denials\nTryExec=aa-notify\nExec=aa-notify -p -s 1 -w 60 -f /var/log/audit/audit.log\nStartupNotify=false\nNoDisplay=true" > $HOME/.config/autostart/apparmor-notify.desktop
 fi
 if [ $dm == sddm ];then
     if [ $de == 2 ];then
@@ -77,9 +77,6 @@ if [ "$zram" -gt 0 ];then
     if [ "$zramcomp" == lz4 ];then
         sudo sed -i 's/vm.page-cluster = 0/vm.page-cluster = 1' /etc/sysctl.d/99-ram.conf
     fi
-fi
-if ! grep quiet $bootdir;then
-    sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="quiet/' $bootdir
 fi
 if [ $apparmr == y ];then
     sudo sed -i 's/quiet/lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off random.trust_cpu=off quiet/' $bootdir
@@ -193,11 +190,6 @@ sudo ufw allow mdns
 sudo ufw allow 631
 sudo ufw allow qbittorrent
 
-#Dinit grub-btrfsd service
-if [ "$grbtrfs" == y ] && [ "$init" == dinit ];then
-    echo -e "type            = process\nenv-file        = /etc/default/grub-btrfs/config\ncommand         = /usr/bin/grub-btrfsd --syslog /.snapshots\nsmooth-recovery = true" | sudo tee /etc/dinit.d/grub-btrfsd
-fi
-
 # Install snap-pac (done late to reduce snapshot count)
 if [ "$snapac" == y ];then
     export SNAP_PAC_SKIP=y
@@ -216,100 +208,157 @@ fi
 sudo touch /var/log/clamav/freshclam.log
 
 #Enable init services
-if ! [ "$artix" == y ];then
+if [ "$apparmr" == y ];then
+    APPARMOR=" apparmor auditd"
+fi
+if [ "$LAPTOP" == 1 ];then
+    TLP=" tlp"
+fi
+if [ "$artix" != y ];then
     sudo systemctl disable systemd-timesyncd
-    sudo systemctl enable openntpd cups ufw $dm $cron apparmor rngd earlyoom power-profiles-daemon freshclam
-    if [ $apparmr == y ];then
-        sudo systemctl enable auditd
-    fi
-    if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
+    sudo systemctl enable openntpd cups ufw $dm $cron rngd earlyoom freshclam$APPARMOR$TLP
+else
+    for SERVICE in $(echo "ntpd ufw cupsd $cron rngd earlyoom freshclam $dm$APPARMOR$TLP");do
+        if [ $init == dinit ];then
+            INITSTART="sudo ln -s /etc/dinit.d/$SERVICE /etc/dinit.d/boot.d/"
+        elif [ $init == runit ];then
+            INITSTART="sudo ln -s /etc/runit/sv/$SERVICE /run/runit/service/"
+        elif [ $init == openrc ];then
+            INITSTART="sudo rc-update add $SERVICE default"
+        elif [ $init == s6 ];then
+            INITSTART="sudo touch /etc/s6/adminsv/default/contents.d/$SERVICE"
+        fi
+        $INITSTART
+    done
+fi
+
+if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
+    if [ "$artix" != y ];then
         sudo systemctl enable --now libvirtd.service virtlogd.socket
-        sudo virsh net-autostart default
+    else
+        if [ $init == dinit ];then
+            sudo dinitctl enable libvirtd
+            sudo dinitctl enable virtlogd
+        elif [ $init == runit ];then
+            sudo ln -s /etc/runit/sv/libvirtd /run/runit/service
+            sudo ln -s /etc/runit/sv/virtlogd /run/runit/service
+        elif [ $init == openrc ];then
+            sudo rc-update add libvirtd default
+            sudo rc-update add virtlogd default
+        elif [ $init == s6 ];then
+            sudo touch /etc/s6/adminsv/default/contents.d/libvirtd
+            sudo touch /etc/s6/adminsv/default/contents.d/virtlogd
+        fi
     fi
-    if [ "$grbtrfs" == y ];then
-        sudo systemctl enable grub-btrfsd
-    fi
-elif [ $init == dinit ]; then
-    sudo dinitctl enable ntpd
-    sudo dinitctl enable ufw
-    sudo dinitctl enable cupsd
-    sudo dinitctl enable $cron
-    if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
-        sudo dinitctl enable libvirtd
-        sudo dinitctl enable virtlogd
-        sudo virsh net-autostart default
-    fi
-    sudo dinitctl enable apparmor
-    if [ $apparmr == y ];then
-        sudo dinitctl enable auditd
-    fi
-    sudo dinitctl enable rngd
-    sudo dinitctl enable earlyoom
-    sudo dinitctl enable power-profiles-daemon
-    sudo dinitctl enable freshclam
-    if [ "$grbtrfs" == y ];then
-        sudo dinitctl enable grub-btrfsd
-    fi
-    sudo ln -s /etc/dinit.d/$dm /etc/dinit.d/boot.d/
-elif [ $init == runit ]; then
-    sudo ln -s /etc/runit/sv/ntpd /run/runit/service
-    sudo ln -s /etc/runit/sv/cupsd /run/runit/service
-    sudo ln -s /etc/runit/sv/$dm /run/runit/service
-    sudo ln -s /etc/runit/sv/$cron /run/runit/service
-    sudo ln -s /etc/runit/sv/apparmor /run/runit/service
-    if [ $apparmr == y ];then
-        sudo ln -s /etc/runit/sv/auditd /run/runit/service
-    fi
-    sudo ln -s /etc/runit/sv/ufw /run/runit/service
-    sudo ln -s /etc/runit/sv/rngd /run/runit/service
-    sudo ln -s /etc/runit/sv/power-profiles-daemon /run/runit/service
-    sudo ln -s /etc/runit/sv/earlyoom /run/runit/service
-    sudo ln -s /etc/runit/sv/freshclam /run/runit/service
-    if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
-        sudo ln -s /etc/runit/sv/libvirtd /run/runit/service
-        sudo ln -s /etc/runit/sv/virtlogd /run/runit/service
-        sudo virsh net-autostart default
-    fi
-elif [ $init == openrc ]; then
-    sudo rc-update add ntpd boot
-    sudo rc-update add cupsd boot
-    sudo rc-update add $dm boot
-    sudo rc-update add rngd default
-    sudo rc-update add ufw default
-    sudo rc-update add power-profiles-daemon default
-    sudo rc-update add apparmor default
-    if [ $apparmr == y ];then
-        sudo rc-update add auditd default
-    fi
-    sudo rc-update add $cron default
-    sudo rc-update add earlyoom default
-    sudo rc-update add freshclam default
-    if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
-        sudo rc-update add libvirtd default
-        sudo rc-update add virtlogd default
-        sudo virsh net-autostart default
-    fi
-elif [ $init == s6 ];then
-    sudo touch /etc/s6/adminsv/default/contents.d/ntpd
-    sudo touch /etc/s6/adminsv/default/contents.d/ufw
-    sudo touch /etc/s6/adminsv/default/contents.d/$dm
-    sudo touch /etc/s6/adminsv/default/contents.d/rngd
-    sudo touch /etc/s6/adminsv/default/contents.d/cupsd
-    sudo touch /etc/s6/adminsv/default/contents.d/$cron
-    sudo touch /etc/s6/adminsv/default/contents.d/apparmor
-    if [ $apparmr == y ];then
-        sudo touch /etc/s6/adminsv/default/contents.d/auditd
-    fi
-    sudo touch /etc/s6/adminsv/default/contents.d/power-profiles-daemon
-    sudo touch /etc/s6/adminsv/default/contents.d/earlyoom
-    sudo touch /etc/s6/adminsv/default/contents.d/freshclam
-    if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
-        sudo touch /etc/s6/adminsv/default/contents.d/libvirtd
-        sudo touch /etc/s6/adminsv/default/contents.d/virtlogd
-        sudo virsh net-autostart default
-    fi
+    sudo virsh net-autostart default
+fi
+
+#Dinit grub-btrfsd service
+if [ $init == dinit ] && [ "$grbtrfs" == y ];then
+    echo -e "type            = process\nenv-file        = /etc/default/grub-btrfs/config\ncommand         = /usr/bin/grub-btrfsd --syslog /.snapshots\nsmooth-recovery = true" | sudo tee /etc/dinit.d/grub-btrfsd
+    sudo dinitctl enable grub-btrfsd
+fi
+
+if [ $init == s6 ];then
     sudo s6-db-reload
 fi
+#if ! [ "$artix" == y ];then
+#    sudo systemctl disable systemd-timesyncd
+#    sudo systemctl enable openntpd cups ufw $dm $cron rngd earlyoom freshclam
+#    if [ $apparmr == y ];then
+#        sudo systemctl enable apparmor auditd
+#    fi
+#    if [ "$LAPTOP" == 1 ];then
+#        sudo systemctl enable tlp
+#    fi
+#    if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
+#        sudo systemctl enable --now libvirtd.service virtlogd.socket
+#        sudo virsh net-autostart default
+#    fi
+#    if [ "$grbtrfs" == y ];then
+#        sudo systemctl enable grub-btrfsd
+#    fi
+#elif [ $init == dinit ]; then
+#    sudo dinitctl enable ntpd
+#    sudo dinitctl enable ufw
+#    sudo dinitctl enable cupsd
+##    sudo dinitctl enable $cron
+#    if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
+#        sudo dinitctl enable libvirtd
+#        sudo dinitctl enable virtlogd
+#        sudo virsh net-autostart default
+#    fi
+#    sudo dinitctl enable apparmor
+#    if [ $apparmr == y ];then
+#        sudo dinitctl enable auditd
+#    fi
+#    sudo dinitctl enable rngd
+#    sudo dinitctl enable earlyoom
+#    sudo dinitctl enable power-profiles-daemon
+#    sudo dinitctl enable freshclam
+#    if [ "$grbtrfs" == y ];then
+#        sudo dinitctl enable grub-btrfsd
+#    fi
+#    sudo ln -s /etc/dinit.d/$dm /etc/dinit.d/boot.d/
+#elif [ $init == runit ]; then
+#    sudo ln -s /etc/runit/sv/ntpd /run/runit/service
+#    sudo ln -s /etc/runit/sv/cupsd /run/runit/service
+#    sudo ln -s /etc/runit/sv/$dm /run/runit/service
+#    sudo ln -s /etc/runit/sv/$cron /run/runit/service
+#    sudo ln -s /etc/runit/sv/apparmor /run/runit/service
+#    if [ $apparmr == y ];then
+#       sudo ln -s /etc/runit/sv/auditd /run/runit/service
+#    fi
+#    sudo ln -s /etc/runit/sv/ufw /run/runit/service
+#    sudo ln -s /etc/runit/sv/rngd /run/runit/service
+#    sudo ln -s /etc/runit/sv/power-profiles-daemon /run/runit/service
+#    sudo ln -s /etc/runit/sv/earlyoom /run/runit/service
+#    sudo ln -s /etc/runit/sv/freshclam /run/runit/service
+#    if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
+#        sudo ln -s /etc/runit/sv/libvirtd /run/runit/service
+#        sudo ln -s /etc/runit/sv/virtlogd /run/runit/service
+#        sudo virsh net-autostart default
+#    fi
+#elif [ $init == openrc ]; then
+#    sudo rc-update add ntpd boot
+#    sudo rc-update add cupsd boot
+#    sudo rc-update add $dm boot
+#    sudo rc-update add rngd default
+#    sudo rc-update add ufw default
+#    sudo rc-update add power-profiles-daemon default
+#    sudo rc-update add apparmor default
+#    if [ $apparmr == y ];then
+#        sudo rc-update add auditd default
+#    fi
+#    sudo rc-update add $cron default
+#    sudo rc-update add earlyoom default
+#    sudo rc-update add freshclam default
+#    if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
+#        sudo rc-update add libvirtd default
+#        sudo rc-update add virtlogd default
+#        sudo virsh net-autostart default
+#    fi
+#elif [ $init == s6 ];then
+#    sudo touch /etc/s6/adminsv/default/contents.d/ntpd
+#    sudo touch /etc/s6/adminsv/default/contents.d/ufw
+#    sudo touch /etc/s6/adminsv/default/contents.d/$dm
+#    sudo touch /etc/s6/adminsv/default/contents.d/rngd
+#    sudo touch /etc/s6/adminsv/default/contents.d/cupsd
+#    sudo touch /etc/s6/adminsv/default/contents.d/$cron
+#    sudo touch /etc/s6/adminsv/default/contents.d/apparmor
+#    if [ $apparmr == y ];then
+#        sudo touch /etc/s6/adminsv/default/contents.d/auditd
+#    fi
+#    sudo touch /etc/s6/adminsv/default/contents.d/power-profiles-daemon
+#    sudo touch /etc/s6/adminsv/default/contents.d/earlyoom
+#    sudo touch /etc/s6/adminsv/default/contents.d/freshclam
+#    if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
+#        sudo touch /etc/s6/adminsv/default/contents.d/libvirtd
+#        sudo touch /etc/s6/adminsv/default/contents.d/virtlogd
+#        sudo virsh net-autostart default
+#    fi
+#    sudo s6-db-reload
+#fi
 
 rm -rf ${repo}
 if [ $bin == y ];then

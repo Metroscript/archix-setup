@@ -8,10 +8,15 @@ elif grep -q dracut <<< $(pacman -Q);then
     img=booster
 fi
 
+CHASSIS=$(cat /sys/class/dmi/id/chassis_type)
+if [ "$CHASSIS" == 9 ] || [ "$CHASSIS" == 10 ];then
+    LAPTOP=1
+fi
+
 if ! [ $img == mkinit ];then
     echo "ERROR: This script doesn't support initramfs generators other than mkinitcpio. Proceed at your own risk."
     wait 3
-    until [ "$imgcont" == y ] || [ "$imgcont" == n ];do
+    until [[ "$imgcont" == y ]] || [[ "$imgcont" == n ]];do
         printf "Continue? [y/n]: "
         read imgcont
     done
@@ -49,11 +54,13 @@ if grep -q btrfs <<< $(sudo blkid);then
     btrfs=y
 fi
 
-echo "Which DE/WM would you like to install? 1.Hyprland or 2.KDE Plasma"
-printf "[1/2]: "
-read de
-until [ "$de" == 1 ] || [ "$de" == 2 ];do
-    echo "Please try again. Which DE/WM would you like to install? 1.Hyprland or 2.KDE Plasma"
+#Add quiet if not present so later sed calls do not break
+if ! grep quiet $bootdir;then
+    sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="quiet/' $bootdir
+fi
+
+until [[ "$de" == 1 ]] || [[ "$de" == 2 ]];do
+    echo "Which DE/WM would you like to install? 1.Hyprland or 2.KDE Plasma"
     printf "[1/2]: "
     read de
 done
@@ -61,26 +68,17 @@ if [ $de == 1 ] || [ $de == 2 ];then
     dm=sddm
 fi
 
-printf "Use repo dotfiles? (Does not apply to Hyprland Rice) [y/n]: "
-read dotfs
-until [ "$dotfs" == y ] || [ "$dotfs" == n ];do
-    echo "Sorry, please try again."
+until [[ "$dotfs" == y ]] || [[ "$dotfs" == n ]];do
     printf "Use repo dotfiles? (Does not apply to Hyprland Rice) [y/n]: "
     read dotfs
 done
 
-printf "Use precompiled AUR binaries where availiable? [y/n]: "
-read bin
-until [ "$bin" == y ] || [ "$bin" == n ];do
-    echo "Sorry, please try again."
+until [[ "$bin" == y ]] || [[ "$bin" == n ]];do
     printf "Use precompiled binaries where availiable? [y/n]: "
     read bin
 done
 
-printf "Enable compile optimisations such as multithreading & native binaries to makepkg.conf? [y/n]: "
-read opt
-until [ "$opt" == y ] || [ "$opt" == n ];do
-    echo "Sorry, please try again."
+until [[ "$opt" == y ]] || [[ "$opt" == n ]];do
     printf "Enable compile optimisations such as multithreading & native binaries to makepkg.conf? [y/n]: "
     read opt
 done
@@ -112,19 +110,12 @@ else
     sed -i "/ffmpeg/a   alias icat 'wezterm imgcat'" ${repo}dotfiles/config.fish
 fi
 
-printf "Install Virtualisation Software? [y/n]: "
-read vir
-until [ "$vir" == y ] || [ "$vir" == n ];do
-    echo "Sorry, please try again"
+until [[ "$vir" == y ]] || [[ "$vir" == n ]];do
     printf "Install Virtualisation Software? [y/n]: "
     read vir
 done
 if [ $vir == y ];then
-    echo "Install 1.Qemu, 2.Virtualbox or 3.Both?"
-    printf " [1/2/3]: "
-    read virt
-    until [ "$virt" == 1 ] || [ "$virt" == 2 ] || [ "$virt" == 3 ];do
-        echo "Sorry, please try again"
+    until [[ "$virt" == 1 ]] || [[ "$virt" == 2 ]] || [[ "$virt" == 3 ]];do
         echo "Install 1.Qemu, 2.Virtualbox or 3.Both?"
         printf " [1/2/3]: "
         read virt
@@ -136,98 +127,64 @@ until [[ "$games" == y ]] || [[ "$games" == n ]];do
     read games
 done
 if [ $games == y ];then
-    printf "Install Vinegar? (A WINE wrapper for Roblox) [y/n]: "
-    read rlx
-    until [ "$rlx" == y ] || [ "$rlx" == n ];do
-        echo "Sorry, please try again"
+    until [[ "$rlx" == y ]] || [[ "$rlx" == n ]];do
         printf "Install Vinegar? (A WINE wrapper for Roblox) [y/n]: "
         read rlx
     done
-    printf "Install Prismlauncher? (A custom Minecraft launcher with mod support - Flatpak) [y/n]: "
-    read min
-    until [ "$min" == y ] || [ "$min" == n ];do
-        echo "Sorry, please try again."
+    until [[ "$min" == y ]] || [[ "$min" == n ]];do
         printf "Install Prismlauncher? (A custom Minecraft launcher with mod support - Flatpak) [y/n]: "
         read min
     done
-    printf "Install console emulators? (Most are installed through Flatpak) [y/n]: "
-    read emu
-    until [ "$emu" == y ] || [ "$emu" == n ];do
+    until [[ "$emu" == y ]] || [[ "$emu" == n ]];do
         printf "Install console emulators? (Most are installed through Flatpak) [y/n]: "
         read emu
     done
     if [ "$emu" == y ];then
-        printf "Install MelonDS? (DS emulator) [y/n]: "
-        read melonds
-        until [ "$melonds" == y ] || [ "$melonds" == n ];do
+        until [[ "$melonds" == y ]] || [[ "$melonds" == n ]];do
             printf "Install MelonDS? (DS emulator) [y/n]: "
             read melonds
         done
-        printf "Install Citra? (3DS emulator [NO LONGER MAINTAINED]) [y/n]: "
-        read citra
-        until [ "$citra" == y ] || [ "$citra" == n ];do
+        until [[ "$citra" == y ]] || [[ "$citra" == n ]];do
             printf "Install Citra? (3DS emulator [NO LONGER MAINTAINED]) [y/n]: "
             read citra
         done
-        printf "Install Dolphin? (Gamecube/Wii emulator) [y/n]: "
-        read dolphin
-        until [ "$dolphin" == y ] || [ "$dolphin" == n ];do
+        until [[ "$dolphin" == y ]] || [[ "$dolphin" == n ]];do
             printf "Install Dolphin? (Gamecube/Wii emulator) [y/n]: "
             read dolphin
         done
-        printf "Install Cemu? (Wii U emulator) [y/n]: "
-        read cemu
-        until [ "$cemu" == y ] || [ "$cemu" == n ];do
+        until [[ "$cemu" == y ]] || [[ "$cemu" == n ]];do
             printf "Install Cemu? (Wii U emulator) [y/n]: "
             read cemu
         done
-        printf "Install Ryujinx? (Switch emulator) [y/n]: "
-        read switch
-        until [ "$switch" == y ] || [ "$switch" == n ];do
+        until [[ "$switch" == y ]] || [[ "$switch" == n ]];do
             printf "Install Ryujinx? (Switch emulator) [y/n]: "
             read switch
         done
-        printf "Install Duckstation? (PS1 emulator) [y/n]: "
-        read duckstation
-        until [ "$duckstation" == y ] || [ "$duckstation" == n ];do
+        until [[ "$duckstation" == y ]] || [[ "$duckstation" == n ]];do
             printf "Install Duckstation? (PS1 emulator) [y/n]: "
             read duckstation
         done
-        printf "Install PCSX2? (PS2 emulator) [y/n]: "
-        read pcsx2
-        until [ "$pcsx2" == y ] || [ "$pcsx2" == n ];do
+        until [[ "$pcsx2" == y ]] || [[ "$pcsx2" == n ]];do
             printf "Install PCSX2? (PS2 emulator) [y/n]: "
             read pcsx2
         done
-        printf "Install PPSSPP? (PS Portable emulator) [y/n]: "
-        read ppsspp
-        until [ "$ppsspp" == y ] || [ "$ppsspp" == n ];do
+        until [[ "$ppsspp" == y ]] || [[ "$ppsspp" == n ]];do
             printf "Install PPSSPP? (PS Portable emulator) [y/n]: "
             read ppsspp
         done
     fi
 fi
-echo "Install Multimedia tools? (Kdenlive, OBS)"
-printf "[y/n]: "
-read multitools
-until [ "$multitools" == y ] || [ "$multitools" == n ];do
+until [[ "$multitools" == y ]] || [[ "$multitools" == n ]];do
     echo "Install Multimedia tools? (Kdenlive, OBS)"
     printf "[y/n]: "
     read multitools
 done
-
-echo "Install Graphics tools? (GIMP, Blender)"
-printf "[y/n]: "
-read graphitools
-until [ "$graphitools" == y ] || [ "$graphitools" == n ];do
+until [[ "$graphitools" == y ]] || [[ "$graphitools" == n ]];do
     echo "Install Graphics tools? (GIMP, Blender)"
     printf "[y/n]: "
     read graphitools
 done
-echo "Install LibreOffice?"
-printf "[y/n]: "
-read office
-until [ "$office" == y ] || [ "$office" == n ];do
+until [[ "$office" == y ]] || [[ "$office" == n ]];do
     echo "Install LibreOffice?"
     printf "[y/n]: "
     read office
@@ -245,11 +202,8 @@ elif [ $shell == 3 ];then
     shell=zsh;else
     shell=dash
 fi
-echo "What cron would you like? (If unsure, choose Cronie) 1.Cronie or 2.Fcron"
-printf "[1/2]: "
-read cron
-until [ "$cron" == 1 ] || [ "$cron" == 2 ];do
-    echo "What cron would you like? (If unsure, choose Cronie) 1.Cronie or 2.Fcron"
+until [[ "$cron" == 1 ]] || [[ "$cron" == 2 ]];do
+    echo "Use which cron provider? (If unsure, choose Cronie) 1.Cronie or 2.Fcron"
     printf "[1/2]: "
     read cron
 done
@@ -257,59 +211,39 @@ if [ $cron == 1 ];then
     cron=cronie;else
     cron=fcron
 fi
-printf "Sort package mirrors to prioritse faster servers? [y/n]: "
-read mirrorsort
-until [ "$mirrorsort" == y ] || [ "$mirrorsort" == n ];do
+until [[ "$mirrorsort" == y ]] || [[ "$mirrorsort" == n ]];do
     printf "Sort package mirrors to prioritse faster servers? [y/n]: "
     read mirrorsort
 done
-printf "Install Plymouth? (Adds boot splash screen) [y/n]: "
-read ply
-until [ "$ply" == y ] || [ "$ply" == n ];do
+until [[ "$ply" == y ]] || [[ "$ply" == n ]];do
     printf "Install Plymouth? (Adds boot splash screen) [y/n]: "
     read ply
 done
 if [ $ply == y ];then
-    echo 'Select Plymouth Theme: spinner, bgrt, breeze, breeze-text, fade-in, glow, solar, spininfinity, spinner, text, tribar, script, details.'
-    printf "Type desired theme name: "
-    read plytheme
-    until [ "$plytheme" == spinner ] || [ "$plytheme" == bgrt ] || [ "$plytheme" == breeze ] || [ "$plytheme" == breeze-text ] || [ "$plytheme" == fade-in ] || [ "$plytheme" == glow ] || [ "$plytheme" == solar ] ||  [ "$plytheme" == spininfinity ] || [ "$plytheme" == text ] || [ "$plytheme" == tribar ] || [ "$plytheme" == script ] || [ "$plytheme" == details ];do
-        echo 'Sorry, please try again.'
+    until [[ "$plytheme" == spinner ]] || [[ "$plytheme" == bgrt ]] || [[ "$plytheme" == breeze ]] || [[ "$plytheme" == breeze-text ]] || [[ "$plytheme" == fade-in ]] || [[ "$plytheme" == glow ]] || [[ "$plytheme" == solar ]] ||  [[ "$plytheme" == spininfinity ]] || [[ "$plytheme" == text ]] || [[ "$plytheme" == tribar ]] || [[ "$plytheme" == script ]] || [[ "$plytheme" == details ]];do
         echo 'Select Plymouth Theme: spinner, bgrt, breeze, breeze-text, fade-in, glow, solar, spininfinity, spinner, text, tribar, script, details.'
         printf "Type desired theme name: "
         read plytheme
     done
     if [ "$plytheme" == bgrt ];then
-        printf "Remove distro watermark to leave only BIOS vender logo? [y/n] "
-        read vr
-        until [ "$vr" == y ] || [ "$vr" == n ];do
-            echo "Sorry, please try again."
+        until [[ "$vr" == y ]] || [[ "$vr" == n ]];do
             printf "Remove distro watermark to leave only BIOS vender logo? [y/n] "
             read vr
         done
     fi
 fi
-printf "Install MakeMKV? (A DVD/Bluray ripper) [y/n]: "
-read makemkv
-until [ "$makemkv" == y ] || [ "$makemkv" == n ];do
+until [[ "$makemkv" == y ]] || [[ "$makemkv" == n ]];do
     printf "Install MakeMKV? (A DVD/Bluray ripper) [y/n]: "
     read makemkv
 done
 if [ $img == mkinit ];then
-    printf "Install mkinitcpio-firmware (Removes missing firmware warnings when generating initramfs) [y/n]: "
-    read mkfirm
-    until [ "$mkfirm" == y ] || [ "$mkfirm" == n ];do
-        echo "Sorry, please try again."
+    until [[ "$mkfirm" == y ]] || [[ "$mkfirm" == n ]];do
         printf "Install mkinitcpio-firmware (Removes missing firmware warnings when generating initramfs) [y/n]: "
         read mkfirm
     done
 fi
 
-echo "Enable Kernel lockdown to prevent modification of kernel during runtime? (Prevents non-signed kernel modules from loading & disables hibernation)"
-echo "0.No (Default) 1.Integrity (Standard Lockdown) 2.Confidential (Changes how RAM is accessed; Can cause issues)"
-printf "0/1/2: "
-read lckdwn
-until [ "$lckdwn" == 0 ] || [ "$lckdwn" == 1 ] || [ "$lckdwn" == 2 ];do
+until [[ "$lckdwn" == 0 ]] || [[ "$lckdwn" == 1 ]] || [[ "$lckdwn" == 2 ]];do
     echo "Enable Kernel lockdown to prevent modification of kernel during runtime? (Prevents non-signed kernel modules from loading & disables hibernation)"
     echo "0.No (Default) 1.Integrity (Standard Lockdown) 2.Confidential (Changes how RAM is accessed; Can cause issues)"
     printf "0/1/2: "
@@ -317,10 +251,7 @@ until [ "$lckdwn" == 0 ] || [ "$lckdwn" == 1 ] || [ "$lckdwn" == 2 ];do
 done
 
 if [ $lckdwn -gt 0 ] && [ "$virt" -ge 2 ];then
-    echo "VIRTUALBOX KERNEL MODULES DO NOT APPLY WITH LOCKDOWN. ARE YOU SURE YOU STILL WANT TO ENABLE LOCKDOWN?"
-    printf "[y/n]: "
-    read lckdwn_con
-    until [ "$lckdwn_con" == y ] || [ "$lckdwn_con" == n ];do
+    until [[ "$lckdwn_con" == y ]] || [[ "$lckdwn_con" == n ]];do
         echo "VIRTUALBOX KERNEL MODULES DO NOT APPLY WITH LOCKDOWN. ARE YOU SURE YOU STILL WANT TO ENABLE LOCKDOWN?"
         printf "[y/n]: "
         read lckdwn_con
@@ -330,19 +261,15 @@ if [ $lckdwn -gt 0 ] && [ "$virt" -ge 2 ];then
     fi
 fi
 
-until [ "$apparmr" == y ] || [ "$apparmr" == n ];do
+until [[ "$apparmr" == y ]] || [[ "$apparmr" == n ]];do
     echo "Install apparmor for app sandboxing / Mandatory Access Control configuration?"
     printf "[y/n]: "
     read apparmr
 done
 
 if ! grep Size <<< $(swapon -s);then
-    echo "Swapfile size in GiB. Matching RAM size OR RAM x 1.5 sized swap is usually a good choice for hibernation. Put '0' for no swapfile."
-    printf "Size of swapfile in GiB: "
-    read swap
-    until [ "$swap" -ge 0 ];do
-        echo "Sorry, please try again."
-        echo "Swapfile size in GiB. Put '0' for no swapfile."
+    until [[ "$swap" -ge 0 ]];do
+        echo "Swapfile size in GiB. Swap at least equal to RAM for hibernation. Put '0' for no swapfile."
         printf "Size of swapfile in GiB: "
         read swap
     done
@@ -350,16 +277,13 @@ if ! grep Size <<< $(swapon -s);then
         if [ "$btrfs" == y ];then
             printf "What would you like your swap subvolume to be called?: "
             read swapvol
-            echo "Are you sure you want to call your swap subvolume \"${swapvol}\"?"
-            printf "[y/n]: "
-            read swapvolconf
-            until [ "$swapvolconf" == y ] || [ "$swapvolconf" == n ];do
+            until [[ "$swapvolconf" == y ]] || [[ "$swapvolconf" == n ]];do
                 echo "Are you sure you want to call your swap subvolume \"${swapvol}\"?"
                 printf "[y/n]: "
                 read swapvolconf
             done
             if [ "$swapvolconf" == n ];then
-                until [ "$swapvolconf" == y ];do
+                until [[ "$swapvolconf" == y ]];do
                     printf "What would you like your swap subvolume to be called?: "
                     read swapvol
                     echo "Are you sure you want to call your swap subvolume \"${swapvol}\"?"
@@ -374,9 +298,7 @@ if ! grep Size <<< $(swapon -s);then
             fi
         fi
         if [ $swap -ge $(($(grep MemTotal /proc/meminfo|cut -d: -f2|cut -dk -f1)/1024/1024)) ] && [ "$lckdwn" == 0 ];then
-            printf "Enable suspend to & resume from disk support? [y/n]: "
-            read res
-            until [ $res == y ] || [ $res == n ];do 
+            until [[ $res == y ]] || [[ $res == n ]];do
                 printf "Enable suspend to & resume from disk support? [y/n]: "
                 read res
             done
@@ -416,10 +338,7 @@ if [ "$btrfs" == y ];then
         fi
         for submnt in $(findmnt -nt btrfs|cut -d\  -f1|sed 's/─//'|sed 's/├//'|sed 's/└//');do 
             subvol=$(findmnt -nt btrfs|grep "$submnt "|sed 's,.*subvol=/,,')
-            echo "Create snapshot config for subvolume: \"$subvol\" (Mounted at $submnt)?"
-            printf "[y/n]: "
-            read snap_conf
-            until [ $snap_conf == y ] || [ $snap_conf == n ];do
+            until [[ $snap_conf == y ]] || [[ $snap_conf == n ]];do
                 echo "Create snapshot config for subvolume: \"$subvol\" (Mounted at $submnt)?"
                 printf "[y/n]: "
                 read snap_conf
@@ -431,21 +350,13 @@ if [ "$btrfs" == y ];then
     fi
 fi
 if ! grep zram <<< $(lsblk);then
-    echo "Would you like to use zram? (Compressed RAM; faster than standard swap) Please input the size in GiB of uncompressed data zram should have. Half of RAM is usually good. Put 0 for no zram"
-    printf "Size of zram in GiB: "
-    read zram
-    until [ "$zram" -ge 0 ];do
-        echo "Sorry, please try again."
-        echo "Would you like to use zram? (Compressed RAM; faster than standard swap) Please input the size in GiB of uncompressed data zram should have. Half of RAM is usually good. Put 0 for no zram"
+    until [[ "$zram" -ge 0 ]];do
+        echo "Would you like to use zram? (Compressed RAM; faster than standard swap) Please input the size in GiB of uncompressed data zram should have. 50% of real RAM is reccommended. Put 0 for no zram"
         printf "Size of zram in GiB: "
         read zram
     done
     if [ "$zram" -gt 0 ];then
-        echo -e "Please select the compression algorithm for zram. 1. LZ4, 2. ZSTD.\nLZ4 is faster, but less effective. ZSTD is slower, but more effective at compression"
-        printf "1 OR 2: "
-        read zramc
-        until [ "$zramc" == 1 ] || [ "$zramc" == 2 ];do
-            echo "Sorry, please try again."
+        until [[ "$zramc" == 1 ]] || [[ "$zramc" == 2 ]];do
             echo -e "Please select the compression algorithm for zram. 1. LZ4, 2. ZSTD.\nLZ4 is faster, but less effective. ZSTD is slower, but more effective at compression"
             printf "1 OR 2: "
             read zramc
