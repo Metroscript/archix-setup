@@ -30,7 +30,12 @@ elif grep -E "Intel Corporation|UHD" <<< $gpu;then
 fi
 
 #Basic packages
-sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber man-db wayland xorg-xwayland smartmontools strace v4l2loopback-dkms gst-plugin-pipewire gnu-free-fonts noto-fonts ttf-{dejavu,liberation,hack-nerd,ubuntu-font-family} bash-language-server cups{,-pk-helper,-pdf} gutenprint net-tools gparted foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley ufw fuse fastfetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{archiver,rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay hunspell{,-en_{au,gb,us}} libpulse keepassxc gst-{libav,plugins-{base,good}} imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq nvme-cli noise-suppression-for-voice wl-clipboard rng-tools opensc btop mpv lollypop qbittorrent nvtop $shell openntpd libressl earlyoom $terminal clamav
+#Terminal
+sudo pacman -Syu --needed --noconfirm $terminal
+#Pipewire
+sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber gst-plugin-pipewire noise-suppression-for-voice
+
+sudo pacman -Syu --needed --noconfirm man-db wayland xorg-xwayland smartmontools strace v4l2loopback-dkms gnu-free-fonts noto-fonts ttf-{dejavu,liberation,hack-nerd,ubuntu-font-family} bash-language-server cups{,-pk-helper,-pdf} gutenprint net-tools gparted foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley ufw fuse fastfetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{archiver,rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay hunspell{,-en_{au,gb,us}} libpulse keepassxc gst-{libav,plugins-{base,good}} imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq nvme-cli wl-clipboard rng-tools opensc btop mpv lollypop qbittorrent nvtop $shell openntpd libressl earlyoom clamav
 if [ $apparmr == y ];then
     sudo pacman -S --needed --noconfirm apparmor audit python-{notify2,psutil}
 fi
@@ -165,12 +170,16 @@ if [ "$artix" == y ];then
         sudo pacman -S --needed --noconfirm tlp-$init
     fi
     if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
-       sudo pacman -S libvirt-$init
+       sudo pacman -S --needed --noconfirm libvirt-$init
     fi
     if [ $cron == fcron ];then
-       sudo pacman -Rns --noconfirm cronie-$init
-       sudo pacman -S --noconfirm fcron-$init;else
-       sudo pacman -S --needed --noconfirm $cron
+       sudo pacman -Rns --noconfirm cronie{,-$init}
+       sudo pacman -S --needed --noconfirm fcron{,-$init}
+    fi
+else
+    if [ $cron == fcron ];then
+        sudo pacman -Rns --noconfirm cronie
+        sudo pacman -Syu --needed --noconfirm fcron
     fi
 fi
 
@@ -182,7 +191,7 @@ if [ $de == 1 ];then
 sudo pacman -Syu --needed --noconfirm rofi-calc
 #KDE
 elif [ $de == 2 ];then
-    sudo pacman -Syu --needed --noconfirm plasma-meta cryfs flatpak-kcm fwupd packagekit-qt6 xdg-desktop-portal-{kde,gtk} gwenview kimageformats qt6-imageformats dolphin{,-plugins} ffmpegthumbs kde{-{inotify-survey,cli-tools},graphics-thumbnailers,network-filesharing} kio-{admin,fuse,extras} purpose icoutils libappimage openexr perl taglib kmousetool colord-kde kcolorchooser okular ebook-tools spectacle svgpart kcron ark filelight kate kcalc kcharselect kclock kdialog keditbookmarks kweather markdownpart print-manager skanpage tesseract-data-eng maliit-keyboard breeze5
+    sudo pacman -Syu --needed --noconfirm plasma-meta cryfs flatpak-kcm fwupd packagekit-qt6 xdg-desktop-portal-{kde,gtk} gwenview kimageformats qt6-imageformats dolphin{,-plugins} ffmpegthumbs kde{-{inotify-survey,cli-tools},graphics-thumbnailers,network-filesharing} kio-{admin,fuse,extras} purpose icoutils libappimage openexr perl taglib colord-kde kcolorchooser okular ebook-tools spectacle svgpart kcron ark filelight kate kcalc kcharselect kclock kdialog keditbookmarks kweather markdownpart print-manager skanpage tesseract-data-eng maliit-keyboard breeze5
     if [ $ply == y ];then
         sudo pacman -S --noconfirm plymouth-kcm
     fi

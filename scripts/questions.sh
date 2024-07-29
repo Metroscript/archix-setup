@@ -8,11 +8,6 @@ elif grep -q dracut <<< $(pacman -Q);then
     img=booster
 fi
 
-CHASSIS=$(cat /sys/class/dmi/id/chassis_type)
-if [ "$CHASSIS" == 9 ] || [ "$CHASSIS" == 10 ];then
-    LAPTOP=1
-fi
-
 if ! [ $img == mkinit ];then
     echo "ERROR: This script doesn't support initramfs generators other than mkinitcpio. Proceed at your own risk."
     wait 3
@@ -25,6 +20,12 @@ if ! [ $img == mkinit ];then
         exit 1
     fi
 fi
+
+CHASSIS=$(cat /sys/class/dmi/id/chassis_type)
+if [ "$CHASSIS" == 9 ] || [ "$CHASSIS" == 10 ];then
+    LAPTOP=1
+fi
+
 if grep -q Artix <<< $(cat /etc/issue);then
     artix=y
     sdir=/etc/elogind/

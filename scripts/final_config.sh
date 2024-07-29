@@ -87,12 +87,12 @@ if [ $apparmr == y ];then
     sudo sed -i '/log_group/a log_group = audit' /etc/audit/auditd.conf;else
     sudo sed -i 's/quiet/slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off random.trust_cpu=off quiet/' $bootdir
 fi
-if ! grep nowatchdog <<< $(cat $bootdir);then
-    sudo sed -i 's/quiet/nowatchdog quiet/' $bootdir
-fi
 if ! grep loglevel <<< $(cat $bootdir);then
     sudo sed -i 's/quiet/loglevel=0 quiet/' $bootdir;else
     sudo sed -i 's/loglevel=./loglevel=0/' $bootdir
+fi
+if ! grep nowatchdog <<< $(cat $bootdir);then
+    sudo sed -i 's/quiet/nowatchdog quiet/' $bootdir
 fi
 if [ $lckdwn -gt 0 ];then
     if [ $lckdwn == 1 ];then
@@ -109,7 +109,7 @@ fi
 #set machine ID to generic whonix machine ID
 if ! grep b08dfa6083e7567a1921a715000001fb <<< $(cat /etc/machine-id);then
     echo "b08dfa6083e7567a1921a715000001fb" | sudo tee /etc/machine-id
-    echo "b08dfa6083e7567a1921a715000001fb" > /var/lib/dbus/machine-id
+    #echo "b08dfa6083e7567a1921a715000001fb" > /var/lib/dbus/machine-id
 fi
 #Add 5 second delay between failed password attempts
 if ! grep pam_faildelay <<< $(cat /etc/pam.d/system-login);then
@@ -218,7 +218,7 @@ if [ "$artix" != y ];then
     sudo systemctl disable systemd-timesyncd
     sudo systemctl enable openntpd cups ufw $dm $cron rngd earlyoom freshclam$APPARMOR$TLP
 else
-    for SERVICE in $(echo "ntpd ufw cupsd $cron rngd earlyoom freshclam $dm$APPARMOR$TLP");do
+    for SERVICE in $(echo "ntpd cupsd ufw $dm $cron rngd earlyoom freshclam$APPARMOR$TLP");do
         if [ "$suas" == y ];then
             ESCALATE=doas;else
             ESCALATE=sudo
@@ -258,12 +258,12 @@ if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
 fi
 
 #Dinit grub-btrfsd service
-if [ $init == dinit ] && [ "$grbtrfs" == y ];then
+if [ "$init" == dinit ] && [ "$grbtrfs" == y ];then
     echo -e "type            = process\nenv-file        = /etc/default/grub-btrfs/config\ncommand         = /usr/bin/grub-btrfsd --syslog /.snapshots\nsmooth-recovery = true" | sudo tee /etc/dinit.d/grub-btrfsd
     sudo dinitctl enable grub-btrfsd
 fi
 
-if [ $init == s6 ];then
+if [ "$init" == s6 ];then
     sudo s6-db-reload
 fi
 #if ! [ "$artix" == y ];then
