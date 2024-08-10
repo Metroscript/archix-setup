@@ -23,13 +23,13 @@ if [ $mirrorsort == y ];then
     if [ "$artix" == y ];then
         sudo sed -i '/http:/d' /etc/pacman.d/mirrorlist.pacnew #Remove HTTP mirrors
         rankmirrors -vwn 5 /etc/pacman.d/mirrorlist.pacnew | sudo tee /etc/pacman.d/mirrorlist
-        printf "Server = https://mirrors.dotsrc.org/artix-linux/repos/$repo/os/$arch\nServer = https://mirror.clarkson.edu/artix/linux/repos/$repo/os/$arch\n" | sudo tee -a /etc/pacman.d/mirrorlist
+        printf "Server = https://mirrors.dotsrc.org/artix-linux/repos/\$repo/os/\$arch\nServer = https://mirror.clarkson.edu/artix/linux/repos/$repo/os/$arch\n" | sudo tee -a /etc/pacman.d/mirrorlist
         sudo nvim /etc/pacman.d/mirrorlist
         sudo reflector --save /etc/pacman.d/mirrorlist-arch --sort rate -c $country -p https
-        printf "Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch\nServer = https://mirror.rackspace.com/archlinux/$repo/os/$arch\n" | sudo tee -a /etc/pacman.d/mirrorlist-arch
+        printf "Server = https://geo.mirror.pkgbuild.com/\$repo/os/\$arch\nServer = https://mirror.rackspace.com/archlinux/\$repo/os/\$arch\n" | sudo tee -a /etc/pacman.d/mirrorlist-arch
         sudo nvim /etc/pacman.d/mirrorlist-arch;else
         sudo reflector --save /etc/pacman.d/mirrorlist --sort rate -c $country -p https
-        printf "Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch\nServer = https://mirror.rackspace.com/archlinux/$repo/os/$arch\n" | sudo tee -a /etc/pacman.d/mirrorlist
+        printf "Server = https://geo.mirror.pkgbuild.com/\$repo/os/\$arch\nServer = https://mirror.rackspace.com/archlinux/\$repo/os/\$arch\n" | sudo tee -a /etc/pacman.d/mirrorlist
         sudo nvim /etc/pacman.d/mirrorlist
     fi
 fi
