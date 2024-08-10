@@ -23,7 +23,7 @@ if [ $mirrorsort == y ];then
     if [ "$artix" == y ];then
         sudo sed -i '/http:/d' /etc/pacman.d/mirrorlist.pacnew #Remove HTTP mirrors
         rankmirrors -vwn 5 /etc/pacman.d/mirrorlist.pacnew | sudo tee /etc/pacman.d/mirrorlist
-        printf "Server = https://mirrors.dotsrc.org/artix-linux/repos/\$repo/os/\$arch\nServer = https://mirror.clarkson.edu/artix/linux/repos/$repo/os/$arch\n" | sudo tee -a /etc/pacman.d/mirrorlist
+        printf "Server = https://mirrors.dotsrc.org/artix-linux/repos/\$repo/os/\$arch\nServer = https://mirror.clarkson.edu/artix/linux/repos/\$repo/os/\$arch\n" | sudo tee -a /etc/pacman.d/mirrorlist
         sudo nvim /etc/pacman.d/mirrorlist
         sudo reflector --save /etc/pacman.d/mirrorlist-arch --sort rate -c $country -p https
         printf "Server = https://geo.mirror.pkgbuild.com/\$repo/os/\$arch\nServer = https://mirror.rackspace.com/archlinux/\$repo/os/\$arch\n" | sudo tee -a /etc/pacman.d/mirrorlist-arch
@@ -95,6 +95,6 @@ if [ "$zram" -gt 0 ];then
     sudo sed -i 's;quiet;zswap.enabled=0 quiet;' /etc/default/grub
     printf "/dev/zram0 none swap defaults,pri=100 0 0\n" | sudo tee -a /etc/fstab
 fi
-if grep nvme <<< $(lsblk) && ! grep nvme_load <<< $(cat $bootdir);then
+if grep -q nvme <<< $(lsblk) && ! grep -q nvme_load <<< $(cat $bootdir);then
     sudo sed -i 's/quiet/nvme_load=YES quiet/' $bootdir
 fi

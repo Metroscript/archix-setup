@@ -73,7 +73,7 @@ printf "#Increase ASLR bit entropy\nvm.mmap_rnd_bits=32\nvm.mmap_rnd_compat_bits
 printf "#Improve compatability by increasing memory map count\nvm.max_map_count=2147483642\nvm.swappiness=50" | sudo tee /etc/sysctl.d/99-ram.conf
 if [ "$zram" -gt 0 ];then
     sudo sed -i '/vm.swappiness/d' /etc/sysctl.d/99-ram.conf
-    printf "\n\n#Optimise zram performance\nvm.watermark_boost_factor = 0\nvm.watermark_scale_factor = 125\nvm.page-cluster = 0" | sudo tee -a /etc/sysctl.d/99-ram.conf
+    printf "\n#Optimise zram performance\nvm.watermark_boost_factor = 0\nvm.watermark_scale_factor = 125\nvm.page-cluster = 0" | sudo tee -a /etc/sysctl.d/99-ram.conf
     if [ "$zramcomp" == lz4 ];then
         sudo sed -i 's/vm.page-cluster = 0/vm.page-cluster = 1' /etc/sysctl.d/99-ram.conf
     fi
@@ -224,11 +224,11 @@ if [ "$suas" == y ];then
         ESCALATE=sudo
 fi
 if [ "$artix" != y ];then
-    SERVICES="openntpd cups clamav-freshclam$SERVICES"
+    SERVICES="openntpd cups clamav-freshclam $SERVICES"
     sudo systemctl disable systemd-timesyncd
     sudo systemctl enable $SERVICES
 else
-    SERVICES="ntpd cupsd freshclam$SERVICES"
+    SERVICES="ntpd cupsd freshclam $SERVICES"
     for SERVICE in $SERVICES;do
         if [ $init == dinit ];then
             INITSTART="$ESCALATE ln -s /etc/dinit.d/$SERVICE /etc/dinit.d/boot.d/"
