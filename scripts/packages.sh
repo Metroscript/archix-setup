@@ -14,19 +14,19 @@ if grep -E "Radeon|AMD|ATI" <<< $gpu && grep -E "Intel Corporation|UHD" <<< $gpu
     if [ $games == y ];then
         sudo pacman -S --needed --noconfirm lib32-vulkan-{radeon,intel}
     fi
-    echo 'RUSTICL_ENABLE=radeonsi,iris' | sudo tee -a /etc/environment
+    printf "RUSTICL_ENABLE=radeonsi,iris\n" | sudo tee -a /etc/environment
 elif grep -E "Radeon|AMD|ATI" <<< $gpu;then
    sudo pacman -Syu --noconfirm --needed vulkan-{radeon,icd-loader} mesa{,-vdpau} opencl-rusticl-mesa libva-{mesa,vdpau}-driver
    if [ $games == y ];then
        sudo pacman -S --needed --noconfirm lib32-vulkan-radeon
    fi
-   echo -e 'RUSTICL_ENABLE=radeonsi' | sudo tee -a /etc/environment
+   printf "RUSTICL_ENABLE=radeonsi\n" | sudo tee -a /etc/environment
 elif grep -E "Intel Corporation|UHD" <<< $gpu;then
      sudo pacman -Syu --noconfirm --needed vulkan-{intel,icd-loader} mesa opencl-rusticl-mesa libva-{{intel-driver,utils},vdpau-driver} intel-media-driver
      if [ $games == y ];then
          sudo pacman -S --needed --noconfirm lib32-vulkan-intel
      fi
-     echo -e 'RUSTICL_ENABLE=iris' | sudo tee -a /etc/environment
+     printf "RUSTICL_ENABLE=iris" | sudo tee -a /etc/environment
 fi
 
 #Basic packages
@@ -35,7 +35,7 @@ sudo pacman -Syu --needed --noconfirm $terminal
 #Pipewire
 sudo pacman -Syu --needed --noconfirm pipewire{,-{audio,jack,pulse,alsa,v4l2}} wireplumber gst-plugin-pipewire noise-suppression-for-voice
 
-sudo pacman -Syu --needed --noconfirm man-db wayland xorg-xwayland smartmontools strace v4l2loopback-dkms gnu-free-fonts noto-fonts ttf-{dejavu,liberation,hack-nerd,ubuntu-font-family} bash-language-server cups{,-pk-helper,-pdf} gutenprint net-tools gparted foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley ufw fuse fastfetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{archiver,rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay hunspell{,-en_{au,gb,us}} libpulse keepassxc gst-{libav,plugins-{base,good}} imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq nvme-cli wl-clipboard rng-tools opensc btop mpv lollypop qbittorrent nvtop $shell openntpd libressl earlyoom clamav
+sudo pacman -Syu --needed --noconfirm man-db wayland xorg-xwayland smartmontools strace v4l2loopback-dkms gnu-free-fonts noto-fonts ttf-{dejavu,liberation,hack-nerd,ubuntu-font-family} bash-language-server cups{,-pk-helper,-pdf} gutenprint net-tools gparted foomatic-db-{engine,ppds,gutenprint-ppds} libsecret python-{mutagen,pysmbc} yt-dlp ffmpeg atomicparsley ufw fuse fastfetch arj binutils bzip2 cpio gzip l{hasa,rzip,z{4,ip,op}} p7zip tar un{archiver,rar,zip,arj,ace} xz zip zstd squashfs-tools ripgrep fd bat lsd fortune-mod ponysay hunspell{,-en_{au,gb,us}} libpulse keepassxc gst-{libav,plugins-{base,good}} imagemagick djvulibre ghostscript lib{heif,jxl,raw,rsvg,webp,wmf,xml2,zip} ocl-icd open{exr,jpeg2} wget jq nvme-cli wl-clipboard opensc btop mpv lollypop qbittorrent nvtop $shell openntpd libressl earlyoom clamav
 if [ $apparmr == y ];then
     sudo pacman -S --needed --noconfirm apparmor audit python-{notify2,psutil}
 fi
@@ -147,7 +147,7 @@ if [ "$mkfirm" == y ];then
 fi
 if [ "$makemkv" == y ];then
     paru -S makemkv
-    echo "sg" | sudo tee /etc/modules-load.d/sg.conf
+    printf "sg" | sudo tee /etc/modules-load.d/sg.conf
 fi
 if [ "$artix" == y ];then
     sudo pacman -S --needed --noconfirm librewolf;else
@@ -162,7 +162,7 @@ if ! [ $cron == fcron ];then
 fi
 #Artix Init Services
 if [ "$artix" == y ];then
-    sudo pacman -S --needed --noconfirm ${dm}-$init ${init}-system cups-$init openntpd-$init ufw-$init avahi-$init rng-tools-$init earlyoom-$init clamav-$init
+    sudo pacman -S --needed --noconfirm ${dm}-$init ${init}-system cups-$init openntpd-$init ufw-$init avahi-$init earlyoom-$init clamav-$init
     if [ $apparmr == y ];then
         sudo pacman -S --needed --noconfirm apparmor-$init audit-$init
     fi
@@ -173,12 +173,16 @@ if [ "$artix" == y ];then
        sudo pacman -S --needed --noconfirm libvirt-$init
     fi
     if [ $cron == fcron ];then
-       sudo pacman -Rns --noconfirm cronie{,-$init}
+        if grep -q cronie <<< $(pacman -Qs);then
+            sudo pacman -Rns --noconfirm cronie{,-$init}
+        fi
        sudo pacman -S --needed --noconfirm fcron{,-$init}
     fi
 else
     if [ $cron == fcron ];then
-        sudo pacman -Rns --noconfirm cronie
+        if grep -q cronie <<< $(pacman -Qs);then
+            sudo pacman -Rns --noconfirm cronie
+        fi
         sudo pacman -Syu --needed --noconfirm fcron
     fi
 fi

@@ -48,18 +48,18 @@ if ! grep "autostart" <<< $(ls .config/);then
     mkdir $HOME/.config/autostart
 fi
 if [ "$artix" == y ] && ! [ $de == 1 ];then
-    echo -e "[Desktop Entry]\nExec=/usr/bin/pkill -u \"\$USER\" -x pipewire\|wireplumber ; /usr/bin/pidwait -u \"\$USER\" -x pipewire\|wireplumber ; /usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/sleep 1 ; /usr/bin/wireplumber &\nName=Pipewire\nType=Application\nX-KDE-AutostartScript=true" > ~/.config/autostart/pipewire.desktop
+    printf "[Desktop Entry]\nExec=/usr/bin/pkill -u \"\$USER\" -x pipewire\|wireplumber ; /usr/bin/pidwait -u \"\$USER\" -x pipewire\|wireplumber ; /usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/sleep 1 ; /usr/bin/wireplumber &\nName=Pipewire\nType=Application\nX-KDE-AutostartScript=true" > ~/.config/autostart/pipewire.desktop
     #Not .config/autostart to fix OBS pipewire capture errors
     #mkdir -p ~/.config/plasma-workspace/env/
     #echo -e "#!/bin/sh\n/usr/bin/pkill -u \"\$USER\" -x pipewire\|wireplumber\n/usr/bin/pidwait -u \"\$USER\" -x pipewire\|wireplumber\n/usr/bin/pipewire &\n/usr/bin/pipewire-pulse &\n/usr/bin/sleep 1\n/usr/bin/wireplumber &" > ~/.config/plasma-workspace/env/pipewire.sh
 fi
 if [ $apparmr == y ];then
-    echo -e "[Desktop Entry]\nType=Application\nName=Apparmor Notify\nComment=Notify User of Apparmor Denials\nTryExec=aa-notify\nExec=aa-notify -p -s 1 -w 60 -f /var/log/audit/audit.log\nStartupNotify=false\nNoDisplay=true" > $HOME/.config/autostart/apparmor-notify.desktop
+    printf "[Desktop Entry]\nType=Application\nName=Apparmor Notify\nComment=Notify User of Apparmor Denials\nTryExec=aa-notify\nExec=aa-notify -p -s 1 -w 60 -f /var/log/audit/audit.log\nStartupNotify=false\nNoDisplay=true" > $HOME/.config/autostart/apparmor-notify.desktop
 fi
 if [ $dm == sddm ];then
     if [ $de == 2 ];then
-    echo -e '[Theme]\nCurrent=breeze' | sudo tee /etc/sddm.conf;else
-    echo -e '[Theme]\nCurrent=archlinux-simplyblack' | sudo tee /etc/sddm.conf
+    printf "[Theme]\nCurrent=breeze\n" | sudo tee /etc/sddm.conf;else
+    printf "[Theme]\nCurrent=archlinux-simplyblack\n" | sudo tee /etc/sddm.conf
     fi
 fi
 
@@ -67,13 +67,13 @@ fi
 if ! grep "sysctl.d" <<< $(ls /etc/);then
     sudo mkdir /etc/sysctl.d/
 fi
-echo -e "#Hide kernel pointers\nkernel.kptr_restrict=2\n\n#Restrict access to kernel log\nkernel.dmesg_restrict=1\n\n#Restrict kernel log output during boot\nkernel.printk=3 3 3 3\n\n#Restrict BPF & enable JIT hardening\nkernel.unprivileged_bpf_disabled=1\nnet.core.bpf_jit_harden=2\n\n#Restrict loading of TTY line disciplines\ndev.tty.ldisc_autoload=0\n\n#Mitigate use-after-free flaws\nvm.unprivileged_userfaultfd=0\n\n#Prevent loading of another kernel during runtime\nkernel.kexec_load_disabled=1\n\n#Restrict SysRq access to only through use of the secure attention key (Set to '0' to disable SysRq)\nkernel.sysrq=4\n\n#Restrict use of kernel performance events\nkernel.perf_event_paranoid=3" | sudo tee /etc/sysctl.d/99-kernel-security.conf
-echo -e '#Protect against SYN flood attacks\nnet.ipv4.tcp_syncookies=1\n\n#Drop RST packets in time-wait state\nnet.ipv4.tcp_rfc1337=1\n\n#IP source validation\nnet.ipv4.conf.all.rp_filter=1\nnet.ipv4.conf.default.rp_filter=1\n\n#Disable TCP timestamps\nnet.ipv4.tcp_timestamps=0\n\n#Prevent source routing\nnet.ipv4.conf.all.accept_source_route=0\nnet.ipv4.conf.default.accept_source_route=0\nnet.ipv6.conf.all.accept_source_route=0\nnet.ipv6.conf.default.accept_source_route=0\n\n#IPv6 privacy extentions\nnet.ipv6.conf.all.use_tempaddr = 2\nnet.ipv6.conf.default.use_tempaddr = 2' | sudo tee /etc/sysctl.d/99-network.conf
-echo -e '#Increase ASLR bit entropy\nvm.mmap_rnd_bits=32\nvm.mmap_rnd_compat_bits=16\n\n#Allow sym/hardlinks to be created only when destination is not world-writable or shares the same owner of the source\nfs.protected_symlinks=1\nfs.protected_hardlinks=1\n\n#Prevents access to files in world-writable directories by those who are not the owner\nfs.protected_fifos=2\nfs.protected_regular=2' | sudo tee /etc/sysctl.d/99-userspace.conf
-echo -e '#Improve compatability by increasing memory map count\nvm.max_map_count=2147483642\nvm.swappiness=50' | sudo tee /etc/sysctl.d/99-ram.conf
+printf "#Hide kernel pointers\nkernel.kptr_restrict=2\n\n#Restrict access to kernel log\nkernel.dmesg_restrict=1\n\n#Restrict kernel log output during boot\nkernel.printk=3 3 3 3\n\n#Restrict BPF & enable JIT hardening\nkernel.unprivileged_bpf_disabled=1\nnet.core.bpf_jit_harden=2\n\n#Restrict loading of TTY line disciplines\ndev.tty.ldisc_autoload=0\n\n#Mitigate use-after-free flaws\nvm.unprivileged_userfaultfd=0\n\n#Prevent loading of another kernel during runtime\nkernel.kexec_load_disabled=1\n\n#Restrict SysRq access to only through use of the secure attention key (Set to '0' to disable SysRq)\nkernel.sysrq=4\n\n#Restrict use of kernel performance events\nkernel.perf_event_paranoid=3" | sudo tee /etc/sysctl.d/99-kernel-security.conf
+printf "#Protect against SYN flood attacks\nnet.ipv4.tcp_syncookies=1\n\n#Drop RST packets in time-wait state\nnet.ipv4.tcp_rfc1337=1\n\n#IP source validation\nnet.ipv4.conf.all.rp_filter=1\nnet.ipv4.conf.default.rp_filter=1\n\n#Disable TCP timestamps\nnet.ipv4.tcp_timestamps=0\n\n#Prevent source routing\nnet.ipv4.conf.all.accept_source_route=0\nnet.ipv4.conf.default.accept_source_route=0\nnet.ipv6.conf.all.accept_source_route=0\nnet.ipv6.conf.default.accept_source_route=0\n\n#IPv6 privacy extentions\nnet.ipv6.conf.all.use_tempaddr = 2\nnet.ipv6.conf.default.use_tempaddr = 2" | sudo tee /etc/sysctl.d/99-network.conf
+printf "#Increase ASLR bit entropy\nvm.mmap_rnd_bits=32\nvm.mmap_rnd_compat_bits=16\n\n#Allow sym/hardlinks to be created only when destination is not world-writable or shares the same owner of the source\nfs.protected_symlinks=1\nfs.protected_hardlinks=1\n\n#Prevents access to files in world-writable directories by those who are not the owner\nfs.protected_fifos=2\nfs.protected_regular=2" | sudo tee /etc/sysctl.d/99-userspace.conf
+printf "#Improve compatability by increasing memory map count\nvm.max_map_count=2147483642\nvm.swappiness=50" | sudo tee /etc/sysctl.d/99-ram.conf
 if [ "$zram" -gt 0 ];then
     sudo sed -i '/vm.swappiness/d' /etc/sysctl.d/99-ram.conf
-    echo -e '\n#Optimise zram performance\nvm.watermark_boost_factor = 0\nvm.watermark_scale_factor = 125\nvm.page-cluster = 0' | sudo tee -a /etc/sysctl.d/99-ram.conf
+    printf "\n\n#Optimise zram performance\nvm.watermark_boost_factor = 0\nvm.watermark_scale_factor = 125\nvm.page-cluster = 0" | sudo tee -a /etc/sysctl.d/99-ram.conf
     if [ "$zramcomp" == lz4 ];then
         sudo sed -i 's/vm.page-cluster = 0/vm.page-cluster = 1' /etc/sysctl.d/99-ram.conf
     fi
@@ -103,17 +103,16 @@ if [ $lckdwn -gt 0 ];then
 fi
 sudo grub-mkconfig -o /boot/grub/grub.cfg
 #Enable NetworkManager ipv6 privacy features
-if grep networkmanager <<< $(pacman -Q) && ! grep 'ipv6.ip6-privacy=2' <<< $(cat /etc/NetworkManager/conf.d/*);then
-    echo -e '[connection]\nipv6.ip6-privacy=2' | sudo tee /etc/NetworkManager/conf.d/ipv6-privacy-features.conf
+if grep -q networkmanager <<< $(pacman -Q) && ! grep 'ipv6.ip6-privacy=2' <<< $(cat /etc/NetworkManager/conf.d/*);then
+    printf "[connection]\nipv6.ip6-privacy=2" | sudo tee /etc/NetworkManager/conf.d/ipv6-privacy-features.conf
 fi
 #set machine ID to generic whonix machine ID
-if ! grep b08dfa6083e7567a1921a715000001fb <<< $(cat /etc/machine-id);then
-    echo "b08dfa6083e7567a1921a715000001fb" | sudo tee /etc/machine-id
-    #echo "b08dfa6083e7567a1921a715000001fb" > /var/lib/dbus/machine-id
+if ! grep -q b08dfa6083e7567a1921a715000001fb <<< $(cat /etc/machine-id);then
+    printf "b08dfa6083e7567a1921a715000001fb" | sudo tee /etc/machine-id
 fi
 #Add 5 second delay between failed password attempts
-if ! grep pam_faildelay <<< $(cat /etc/pam.d/system-login);then
-    echo 'auth       optional   pam_faildelay.so   delay=5000000' | sudo tee -a /etc/pam.d/system-login
+if ! grep -q pam_faildelay <<< $(cat /etc/pam.d/system-login);then
+    printf "auth       optional   pam_faildelay.so   delay=5000000\n" | sudo tee -a /etc/pam.d/system-login
 fi
 #Restrict 'su' to :wheel
 sudo sed -i 's/#auth           required        pam_wheel.so use_uid/auth            required        pam_wheel.so use_uid/' /etc/pam.d/su /etc/pam.d/su-l
@@ -158,6 +157,7 @@ fi
 if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
     sudo sed -i -e 's/#unix_sock_group = "libvirt"/unix_sock_group = "libvirt"/' -i -e 's/#unix_sock_ro_perms = "0777"/unix_sock_ro_perms = "0777"/' -i -e 's/#unix_sock_rw_perms = "0770"/unix_sock_rw_perms = "0770"/' /etc/libvirt/libvirtd.conf
     sudo sed -i 's/#group.*/group = "libvirt"/' /etc/libvirt/qemu.conf
+    sudo sed -i 's/#firewall_backend = "nftables"/firewall_backend = "iptables"/' /etc/libvirt/network.conf
     sudo gpasswd -a $USER libvirt
 fi
 if ! grep localtime <<< $(ls /etc/);then
@@ -211,18 +211,25 @@ sudo touch /var/log/clamav/freshclam.log
 if [ "$apparmr" == y ];then
     APPARMOR=" apparmor auditd"
 fi
+if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
+    QEMU=" libvirtd virtlogd"
+fi
 if [ "$LAPTOP" == 1 ];then
     TLP=" tlp"
 fi
+
+SERVICES="ufw $dm $cron earlyoom$APPARMOR$QEMU$TLP"
+if [ "$suas" == y ];then
+        ESCALATE=doas;else
+        ESCALATE=sudo
+fi
 if [ "$artix" != y ];then
+    SERVICES="openntpd cups clamav-freshclam$SERVICES"
     sudo systemctl disable systemd-timesyncd
-    sudo systemctl enable openntpd cups ufw $dm $cron rngd earlyoom freshclam$APPARMOR$TLP
+    sudo systemctl enable $SERVICES
 else
-    for SERVICE in $(echo "ntpd cupsd ufw $dm $cron rngd earlyoom freshclam$APPARMOR$TLP");do
-        if [ "$suas" == y ];then
-            ESCALATE=doas;else
-            ESCALATE=sudo
-        fi
+    SERVICES="ntpd cupsd freshclam$SERVICES"
+    for SERVICE in $SERVICES;do
         if [ $init == dinit ];then
             INITSTART="$ESCALATE ln -s /etc/dinit.d/$SERVICE /etc/dinit.d/boot.d/"
         elif [ $init == runit ];then
@@ -236,39 +243,41 @@ else
     done
 fi
 
-if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
-    if [ "$artix" != y ];then
-        sudo systemctl enable --now libvirtd.service virtlogd.socket
-    else
-        if [ $init == dinit ];then
-            sudo dinitctl enable libvirtd
-            sudo dinitctl enable virtlogd
-        elif [ $init == runit ];then
-            sudo ln -s /etc/runit/sv/libvirtd /run/runit/service
-            sudo ln -s /etc/runit/sv/virtlogd /run/runit/service
-        elif [ $init == openrc ];then
-            sudo rc-update add libvirtd default
-            sudo rc-update add virtlogd default
-        elif [ $init == s6 ];then
-            sudo touch /etc/s6/adminsv/default/contents.d/libvirtd
-            sudo touch /etc/s6/adminsv/default/contents.d/virtlogd
-        fi
+if [ "$grbtrfs" == y ];then
+    if [ "$init" == dinit ];then
+        printf "type            = process\nenv-file        = /etc/default/grub-btrfs/config\ncommand         = /usr/bin/grub-btrfsd --syslog /.snapshots\nsmooth-recovery = true" | sudo tee /etc/dinit.d/grub-btrfsd
+        sudo dinitctl enable grub-btrfsd
     fi
-    sudo virsh net-autostart default
-fi
-
-#Dinit grub-btrfsd service
-if [ "$init" == dinit ] && [ "$grbtrfs" == y ];then
-    echo -e "type            = process\nenv-file        = /etc/default/grub-btrfs/config\ncommand         = /usr/bin/grub-btrfsd --syslog /.snapshots\nsmooth-recovery = true" | sudo tee /etc/dinit.d/grub-btrfsd
-    sudo dinitctl enable grub-btrfsd
+    sudo systemctl enable grub-btrfsd
 fi
 
 if [ "$init" == s6 ];then
     sudo s6-db-reload
 fi
+
+if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
+    if [ "$artix" != y ];then
+        sudo systemctl start libvirtd.service virtlogd.socket
+    else
+        if [ $init == dinit ];then
+            sudo dinitctl start libvirtd
+            sudo dinitctl start virtlogd
+        elif [ $init == runit ];then
+            sudo sv up libvirtd
+            sudo sv up virtlogd
+        elif [ $init == openrc ];then
+            sudo rc-service libvirtd start
+            sudo rc-service virtlogd start
+        elif [ $init == s6 ];then
+            sudo s6-rc -u change libvirtd
+            sudo s6-rc -u change virtlogd
+        fi
+    fi
+    sudo virsh net-autostart default
+fi
 #if ! [ "$artix" == y ];then
 #    sudo systemctl disable systemd-timesyncd
-#    sudo systemctl enable openntpd cups ufw $dm $cron rngd earlyoom freshclam
+#    sudo systemctl enable openntpd cups ufw $dm $cron earlyoom freshclam
 #    if [ $apparmr == y ];then
 #        sudo systemctl enable apparmor auditd
 #    fi
@@ -296,7 +305,7 @@ fi
 #    if [ $apparmr == y ];then
 #        sudo dinitctl enable auditd
 #    fi
-#    sudo dinitctl enable rngd
+#    sudo dinitctl enable
 #    sudo dinitctl enable earlyoom
 #    sudo dinitctl enable power-profiles-daemon
 #    sudo dinitctl enable freshclam

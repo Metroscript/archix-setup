@@ -9,14 +9,14 @@ elif grep -q dracut <<< $(pacman -Q);then
 fi
 
 if ! [ $img == mkinit ];then
-    echo "ERROR: This script doesn't support initramfs generators other than mkinitcpio. Proceed at your own risk."
+    printf "ERROR: This script doesn't support initramfs generators other than mkinitcpio. Proceed at your own risk.\n"
     wait 3
     until [[ "$imgcont" == y ]] || [[ "$imgcont" == n ]];do
         printf "Continue? [y/n]: "
         read imgcont
     done
     if [ $imgcont == n ];then
-        echo EXITING....
+        printf "EXITING....\n"
         exit 1
     fi
 fi
@@ -56,13 +56,12 @@ if grep -q btrfs <<< $(sudo blkid);then
 fi
 
 #Add quiet if not present so later sed calls do not break
-if ! grep quiet $bootdir;then
+if ! grep -q quiet $bootdir;then
     sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="quiet/' $bootdir
 fi
 
 until [[ "$de" == 1 ]] || [[ "$de" == 2 ]];do
-    echo "Which DE/WM would you like to install? 1.Hyprland or 2.KDE Plasma"
-    printf "[1/2]: "
+    printf "Which DE/WM would you like to install? 1.Hyprland or 2.KDE Plasma\n[1/2]: "
     read de
 done
 if [ $de == 1 ] || [ $de == 2 ];then
@@ -85,14 +84,12 @@ until [[ "$opt" == y ]] || [[ "$opt" == n ]];do
 done
 
 until [[ "$mtdi" == y ]] || [[ "$mtdi" == n ]];do
-    echo "Install multithreaded drop-ins for gzip & bzip2?"
-    printf "[y/n]: "
+    printf "Install multithreaded drop-ins for gzip & bzip2?\n[y/n]: "
     read mtdi
 done
 
 until [[ "$terminal" == 1 ]] || [[ "$terminal" == 2 ]] || [[ "$terminal" == 3 ]];do
-    echo "Install 1.Alacritty, 2.Kitty or 3.Wezterm for terminal emulatior?"
-    printf "[1,2,3]: "
+    printf "Install 1.Alacritty, 2.Kitty or 3.Wezterm for terminal emulatior?\n[1,2,3]: "
     read terminal
 done
 if [ $terminal == 1 ];then
@@ -117,8 +114,7 @@ until [[ "$vir" == y ]] || [[ "$vir" == n ]];do
 done
 if [ $vir == y ];then
     until [[ "$virt" == 1 ]] || [[ "$virt" == 2 ]] || [[ "$virt" == 3 ]];do
-        echo "Install 1.Qemu, 2.Virtualbox or 3.Both?"
-        printf " [1/2/3]: "
+        printf "Install 1.Qemu, 2.Virtualbox or 3.Both?\n[1/2/3]: "
         read virt
     done;else
     virt=0
@@ -176,23 +172,19 @@ if [ $games == y ];then
     fi
 fi
 until [[ "$multitools" == y ]] || [[ "$multitools" == n ]];do
-    echo "Install Multimedia tools? (Kdenlive, OBS)"
-    printf "[y/n]: "
+    printf "Install Multimedia tools? (Kdenlive, OBS)\n[y/n]: "
     read multitools
 done
 until [[ "$graphitools" == y ]] || [[ "$graphitools" == n ]];do
-    echo "Install Graphics tools? (GIMP, Blender)"
-    printf "[y/n]: "
+    printf "Install Graphics tools? (GIMP, Blender)\n[y/n]: "
     read graphitools
 done
 until [[ "$office" == y ]] || [[ "$office" == n ]];do
-    echo "Install LibreOffice?"
-    printf "[y/n]: "
+    printf "Install LibreOffice?\n[y/n]: "
     read office
 done
 until [[ "$shell" == 1 ]] || [[ "$shell" == 2 ]] || [[ "$shell" == 3 ]] || [[ "$shell" == 4 ]];do
-    echo "What shell would you like to use? (Use BASH if unsure) 1.BASH 2.FISH 3.ZSH 4.DASH"
-    printf "[1/2/3/4]: "
+    printf "What shell would you like to use? (Use BASH if unsure) 1.BASH 2.FISH 3.ZSH 4.DASH\n[1/2/3/4]: "
     read shell
 done
 if [ $shell == 1 ];then
@@ -204,8 +196,7 @@ elif [ $shell == 3 ];then
     shell=dash
 fi
 until [[ "$cron" == 1 ]] || [[ "$cron" == 2 ]];do
-    echo "Use which cron provider? (If unsure, choose Cronie) 1.Cronie or 2.Fcron"
-    printf "[1/2]: "
+    printf "Use which cron provider? (If unsure, choose Cronie) 1.Cronie or 2.Fcron\n[1/2]: "
     read cron
 done
 if [ $cron == 1 ];then
@@ -222,8 +213,7 @@ until [[ "$ply" == y ]] || [[ "$ply" == n ]];do
 done
 if [ $ply == y ];then
     until [[ "$plytheme" == spinner ]] || [[ "$plytheme" == bgrt ]] || [[ "$plytheme" == breeze ]] || [[ "$plytheme" == breeze-text ]] || [[ "$plytheme" == fade-in ]] || [[ "$plytheme" == glow ]] || [[ "$plytheme" == solar ]] ||  [[ "$plytheme" == spininfinity ]] || [[ "$plytheme" == text ]] || [[ "$plytheme" == tribar ]] || [[ "$plytheme" == script ]] || [[ "$plytheme" == details ]];do
-        echo 'Select Plymouth Theme: spinner, bgrt, breeze, breeze-text, fade-in, glow, solar, spininfinity, spinner, text, tribar, script, details.'
-        printf "Type desired theme name: "
+        printf "Select Plymouth Theme: spinner, bgrt, breeze, breeze-text, fade-in, glow, solar, spininfinity, spinner, text, tribar, script, details.\nType desired theme name: "
         read plytheme
     done
     if [ "$plytheme" == bgrt ];then
@@ -245,16 +235,13 @@ if [ $img == mkinit ];then
 fi
 
 until [[ "$lckdwn" == 0 ]] || [[ "$lckdwn" == 1 ]] || [[ "$lckdwn" == 2 ]];do
-    echo "Enable Kernel lockdown to prevent modification of kernel during runtime? (Prevents non-signed kernel modules from loading & disables hibernation)"
-    echo "0.No (Default) 1.Integrity (Standard Lockdown) 2.Confidential (Changes how RAM is accessed; Can cause issues)"
-    printf "0/1/2: "
+    printf "Enable Kernel lockdown to prevent modification of kernel during runtime? (Prevents non-signed kernel modules from loading & disables hibernation)\n0.No (Default) 1.Integrity (Standard Lockdown) 2.Confidential (Changes how RAM is accessed; Can cause issues)\n[0/1/2]: "
     read lckdwn
 done
 
 if [ $lckdwn -gt 0 ] && [ "$virt" -ge 2 ];then
     until [[ "$lckdwn_con" == y ]] || [[ "$lckdwn_con" == n ]];do
-        echo "VIRTUALBOX KERNEL MODULES DO NOT APPLY WITH LOCKDOWN. ARE YOU SURE YOU STILL WANT TO ENABLE LOCKDOWN?"
-        printf "[y/n]: "
+        printf "VIRTUALBOX KERNEL MODULES DO NOT APPLY WITH LOCKDOWN. ARE YOU SURE YOU STILL WANT TO ENABLE LOCKDOWN?\n[y/n]: "
         read lckdwn_con
     done
     if [ $lckdwn_con == n ];then
@@ -263,15 +250,13 @@ if [ $lckdwn -gt 0 ] && [ "$virt" -ge 2 ];then
 fi
 
 until [[ "$apparmr" == y ]] || [[ "$apparmr" == n ]];do
-    echo "Install apparmor for app sandboxing / Mandatory Access Control configuration?"
-    printf "[y/n]: "
+    printf "Install apparmor for app sandboxing / Mandatory Access Control configuration?\n[y/n]: "
     read apparmr
 done
 
 if ! grep Size <<< $(swapon -s);then
     until [ "$swap" -ge 0 ] >/dev/null 2>&1;do
-        echo "Swapfile size in GiB. Swap at least equal to RAM for hibernation. Put '0' for no swapfile."
-        printf "Size of swapfile in GiB: "
+        printf "Swapfile size in GiB. Swap at least equal to RAM for hibernation. Put '0' for no swapfile.\nSize of swapfile in GiB: "
         read swap
     done
     if [ $swap -gt 0 ];then
@@ -279,8 +264,7 @@ if ! grep Size <<< $(swapon -s);then
             printf "What would you like your swap subvolume to be called?: "
             read swapvol
             until [[ "$swapvolconf" == y ]] || [[ "$swapvolconf" == n ]];do
-                echo "Are you sure you want to call your swap subvolume \"${swapvol}\"?"
-                printf "[y/n]: "
+                printf "Are you sure you want to call your swap subvolume \"${swapvol}\"?\n[y/n]: "
                 read swapvolconf
             done
             if [ "$swapvolconf" == n ];then
@@ -289,8 +273,7 @@ if ! grep Size <<< $(swapon -s);then
                     read swapvol
                     unset swapvolconf
                     until [ "$swapvolconf" == y ] || [ "$swapvolconf" == n ];do
-                        echo "Are you sure you want to call your swap subvolume \"${swapvol}\"?"
-                        printf "[y/n]: "
+                        printf "Are you sure you want to call your swap subvolume \"${swapvol}\"?\n[y/n]: "
                         read swapvolconf
                     done
             done
@@ -306,59 +289,53 @@ if ! grep Size <<< $(swapon -s);then
 fi
 if [ "$btrfs" == y ];then
     until [[ "$snap" == y ]] || [[ "$snap" == n ]];do
-        echo "Install snapper for automated subvolume snapshots?"
-        printf "[y/n]: "
+        printf "Install snapper for automated subvolume snapshots?\n[y/n]: "
         read snap
     done
     if [ $snap == y ];then
-        echo "Additional changes to snapshot configs must be done manually after install"
+        printf "Additional changes to snapshot configs must be done manually after install\n"
         sleep 3
         until [[ "$snapac" == y ]] || [[ "$snapac" == n ]];do
-            echo "Install snap-pac for snapshots on each pacman [in/un]install?"
-            printf "[y/n]: "
+            printf "Install snap-pac for snapshots on each pacman [in/un]install?\n[y/n]: "
             read snapac
         done
         until [[ "$grbtrfs" == y ]] || [[ "$grbtrfs" == n ]];do
-            echo "Install grub-btrfs to boot from snapshots?"
-            printf "[y/n]: "
+            printf "Install grub-btrfs to boot from snapshots?\n[y/n]: "
             read grbtrfs 
         done
         if [ "$grbtrfs" == y ] && [ "$snapac" == y ] && [ "$artix" == y ];then
-            echo "Installing snap-pac-grub for automated grub snapshot boot entries"
+            printf "Installing snap-pac-grub for automated grub snapshot boot entries\n"
         fi
         sleep 5
         if grep .snapshots <<< $(ls -a /);then
-            echo "/.snapshots directory detected! Prevents snapper from installing! /.snapshots will be unmounted and removed until snapper recreates the directory & any fstab entries for /.snapshots will be removed!"
+            printf "/.snapshots directory detected! Prevents snapper from installing! /.snapshots will be unmounted and removed until snapper recreates the directory & any fstab entries for /.snapshots will be removed!\n"
             sleep 5
             snap_dir=y
         fi
         if [ "$suas" == y ];then
-            echo -e 'alias sudo=doas\n' > ~/archix-setup/snapper_conf_gen.sh
+            printf "alias sudo=doas\n" > ~/archix-setup/snapper_conf_gen.sh
         fi
         for submnt in $(findmnt -nt btrfs|cut -d\  -f1|sed 's/─//'|sed 's/├//'|sed 's/└//');do 
             subvol=$(findmnt -nt btrfs|grep "$submnt "|sed 's,.*subvol=/,,')
             unset snap_conf
             until [ "$snap_conf" == y ] || [ "$snap_conf" == n ];do
-                echo "Create snapshot config for subvolume: \"$subvol\" (Mounted at $submnt)?"
-                printf "[y/n]: "
+                printf "Create snapshot config for subvolume: \"$subvol\" (Mounted at $submnt)?\n[y/n]: "
                 read snap_conf
             done
             if [ $snap_conf == y ];then
-                echo -e "sudo snapper -c $subvol create-config $submnt\n" >> ~/archix-setup/snapper_conf_gen.sh
+                printf "sudo snapper -c $subvol create-config $submnt\n\n" >> ~/archix-setup/snapper_conf_gen.sh
             fi
         done
     fi
 fi
 if ! grep zram <<< $(lsblk);then
     until [ "$zram" -ge 0 ] >/dev/null 2>&1;do
-        echo "Would you like to use zram? (Compressed RAM; faster than standard swap) Please input the size in GiB of uncompressed data zram should have. 50% of real RAM is reccommended. Put 0 for no zram"
-        printf "Size of zram in GiB: "
+        printf "Would you like to use zram? (Compressed RAM; faster than standard swap) Please input the size in GiB of uncompressed data zram should have. 50% of real RAM is reccommended. Put 0 for no zram\nSize of zram in GiB: "
         read zram
     done
     if [ "$zram" -gt 0 ];then
         until [[ "$zramc" == 1 ]] || [[ "$zramc" == 2 ]];do
-            echo -e "Please select the compression algorithm for zram. 1. LZ4, 2. ZSTD.\nLZ4 is faster, but less effective. ZSTD is slower, but more effective at compression"
-            printf "1 OR 2: "
+            printf "Please select the compression algorithm for zram. 1. LZ4, 2. ZSTD.\nLZ4 is faster, but less effective. ZSTD is slower, but more effective at compression\n1 OR 2: "
             read zramc
         done
         if [ "$zramc" == 1 ];then

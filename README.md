@@ -48,7 +48,7 @@ __AUR helper:__
 paru
 
 __Other:__
-cups (With gutenprint & foomatic drivers), ufw, fuse, flatpak, apparmor + audit, wl-clipboard, rng-tools (TRNG entropy generation tool), TLP (If detected platform is a laptop or notebook)
+cups (With gutenprint & foomatic drivers), ufw, fuse, flatpak, apparmor + audit, wl-clipboard, TLP (If detected platform is a laptop or notebook)
 
 ### Desktop:
 __Utilities:__

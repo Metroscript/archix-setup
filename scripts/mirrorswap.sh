@@ -23,13 +23,13 @@ if [ $mirrorsort == y ];then
     if [ "$artix" == y ];then
         sudo sed -i '/http:/d' /etc/pacman.d/mirrorlist.pacnew #Remove HTTP mirrors
         rankmirrors -vwn 5 /etc/pacman.d/mirrorlist.pacnew | sudo tee /etc/pacman.d/mirrorlist
-        echo -e 'Server = https://mirrors.dotsrc.org/artix-linux/repos/$repo/os/$arch\nServer = https://mirror.clarkson.edu/artix/linux/repos/$repo/os/$arch' | sudo tee -a /etc/pacman.d/mirrorlist
+        printf "Server = https://mirrors.dotsrc.org/artix-linux/repos/$repo/os/$arch\nServer = https://mirror.clarkson.edu/artix/linux/repos/$repo/os/$arch\n" | sudo tee -a /etc/pacman.d/mirrorlist
         sudo nvim /etc/pacman.d/mirrorlist
         sudo reflector --save /etc/pacman.d/mirrorlist-arch --sort rate -c $country -p https
-        echo -e 'Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch\nServer = https://mirror.rackspace.com/archlinux/$repo/os/$arch' | sudo tee -a /etc/pacman.d/mirrorlist-arch
+        printf "Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch\nServer = https://mirror.rackspace.com/archlinux/$repo/os/$arch\n" | sudo tee -a /etc/pacman.d/mirrorlist-arch
         sudo nvim /etc/pacman.d/mirrorlist-arch;else
         sudo reflector --save /etc/pacman.d/mirrorlist --sort rate -c $country -p https
-        echo -e 'Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch\nServer = https://mirror.rackspace.com/archlinux/$repo/os/$arch' | sudo tee -a /etc/pacman.d/mirrorlist
+        printf "Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch\nServer = https://mirror.rackspace.com/archlinux/$repo/os/$arch\n" | sudo tee -a /etc/pacman.d/mirrorlist
         sudo nvim /etc/pacman.d/mirrorlist
     fi
 fi
@@ -62,13 +62,13 @@ if [ "$swap" -gt 0 ];then
         sudo btrfs filesystem mkswapfile --size ${swap}G --uuid clear ${swapvol}/swapfile
         sudo swapon ${swapvol}/swapfile
         sudo cp /etc/fstab /etc/fstab.bak
-        echo "/$swapvol/swapfile none swap defaults 0 0" | sudo tee -a /etc/fstab
+        printf "/$swapvol/swapfile none swap defaults 0 0\n" | sudo tee -a /etc/fstab
         cd;else
         sudo dd if=/dev/zero of=/.swapfile bs=1M count=$((${swap}*1024)) status=progress
         sudo chmod 600 /.swapfile
         sudo mkswap -U clear /.swapfile
         sudo cp /etc/fstab /etc/fstab.bak
-        echo '/.swapfile none swap defaults 0 0' | sudo tee -a /etc/fstab
+        printf "/.swapfile none swap defaults 0 0\n" | sudo tee -a /etc/fstab
         sudo mount -a
         sudo swapon -a
     fi
@@ -80,7 +80,7 @@ if [ "$swap" -gt 0 ];then
         if ! grep 'sleep.conf.d' <<< $(ls $sdir);then
             sudo mkdir ${sdir}sleep.conf.d
         fi
-        echo -e '[Sleep]\nHibernateDelaySec=60min\nHibernateMode=shutdown' | sudo tee ${sdir}sleep.conf.d/99-Hibernate-Mode-and-Delay.conf
+        printf "[Sleep]\nHibernateDelaySec=60min\nHibernateMode=shutdown\n" | sudo tee ${sdir}sleep.conf.d/99-Hibernate-Mode-and-Delay.conf
         if [ $de == 1 ];then
             sed -i "s/ctl suspend/ctl suspend-then-hibernate \|\| $(if [ "$artix" == y ];then echo loginctl;else echo systemctl;fi) suspend/" ${repo}dotfiles/hypr-rice/wlogout/layout
         fi
@@ -89,11 +89,11 @@ fi
 
 #ZRAM
 if [ "$zram" -gt 0 ];then
-    echo 'zram' | sudo tee /etc/modules-load.d/zram.conf
-    echo 'options zram num_devices=1' | sudo tee /etc/modprobe.d/zram.conf
-    echo ACTION==\"add\", KERNEL==\"zram0\", ATTR{comp_algorithm}=\"${zramcomp}\", ATTR{disksize}=\"${zram}G\", RUN=\"/usr/bin/mkswap -U clear /dev/zram0\" | sudo tee /etc/udev/rules.d/99-zram.rules
+    printf "zram" | sudo tee /etc/modules-load.d/zram.conf
+    printf "options zram num_devices=1" | sudo tee /etc/modprobe.d/zram.conf
+    printf "ACTION==\"add\", KERNEL==\"zram0\", ATTR{comp_algorithm}=\"${zramcomp}\", ATTR{disksize}=\"${zram}G\", RUN=\"/usr/bin/mkswap -U clear /dev/zram0\"" | sudo tee /etc/udev/rules.d/99-zram.rules
     sudo sed -i 's;quiet;zswap.enabled=0 quiet;' /etc/default/grub
-    echo '/dev/zram0 none swap defaults,pri=100 0 0' | sudo tee -a /etc/fstab
+    printf "/dev/zram0 none swap defaults,pri=100 0 0\n" | sudo tee -a /etc/fstab
 fi
 if grep nvme <<< $(lsblk) && ! grep nvme_load <<< $(cat $bootdir);then
     sudo sed -i 's/quiet/nvme_load=YES quiet/' $bootdir
