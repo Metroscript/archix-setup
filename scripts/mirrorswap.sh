@@ -96,5 +96,6 @@ if [ "$zram" -gt 0 ];then
     printf "/dev/zram0 none swap defaults,pri=100 0 0\n" | sudo tee -a /etc/fstab
 fi
 if grep -q nvme <<< $(lsblk) && ! grep -q nvme_load <<< $(cat $bootdir);then
+    sudo pacman -S --needed --noconfirm nvme-cli
     sudo sed -i 's/quiet/nvme_load=YES quiet/' $bootdir
 fi

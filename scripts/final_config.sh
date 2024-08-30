@@ -246,9 +246,9 @@ fi
 if [ "$grbtrfs" == y ];then
     if [ "$init" == dinit ];then
         printf "type            = process\nenv-file        = /etc/default/grub-btrfs/config\ncommand         = /usr/bin/grub-btrfsd --syslog /.snapshots\nsmooth-recovery = true" | sudo tee /etc/dinit.d/grub-btrfsd
-        sudo dinitctl enable grub-btrfsd
+        sudo dinitctl enable grub-btrfsd;else
+        sudo systemctl enable grub-btrfsd
     fi
-    sudo systemctl enable grub-btrfsd
 fi
 
 if [ "$init" == s6 ];then

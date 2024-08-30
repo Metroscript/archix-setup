@@ -37,5 +37,5 @@ alias ytm 'yt-dlp -x -f ba/b --audio-quality 0 --add-metadata --embed-thumbnail'
 alias yt 'yt-dlp -f bv+ba/b --embed-thumbnail --merge-output-format mp4'
 
 #KEK
-alias pony 'fortune|ponysay'
+alias pony 'fortune|ponysay 2> /dev/null'
 end
