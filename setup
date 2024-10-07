@@ -1,6 +1,6 @@
 #!/bin/sh
-repo=archix-setup/
-source ~/${repo}scripts/questions.sh
-source ~/${repo}scripts/mirrorswap.sh
-source ~/${repo}scripts/packages.sh
-source ~/${repo}scripts/final_config.sh
+repo="$HOME"/archix-setup/
+. "$repo"scripts/questions.sh
+. "$repo"scripts/mirrorswap.sh
+. "$repo"scripts/packages.sh
+. "$repo"scripts/final_config.sh

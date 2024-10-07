@@ -45,17 +45,12 @@ family = "Hack Nerd Font Mono"
 style = "Regular"
 
 [font.offset]
-x = -1
+#x = -1
 y = -1
 
 [[keyboard.bindings]]
 action = "ToggleFullscreen"
 key = "F11"
-
-[[keyboard.bindings]]
-action = "SpawnNewInstance"
-key = "Return"
-mods = "Control|Shift"
 
 [[keyboard.bindings]]
 action = "Copy"
@@ -68,24 +63,34 @@ key = "V"
 mods = "Control|Shift"
 
 [[keyboard.bindings]]
-action = "ResetFontSize"
+action = "None"
 key = "Key0"
 mods = "Control"
 
 [[keyboard.bindings]]
-action = "IncreaseFontSize"
+action = "ResetFontSize"
+key = ")"
+mods = "Control|Shift"
+
+[[keyboard.bindings]]
+action = "None"
 key = "Equals"
 mods = "Control"
 
 [[keyboard.bindings]]
 action = "IncreaseFontSize"
 key = "Plus"
+mods = "Control|Shift"
+
+[[keyboard.bindings]]
+action = "None"
+key = "Minus"
 mods = "Control"
 
 [[keyboard.bindings]]
 action = "DecreaseFontSize"
-key = "Minus"
-mods = "Control"
+key = "_"
+mods = "Control|Shift"
 
 [scrolling]
 history = 100000
@@ -105,7 +110,3 @@ title = "Alacritty"
 [window.class]
 general = "Alacritty"
 instance = "Alacritty"
-
-[window.padding]
-x = 2
-y = 2

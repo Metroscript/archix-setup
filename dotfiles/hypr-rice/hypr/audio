@@ -8,7 +8,7 @@ if [ "$2" != up ] && [ "$2" != down ] && [ "$2" != mute ];then
     exit 2
 fi
 
-if [ $1 == volume ];then
+if [ "$1" = volume ];then
     DEVICE=@DEFAULT_AUDIO_SINK@
 else
     DEVICE=@DEFAULT_AUDIO_SOURCE@
@@ -18,36 +18,36 @@ VOL_CHECK=$(wpctl get-volume $DEVICE)
 IDIR=~/.config/mako/icons
 PING="notify-send -h string:x-canonical-private-synchronous:sys-notify -t 2000 -i"
 
-if [ $2 == mute ];then
+if [ "$2" = mute ];then
     wpctl set-mute $DEVICE toggle
-elif grep -q [MUTED] <<< $VOL_CHECK;then
+elif grep -q "[MUTED]" <<< "$VOL_CHECK";then
     wpctl set-mute $DEVICE 0
     UNMUTE=y
-elif [ $2 == up ];then
+elif [ "$2" = up ];then
     wpctl set-volume -l 1.0 $DEVICE 5%+;else
     wpctl set-volume $DEVICE 5%-
 fi
 
 VOLUME=$(wpctl get-volume $DEVICE | cut -d\  -f2-3 | sed 's/0.00/0/' | sed 's/0\.//' | sed 's/1\./1/' | sed 's/05/5/')
 
-if grep -q [MUTED] <<< $VOLUME;then
-    if [ $1 == mic ];then
+if grep -q "[MUTED]" <<< "$VOLUME";then
+    if [ "$1" = mic ];then
         $PING "$IDIR/microphone-mute.png" "Mute";else
         $PING "$IDIR/volume-mute.png" "Mute"
     fi
-elif ! (grep -q 0.00 <<< $VOL_CHECK && [ $2 == down ] && [ "$UNMUTE" != y ]) && ! (grep -q 1.00 <<< $VOL_CHECK && [ $2 != down ] && [ "$UNMUTE" != y ]);then
-    if [ $1 == mic ];then
-        if [ $VOLUME -eq 0 ];then
+elif ! (grep -q 0.00 <<< "$VOL_CHECK" && [ "$2" = down ] && [ "$UNMUTE" != y ]) && ! (grep -q 1.00 <<< "$VOL_CHECK" && [ "$2" != down ] && [ "$UNMUTE" != y ]);then
+    if [ "$1" = mic ];then
+        if [ "$VOLUME" -eq 0 ];then
             ICON=$IDIR/microphone-mute.png;else
             ICON=$IDIR/microphone.png
         fi;else
-        if [ $VOLUME -eq 0 ];then
+        if [ "$VOLUME" -eq 0 ];then
             ICON=$IDIR/volume-mute.png
-        elif [ $VOLUME -ge 0 ] && [ $VOLUME -le 30 ];then
+        elif [ "$VOLUME" -ge 0 ] && [ "$VOLUME" -le 30 ];then
             ICON=$IDIR/volume-low.png
-        elif [ $VOLUME -ge 30 ] && [ $VOLUME -le 60 ];then
+        elif [ "$VOLUME" -ge 30 ] && [ "$VOLUME" -le 60 ];then
             ICON=$IDIR/volume-mid.png
-        elif [ $VOLUME -ge 60 ];then
+        elif [ "$VOLUME" -ge 60 ];then
             ICON=$IDIR/volume-high.png
         fi
     fi

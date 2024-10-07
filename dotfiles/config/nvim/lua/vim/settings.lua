@@ -40,5 +40,9 @@ set.hlsearch = true --Highlight search results
 
     --Forces Split Pages To The Right--
     set.splitright = true
+    
     --Disables Auto Commenting On New Line--
     vim.cmd"autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o"
+    
+    --Resets Cursor to Underline on Exit--
+    vim.cmd"autocmd VimLeave * set guicursor=a:hor100"

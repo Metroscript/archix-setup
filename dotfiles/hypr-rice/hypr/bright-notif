@@ -5,7 +5,7 @@ if [ "$1" != up ] && [ "$1" != down ];then
 fi
 bf=$(brightnessctl -m | cut -d, -f4 | sed 's/%//')
 
-if [ $1 == up ];then
+if [ "$1" = up ];then
     brightnessctl s +5%;else
     brightnessctl s 5%-
 fi
@@ -13,14 +13,14 @@ fi
 id=~/.config/mako/icons/
 ba=$(brightnessctl -m | cut -d, -f4 | sed 's/%//')
 
-if ! ([ $bf -eq 0 ] && [ $1 == down ]) && ! ([ $bf == 100 ] && [ $1 == up ]);then
-    if [ $ba -le 20 ];then
+if ! { [ "$bf" -eq 0 ] && [ "$1" = down ]; } && ! { [ "$bf" = 100 ] && [ "$1" = up ]; };then
+    if [ "$ba" -le 20 ];then
         i="${id}brightness-20.png"
-    elif [ $ba -le 40 ];then
+    elif [ "$ba" -le 40 ];then
         i="${id}brightness-40.png"
-    elif [ $ba -le 60 ];then
+    elif [ "$ba" -le 60 ];then
         i="${id}brightness-60.png"
-    elif [ $ba -le 80 ];then
+    elif [ "$ba" -le 80 ];then
         i="${id}brightness-80.png";else
         i="${id}brightness-100.png"
     fi

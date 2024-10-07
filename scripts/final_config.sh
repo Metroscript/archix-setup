@@ -1,27 +1,27 @@
 #Plymouth check & conf
-if [ $ply == y ];then
-    if [ $img == mkinit ];then
+if [ "$ply" = y ];then
+    if [ "$img" = mkinit ];then
         sudo sed -i 's/udev/udev plymouth/g' /etc/mkinitcpio.conf
     fi
-    if ! grep splash <<< $(cat $bootdir);then
-        sudo sed -i 's/quiet/quiet splash/' $bootdir
+    if ! grep splash "$bootdir";then
+        sudo sed -i 's/quiet/quiet splash/' "$bootdir"
     fi
-    sudo sed -i 's/quiet/plymouth.nolog quiet/' $bootdir
-    if ! [ $plytheme == bgrt ];then
+    sudo sed -i 's/quiet/plymouth.nolog quiet/' "$bootdir"
+    if ! [ "$plytheme" = bgrt ];then
         sudo sed -i -e 's/DialogVerticalAlignment=.382/DialogVerticalAlignment=.75/' -i -e 's/WatermarkVerticalAlignment=.96/WatermarkVerticalAlignment=.5/' /usr/share/plymouth/themes/spinner/spinner.plymouth
     fi
-    if [ "$vr" == y ];then
+    if [ "$vr" = y ];then
         sudo mv /usr/share/plymouth/themes/spinner/watermark.png /usr/share/plymouth
     fi
-    if [ $img == mkinit ];then
-        if [ "$plytheme" == breeze ] || [ "$plytheme" == breeze-text ];then
+    if [ "$img" = mkinit ];then
+        if [ "$plytheme" = breeze ] || [ "$plytheme" = breeze-text ];then
             sudo pacman -Syu --needed --noconfirm breeze-plymouth
         fi
-        sudo plymouth-set-default-theme $plytheme
+        sudo plymouth-set-default-theme "$plytheme"
     fi
 fi
 
-if [ $de == 1 ];then
+if [ "$de" = 1 ];then
     xdg-user-dirs-update
     mv ${repo}dotfiles/hypr-rice/* .config/
     curl -L https://raw.githubusercontent.com/KDE/plasma-workspace/master/menu/desktop/plasma-applications.menu -o $HOME/.config/menus/applications.menu
@@ -40,31 +40,31 @@ if [ $de == 1 ];then
     sudo sed -i 's/Exec=Hyprland/Exec=dbus-run-session Hyprland/' /usr/share/wayland-sessions/hyprland.desktop
     hyprpm update
     hyprpm add https://github.com/hyprwm/hyprland-plugins
-    if [ $games == y ];then
+    if [ "$games" = y ];then
         hyprpm enable csgo-vulkan-fix
     fi
 fi
-if ! grep "autostart" <<< $(ls .config/);then
+if ! [ -d "$HOME"/.config/autostart ];then
     mkdir $HOME/.config/autostart
 fi
-if [ "$artix" == y ] && ! [ $de == 1 ];then
+if [ "$artix" = y ] && ! [ "$de" = 1 ];then
     printf "[Desktop Entry]\nExec=/usr/bin/pkill -u \"\$USER\" -x pipewire\|wireplumber ; /usr/bin/pidwait -u \"\$USER\" -x pipewire\|wireplumber ; /usr/bin/pipewire & /usr/bin/pipewire-pulse & /usr/bin/sleep 1 ; /usr/bin/wireplumber &\nName=Pipewire\nType=Application\nX-KDE-AutostartScript=true" > ~/.config/autostart/pipewire.desktop
     #Not .config/autostart to fix OBS pipewire capture errors
     #mkdir -p ~/.config/plasma-workspace/env/
     #echo -e "#!/bin/sh\n/usr/bin/pkill -u \"\$USER\" -x pipewire\|wireplumber\n/usr/bin/pidwait -u \"\$USER\" -x pipewire\|wireplumber\n/usr/bin/pipewire &\n/usr/bin/pipewire-pulse &\n/usr/bin/sleep 1\n/usr/bin/wireplumber &" > ~/.config/plasma-workspace/env/pipewire.sh
 fi
-if [ $apparmr == y ];then
+if [ "$apparmr" = y ];then
     printf "[Desktop Entry]\nType=Application\nName=Apparmor Notify\nComment=Notify User of Apparmor Denials\nTryExec=aa-notify\nExec=aa-notify -p -s 1 -w 60 -f /var/log/audit/audit.log\nStartupNotify=false\nNoDisplay=true" > $HOME/.config/autostart/apparmor-notify.desktop
 fi
-if [ $dm == sddm ];then
-    if [ $de == 2 ];then
+if [ "$dm" = sddm ];then
+    if [ "$de" = 2 ];then
     printf "[Theme]\nCurrent=breeze\n" | sudo tee /etc/sddm.conf;else
     printf "[Theme]\nCurrent=archlinux-simplyblack\n" | sudo tee /etc/sddm.conf
     fi
 fi
 
 #Sysctl rules
-if ! grep "sysctl.d" <<< $(ls /etc/);then
+if ! [ -d /etc/sysctl.d ];then
     sudo mkdir /etc/sysctl.d/
 fi
 printf "#Hide kernel pointers\nkernel.kptr_restrict=2\n\n#Restrict access to kernel log\nkernel.dmesg_restrict=1\n\n#Restrict kernel log output during boot\nkernel.printk=3 3 3 3\n\n#Restrict BPF & enable JIT hardening\nkernel.unprivileged_bpf_disabled=1\nnet.core.bpf_jit_harden=2\n\n#Restrict loading of TTY line disciplines\ndev.tty.ldisc_autoload=0\n\n#Mitigate use-after-free flaws\nvm.unprivileged_userfaultfd=0\n\n#Prevent loading of another kernel during runtime\nkernel.kexec_load_disabled=1\n\n#Restrict SysRq access to only through use of the secure attention key (Set to '0' to disable SysRq)\nkernel.sysrq=4\n\n#Restrict use of kernel performance events\nkernel.perf_event_paranoid=3" | sudo tee /etc/sysctl.d/99-kernel-security.conf
@@ -74,54 +74,55 @@ printf "#Improve compatability by increasing memory map count\nvm.max_map_count=
 if [ "$zram" -gt 0 ];then
     sudo sed -i '/vm.swappiness/d' /etc/sysctl.d/99-ram.conf
     printf "\n#Optimise zram performance\nvm.watermark_boost_factor = 0\nvm.watermark_scale_factor = 125\nvm.page-cluster = 0" | sudo tee -a /etc/sysctl.d/99-ram.conf
-    if [ "$zramcomp" == lz4 ];then
+    if [ "$zramcomp" = lz4 ];then
         sudo sed -i 's/vm.page-cluster = 0/vm.page-cluster = 1' /etc/sysctl.d/99-ram.conf
     fi
 fi
-if [ $apparmr == y ];then
-    sudo sed -i 's/quiet/lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off random.trust_cpu=off quiet/' $bootdir
+if [ "$apparmr" = y ];then
+    sudo sed -i 's/quiet/lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off random.trust_cpu=off quiet/' "$bootdir"
     #Apparmor audit settings
     sudo sed -i 's/#write-cache/write-cache/' /etc/apparmor/parser.conf
     sudo groupadd -r audit
     sudo gpasswd -a $USER audit
     sudo sed -i '/log_group/a log_group = audit' /etc/audit/auditd.conf;else
-    sudo sed -i 's/quiet/slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off random.trust_cpu=off quiet/' $bootdir
+    sudo sed -i 's/quiet/slab_nomerge init_on_alloc=1 init_on_free=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on vsyscall=none debugfs=off random.trust_cpu=off quiet/' "$bootdir"
 fi
-if ! grep loglevel <<< $(cat $bootdir);then
-    sudo sed -i 's/quiet/loglevel=0 quiet/' $bootdir;else
-    sudo sed -i 's/loglevel=./loglevel=0/' $bootdir
+if ! grep loglevel "$bootdir";then
+    sudo sed -i 's/quiet/loglevel=0 quiet/' "$bootdir";else
+    sudo sed -i 's/loglevel=./loglevel=0/' "$bootdir"
 fi
-if ! grep nowatchdog <<< $(cat $bootdir);then
-    sudo sed -i 's/quiet/nowatchdog quiet/' $bootdir
+if ! grep nowatchdog "$bootdir";then
+    sudo sed -i 's/quiet/nowatchdog quiet/' "$bootdir"
 fi
-if [ $lckdwn -gt 0 ];then
-    if [ $lckdwn == 1 ];then
-        sudo sed -i 's/slab_nomerge/lockdown=integrity slab_nomerge/' $bootdir
+if [ "$lckdwn" -gt 0 ];then
+    if [ "$lckdwn" = 1 ];then
+        sudo sed -i 's/slab_nomerge/lockdown=integrity slab_nomerge/' "$bootdir"
     else
-        sudo sed -i 's/slab_nomerge/lockdown=confidentiality slab_nomerge/' $bootdir
+        sudo sed -i 's/slab_nomerge/lockdown=confidentiality slab_nomerge/' "$bootdir"
     fi
 fi
 sudo grub-mkconfig -o /boot/grub/grub.cfg
+
 #Enable NetworkManager ipv6 privacy features
-if grep -q networkmanager <<< $(pacman -Q) && ! grep 'ipv6.ip6-privacy=2' <<< $(cat /etc/NetworkManager/conf.d/*);then
+if pacman -Q networkmanager && ! grep 'ipv6.ip6-privacy=2' /etc/NetworkManager/conf.d/*;then
     printf "[connection]\nipv6.ip6-privacy=2" | sudo tee /etc/NetworkManager/conf.d/ipv6-privacy-features.conf
 fi
 #set machine ID to generic whonix machine ID
-if ! grep -q b08dfa6083e7567a1921a715000001fb <<< $(cat /etc/machine-id);then
+if ! grep -q b08dfa6083e7567a1921a715000001fb /etc/machine-id;then
     printf "b08dfa6083e7567a1921a715000001fb" | sudo tee /etc/machine-id
 fi
 #Add 5 second delay between failed password attempts
-if ! grep -q pam_faildelay <<< $(cat /etc/pam.d/system-login);then
+if ! grep -q pam_faildelay /etc/pam.d/system-login;then
     printf "auth       optional   pam_faildelay.so   delay=5000000\n" | sudo tee -a /etc/pam.d/system-login
 fi
 #Restrict 'su' to :wheel
 sudo sed -i 's/#auth           required        pam_wheel.so use_uid/auth            required        pam_wheel.so use_uid/' /etc/pam.d/su /etc/pam.d/su-l
 
-if [ "$dotfs" == y ];then
+if [ "$dotfs" = y ];then
     mv ${repo}dotfiles/config/* .config/
-    if [ $terminal == alacritty ];then
+    if [ $terminal = alacritty ];then
         mv ${repo}dotfiles/alacritty .config/
-    elif [ $terminal == kitty ];then
+    elif [ $terminal = kitty ];then
         mv ${repo}dotfiles/kitty .config/
     else
         mv ${repo}dotfiles/wezterm .config/
@@ -133,11 +134,11 @@ if [ "$dotfs" == y ];then
     wget 'https://raw.githubusercontent.com/po5/thumbfast/5fefc9b8e995cf5e663666aa10649af799e60186/player/lua/osc.lua'
     wget 'https://raw.githubusercontent.com/po5/thumbfast/master/thumbfast.lua'
     cd
-    if [ $games == y ] && ! grep Games <<< $(ls);then
+    if [ $games = y ] && ! [ -d "$HOME"/Games ];then
         mkdir Games
-        sudo setcap 'CAP_SYS_NICE=eip' $(which gamescope)
+        #sudo setcap 'CAP_SYS_NICE=eip' $(which gamescope)
     fi
-    if [ "$rlx" == y ];then
+    if [ "$rlx" = y ];then
         mkdir -p .var/app/org.vinegarhq.Vinegar/config/
         mv ${repo}dotfiles/vinegar .var/app/org.vinegarhq.Vinegar/config
     fi
@@ -145,23 +146,23 @@ if [ "$dotfs" == y ];then
     mv ${repo}dotfiles/inputrc .inputrc
 fi
 #Set Shell
-if ! [ $shell == bash ];then
+if [ "$shell" != bash ];then
     chsh -s /bin/$shell
-    if [ $shell == fish ];then
+    if [ "$shell" = fish ];then
         fish -c 'set -U fish_greeting'
-        if [ "$dotfs" == y ];then
+        if [ "$dotfs" = y ];then
             cp ${repo}dotfiles/config.fish ~/.config/fish/
         fi
     fi
 fi
-if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
+if [ "$virt" = 1 ] || [ "$virt" = 3 ];then
     sudo sed -i -e 's/#unix_sock_group = "libvirt"/unix_sock_group = "libvirt"/' -i -e 's/#unix_sock_ro_perms = "0777"/unix_sock_ro_perms = "0777"/' -i -e 's/#unix_sock_rw_perms = "0770"/unix_sock_rw_perms = "0770"/' /etc/libvirt/libvirtd.conf
     sudo sed -i 's/#group.*/group = "libvirt"/' /etc/libvirt/qemu.conf
     sudo sed -i 's/#firewall_backend = "nftables"/firewall_backend = "iptables"/' /etc/libvirt/network.conf
     sudo gpasswd -a $USER libvirt
 fi
-if ! grep localtime <<< $(ls /etc/);then
-    sudo ln -sf /usr/share/zoneinfo/$tz /etc/localtime
+if ! [ -f /etc/localtime ];then
+    sudo ln -sf /usr/share/zoneinfo/"$tz" /etc/localtime
     sudo hwclock --systohc
 fi
 
@@ -171,9 +172,9 @@ sudo sed -i 's/servers 2.arch.pool.ntp.org/servers 0.arch.pool.ntp.org/' /etc/nt
 sudo sed -i -z 's/servers 0.arch.pool.ntp.org/servers 0.arch.pool.ntp.org\nservers 1.arch.pool.ntp.org\nservers 2.arch.pool.ntp.org\nservers 3.arch.pool.ntp.org/' /etc/ntpd.conf
 
 # Configure earlyoom
-if ! [ "$artix" == y ];then
+if [ "$artix" != y ];then
     sudo sed -i s,EARLYOOM_ARGS=".*",EARLYOOM_ARGS="-n -m 5 -s 5 -r 60 --ignore-root-user --avoid '(^|/)(init|Xorg|Xwayland|systemd)'", /etc/default/earlyoom
-elif [ "$init" == dinit ];then
+elif [ "$init" = dinit ];then
     sudo sed -i s,EARLYOOM_ARGS=".*",EARLYOOM_ARGS="-n -m 5 -s 5 -r 60 --ignore-root-user --avoid '(^|/)(init|Xorg|Xwayland|dinit)'", /etc/dinit.d/config/earlyoom.conf
 else
     sudo sed -i s,EARLYOOM_ARGS=".*",EARLYOOM_ARGS="-n -m 5 -s 5 -r 60 --ignore-root-user --avoid '(^|/)(init|Xorg|Xwayland|$init)'", /etc/default/earlyoom
@@ -191,16 +192,16 @@ sudo ufw allow 631
 sudo ufw allow qbittorrent
 
 # Install snap-pac (done late to reduce snapshot count)
-if [ "$snapac" == y ];then
+if [ "$snapac" = y ];then
     export SNAP_PAC_SKIP=y
     sudo pacman -S --noconfirm --needed snap-pac
-    if [ "$grbtrfs" == y ] && ! [ "$init" == dinit ];then
+    if [ "$grbtrfs" = y ] && [ "$init" != dinit ];then
         paru -S snap-pac-grub
     fi
 fi
 
 # Regenerate the initramfs in case it has been updated
-if [ $img == mkinit ];then
+if [ "$img" = mkinit ];then
     sudo mkinitcpio -P
 fi
 
@@ -208,18 +209,18 @@ fi
 sudo touch /var/log/clamav/freshclam.log
 
 #Enable init services
-if [ "$apparmr" == y ];then
+if [ "$apparmr" = y ];then
     APPARMOR=" apparmor auditd"
 fi
-if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
+if [ "$virt" = 1 ] || [ "$virt" = 3 ];then
     QEMU=" libvirtd virtlogd"
 fi
-if [ "$LAPTOP" == 1 ];then
+if [ "$LAPTOP" = 1 ];then
     TLP=" tlp"
 fi
 
 SERVICES="ufw $dm $cron earlyoom$APPARMOR$QEMU$TLP"
-if [ "$suas" == y ];then
+if [ "$suas" = y ];then
         ESCALATE=doas;else
         ESCALATE=sudo
 fi
@@ -243,8 +244,8 @@ else
     done
 fi
 
-if [ "$grbtrfs" == y ];then
-    if [ "$init" == dinit ];then
+if [ "$grbtrfs" = y ];then
+    if [ "$init" = dinit ];then
         printf "type            = process\nenv-file        = /etc/default/grub-btrfs/config\ncommand         = /usr/bin/grub-btrfsd --syslog /.snapshots\nsmooth-recovery = true" | sudo tee /etc/dinit.d/grub-btrfsd
         sudo dinitctl enable grub-btrfsd;else
         sudo systemctl enable grub-btrfsd
@@ -255,20 +256,20 @@ if [ "$init" == s6 ];then
     sudo s6-db-reload
 fi
 
-if [ "$virt" == 1 ] || [ "$virt" == 3 ];then
+if [ "$virt" = 1 ] || [ "$virt" = 3 ];then
     if [ "$artix" != y ];then
         sudo systemctl start libvirtd.service virtlogd.socket
     else
-        if [ $init == dinit ];then
+        if [ "$init" = dinit ];then
             sudo dinitctl start libvirtd
             sudo dinitctl start virtlogd
-        elif [ $init == runit ];then
+        elif [ "$init" = runit ];then
             sudo sv up libvirtd
             sudo sv up virtlogd
-        elif [ $init == openrc ];then
+        elif [ "$init" = openrc ];then
             sudo rc-service libvirtd start
             sudo rc-service virtlogd start
-        elif [ $init == s6 ];then
+        elif [ "$init" = s6 ];then
             sudo s6-rc -u change libvirtd
             sudo s6-rc -u change virtlogd
         fi
@@ -374,11 +375,11 @@ fi
 #fi
 
 rm -rf ${repo}
-if [ $bin == y ];then
+if [ "$bin" = y ];then
     rm -rf paru-bin/;else
     rm -rf paru/
 fi
-if [ "$artix" == y ];then
+if [ "$artix" = y ];then
     loginctl reboot;else
     reboot
 fi
